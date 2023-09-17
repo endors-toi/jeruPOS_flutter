@@ -28,6 +28,7 @@ class _EditarPedidoPageState extends State<EditarPedidoPage> {
 
   @override
   void initState() {
+    // Inicializa el Widget con información existente de la orden
     super.initState();
     for (var producto in widget.orden['productos']) {
       final cantidad = int.parse(producto.split(' ')[0]);
@@ -83,6 +84,7 @@ class _EditarPedidoPageState extends State<EditarPedidoPage> {
                           title: Text('${entry.value} x ${entry.key}'),
                           onTap: () {
                             setState(() {
+                              // Manejo de cantidades de productos
                               if (productosSeleccionados[entry.key]! > 1) {
                                 productosSeleccionados[entry.key] =
                                     productosSeleccionados[entry.key]! - 1;
@@ -105,12 +107,11 @@ class _EditarPedidoPageState extends State<EditarPedidoPage> {
                       DropdownButton(
                         value: mesa,
                         items:
+                            // Genera una lista de 10 strings del 1 al 10 y los convierte en DropdownMenuItems
                             List.generate(10, (index) => (index + 1).toString())
                                 .map<DropdownMenuItem<String>>((String valor) {
                           return DropdownMenuItem<String>(
-                            value: valor,
-                            child: Text(valor),
-                          );
+                              value: valor, child: Text(valor));
                         }).toList(),
                         onChanged: (String? valor) {
                           setState(() {
@@ -127,6 +128,7 @@ class _EditarPedidoPageState extends State<EditarPedidoPage> {
                     child: FilledButton(
                       child: Text('Actualizar Pedido'),
                       onPressed: () {
+                        // Envía un Map con los cambios realizados a la orden
                         final cambiosOrden = {
                           'numeroMesa': mesa,
                           'productos': productosSeleccionados.entries

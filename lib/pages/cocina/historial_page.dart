@@ -10,7 +10,7 @@ class HistorialPage extends StatefulWidget {
 class _HistorialPageState extends State<HistorialPage> {
   @override
   Widget build(BuildContext context) {
-    // Sort the orders in descending order based on the order number
+    // Ordena las órdenes por orden cronológico inverso (con el # de orden)
     pastOrders.sort((a, b) => b['numeroOrden'].compareTo(a['numeroOrden']));
 
     return Scaffold(

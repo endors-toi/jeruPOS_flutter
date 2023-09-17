@@ -22,8 +22,8 @@ class _ComandaPageState extends State<ComandaPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Lógica de re-ordenamiento
     List<Map<String, dynamic>> sortedOrders = [...currentOrders];
-
     if (sortByOrderNumber) {
       sortedOrders.sort((a, b) {
         int numA = b['numeroOrden'] is String
@@ -53,6 +53,7 @@ class _ComandaPageState extends State<ComandaPage> {
           children: [
             Center(
               child: ElevatedButton(
+                // Abre página que construye un Nuevo Pedido y espera el resultado
                 onPressed: () async {
                   final nuevaOrden = await Navigator.push(
                     context,
@@ -60,6 +61,7 @@ class _ComandaPageState extends State<ComandaPage> {
                       builder: (context) => NuevoPedidoPage(),
                     ),
                   );
+                  // Si recibe un resultado, agrega la orden a la lista compartida 'currentOrders' y asigna número de orden
                   if (nuevaOrden != null) {
                     setState(() {
                       numeroOrden++;
@@ -72,6 +74,7 @@ class _ComandaPageState extends State<ComandaPage> {
               ),
             ),
             IconButton(
+              // Botón que alterna entre Orden cronológico y por número de mesa
               icon: Icon(
                 sortByOrderNumber
                     ? MdiIcons.sortClockAscendingOutline
@@ -94,6 +97,7 @@ class _ComandaPageState extends State<ComandaPage> {
               ),
             )
           : GridView.builder(
+              // Muestra las órdenes en formato Grid
               padding: EdgeInsets.all(16.0),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
@@ -110,14 +114,19 @@ class _ComandaPageState extends State<ComandaPage> {
                   paraServir: order['paraServir'],
                   productos: List<String>.from(order['productos']),
                   onButtonPressed: () async {
+                    // Selecciona la orden a editar usando el número de orden
                     int numOrden = order['numeroOrden'];
                     int indexOrden = currentOrders.indexWhere(
                         (orden) => orden['numeroOrden'] == numOrden);
                     Map<String, dynamic> orden = currentOrders[indexOrden];
+
+                    // Envía la orden a la página de edición y espera el resultado
                     final cambiosOrden = await Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
                       return EditarPedidoPage(orden: orden);
                     }));
+
+                    // Si recibe un resultado, actualiza la orden
                     if (cambiosOrden != null) {
                       setState(() {
                         orden['numeroMesa'] = cambiosOrden['numeroMesa'];

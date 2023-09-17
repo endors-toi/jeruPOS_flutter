@@ -56,11 +56,13 @@ class _CocinaPageState extends State<CocinaPage> {
                   paraServir: order['paraServir'],
                   productos: List<String>.from(order['productos']),
                   onButtonPressed: () {
+                    // Selecciona orden a marcar como lista usando el # de orden
                     int numOrden = order['numeroOrden'];
                     int indexOrden = currentOrders.indexWhere(
                         (orden) => orden['numeroOrden'] == numOrden);
                     if (indexOrden != -1) {
                       setState(() {
+                        // Mueve la orden a la lista compartida de pedidos pasados 'pastOrders' y la remueve de 'currentOrders'
                         pastOrders.add(currentOrders[indexOrden]);
                         currentOrders.removeAt(indexOrden);
                       });

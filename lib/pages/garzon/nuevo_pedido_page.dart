@@ -32,6 +32,7 @@ class _NuevoPedidoPageState extends State<NuevoPedidoPage> {
   }
 
   void enviarPedido() {
+    // "Retorna" Map con los datos de la nueva Orden a Comanda
     final nuevaOrden = {
       'numeroMesa': mesa,
       'paraServir': true,
