@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/data/models.dart';
 import 'package:intl/intl.dart';
 
 class NuevoPedidoPage extends StatefulWidget {
@@ -7,22 +8,8 @@ class NuevoPedidoPage extends StatefulWidget {
 }
 
 class _NuevoPedidoPageState extends State<NuevoPedidoPage> {
-  final List<String> productos = [
-    "GM",
-    "GP",
-    "GF",
-    "GC",
-    "GK",
-    "½M",
-    "½P",
-    "½F",
-    "½C",
-    "½K",
-    "MIX",
-    "Tx2"
-  ];
   final Map<String, int> productosSeleccionados = {};
-  String mesa = '1';
+  int mesa = 0;
 
   void addProducto(String producto) {
     setState(() {
@@ -32,16 +19,8 @@ class _NuevoPedidoPageState extends State<NuevoPedidoPage> {
   }
 
   void enviarPedido() {
-    // "Retorna" Map con los datos de la nueva Orden a Comanda
-    final nuevaOrden = {
-      'numeroMesa': mesa,
-      'paraServir': true,
-      'horaPedido': DateFormat('HH:mm').format(DateTime.now()),
-      'productos': productosSeleccionados.entries
-          .map((e) => '${e.value} x ${e.key}')
-          .toList(),
-    };
-    Navigator.pop(context, nuevaOrden);
+    // Orden nuevaOrden = Orden(timestamp: DateTime.now(),idUsuario: ),
+    // Navigator.pop(context, nuevaOrden);
   }
 
   @override
@@ -51,25 +30,25 @@ class _NuevoPedidoPageState extends State<NuevoPedidoPage> {
         margin: EdgeInsets.all(8),
         child: Column(
           children: [
-            Expanded(
-              flex: 2,
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  mainAxisExtent: 50,
-                ),
-                itemCount: productos.length,
-                itemBuilder: (context, index) {
-                  return ElevatedButton(
-                    style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero))),
-                    onPressed: () => addProducto(productos[index]),
-                    child: Text(productos[index]),
-                  );
-                },
-              ),
-            ),
+            // Expanded(
+            //   flex: 2,
+            //   child: GridView.builder(
+            //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            //       crossAxisCount: 4,
+            //       mainAxisExtent: 50,
+            //     ),
+            //     itemCount: productos.length,
+            //     itemBuilder: (context, index) {
+            //       return ElevatedButton(
+            //         style: ButtonStyle(
+            //             shape: MaterialStateProperty.all(RoundedRectangleBorder(
+            //                 borderRadius: BorderRadius.zero))),
+            //         onPressed: () => addProducto(productos[index]),
+            //         child: Text(productos[index]),
+            //       );
+            //     },
+            //   ),
+            // ),
             Expanded(
               flex: 2,
               child: Column(
@@ -102,17 +81,16 @@ class _NuevoPedidoPageState extends State<NuevoPedidoPage> {
                         'Mesa:  ',
                         style: TextStyle(fontSize: 24),
                       ),
-                      DropdownButton(
+                      DropdownButton<int>(
                         value: mesa,
-                        items:
-                            List.generate(10, (index) => (index + 1).toString())
-                                .map<DropdownMenuItem<String>>((String valor) {
-                          return DropdownMenuItem<String>(
+                        items: List.generate(10, (index) => index + 1)
+                            .map<DropdownMenuItem<int>>((int valor) {
+                          return DropdownMenuItem<int>(
                             value: valor,
-                            child: Text(valor),
+                            child: Text(valor.toString()),
                           );
                         }).toList(),
-                        onChanged: (String? valor) {
+                        onChanged: (int? valor) {
                           setState(() {
                             mesa = valor!;
                           });

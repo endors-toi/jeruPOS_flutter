@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/pages/cocina/historial_page.dart';
 import 'package:jerupos/widgets/orden_card.dart';
-import 'package:jerupos/data/orders.dart';
+import 'package:jerupos/data/ordenes.dart';
+import 'package:jerupos/data/models.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class CocinaPage extends StatefulWidget {
@@ -48,25 +49,15 @@ class _CocinaPageState extends State<CocinaPage> {
               ),
               itemCount: currentOrders.length,
               itemBuilder: (context, index) {
-                final order = currentOrders[index];
+                Orden orden = currentOrders[index];
                 return OrdenCard(
-                  numeroOrden: order['numeroOrden'].toString(),
-                  numeroMesa: order['numeroMesa'].toString(),
-                  horaPedido: order['horaPedido'].toString(),
-                  paraServir: order['paraServir'],
-                  productos: List<String>.from(order['productos']),
+                  orden: orden,
                   onButtonPressed: () {
-                    // Selecciona orden a marcar como lista usando el # de orden
-                    int numOrden = order['numeroOrden'];
-                    int indexOrden = currentOrders.indexWhere(
-                        (orden) => orden['numeroOrden'] == numOrden);
-                    if (indexOrden != -1) {
-                      setState(() {
-                        // Mueve la orden a la lista compartida de pedidos pasados 'pastOrders' y la remueve de 'currentOrders'
-                        pastOrders.add(currentOrders[indexOrden]);
-                        currentOrders.removeAt(indexOrden);
-                      });
-                    }
+                    setState(() {
+                      // Mueve la orden a 'pastOrders' y la remueve de 'currentOrders'
+                      pastOrders.add(currentOrders[index]);
+                      currentOrders.removeAt(index);
+                    });
                   },
                   buttonLabel: "Listo",
                 );

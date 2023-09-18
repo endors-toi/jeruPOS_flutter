@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/data/models.dart';
 
 class HistorialTile extends StatelessWidget {
-  final String numeroOrden;
-  final String numeroMesa;
-  final String horaPedido;
-  final bool paraServir;
-  final List<String> productos;
+  final Orden orden;
 
   const HistorialTile({
-    required this.numeroOrden,
-    required this.numeroMesa,
-    required this.horaPedido,
-    required this.paraServir,
-    required this.productos,
+    required this.orden,
   });
 
   @override
@@ -28,16 +21,16 @@ class HistorialTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Text('Orden #$numeroOrden'),
+            Text('Orden #$orden.idOrden'),
             Spacer(),
-            Text('$horaPedido'),
+            Text('$orden.timeStamp'),
           ]),
-          Text(
-              textAlign: TextAlign.right,
-              '${paraServir ? "Mesa $numeroMesa" : "Para Llevar"}'),
-          SizedBox(height: 10.0),
-          Text('Pedido:'),
-          ...productos.map((producto) => Text('$producto')).toList(),
+          // Text(
+          //     textAlign: TextAlign.right,
+          //     '${paraServir ? "Mesa $numeroMesa" : "Para Llevar"}'),
+          // SizedBox(height: 10.0),
+          // Text('Pedido:'),
+          // ...productos.map((producto) => Text('$producto')).toList(),
         ],
       ),
     );

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/data/models.dart';
 import 'package:jerupos/pages/garzon/editar_pedido_page.dart';
 import 'package:jerupos/pages/garzon/nuevo_pedido_page.dart';
 import 'package:jerupos/widgets/orden_card.dart';
-import 'package:jerupos/data/orders.dart';
+import 'package:jerupos/data/ordenes.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class ComandaPage extends StatefulWidget {
@@ -23,26 +24,14 @@ class _ComandaPageState extends State<ComandaPage> {
   @override
   Widget build(BuildContext context) {
     // Lógica de re-ordenamiento
-    List<Map<String, dynamic>> sortedOrders = [...currentOrders];
+    List<Orden> sortedOrders = [...currentOrders];
     if (sortByOrderNumber) {
       sortedOrders.sort((a, b) {
-        int numA = b['numeroOrden'] is String
-            ? int.parse(b['numeroOrden'])
-            : b['numeroOrden'];
-        int numB = a['numeroOrden'] is String
-            ? int.parse(a['numeroOrden'])
-            : a['numeroOrden'];
-        return numA.compareTo(numB);
+        return b.id.compareTo(a.id);
       });
     } else {
       sortedOrders.sort((a, b) {
-        int numA = a['numeroMesa'] is String
-            ? int.parse(a['numeroMesa'])
-            : a['numeroMesa'];
-        int numB = b['numeroMesa'] is String
-            ? int.parse(b['numeroMesa'])
-            : b['numeroMesa'];
-        return numA.compareTo(numB);
+        return a.numeroMesa!.compareTo(b.numeroMesa!);
       });
     }
 
@@ -53,22 +42,22 @@ class _ComandaPageState extends State<ComandaPage> {
           children: [
             Center(
               child: ElevatedButton(
-                // Abre página que construye un Nuevo Pedido y espera el resultado
                 onPressed: () async {
-                  final nuevaOrden = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NuevoPedidoPage(),
-                    ),
-                  );
+                  // Abre página que construye un Nuevo Pedido y espera el resultado
+                  // final nuevaOrden = await Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => NuevoPedidoPage(),
+                  //   ),
+                  // );
                   // Si recibe un resultado, agrega la orden a la lista compartida 'currentOrders' y asigna número de orden
-                  if (nuevaOrden != null) {
-                    setState(() {
-                      numeroOrden++;
-                      nuevaOrden['numeroOrden'] = numeroOrden;
-                      currentOrders.add(nuevaOrden);
-                    });
-                  }
+                  // if (nuevaOrden != null) {
+                  //   setState(() {
+                  //     numeroOrden++;
+                  //     nuevaOrden['numeroOrden'] = numeroOrden;
+                  //     currentOrders.add(nuevaOrden);
+                  //   });
+                  // }
                 },
                 child: Text("Nuevo Pedido"),
               ),
@@ -106,34 +95,25 @@ class _ComandaPageState extends State<ComandaPage> {
               ),
               itemCount: sortedOrders.length,
               itemBuilder: (context, index) {
-                final order = sortedOrders[index];
+                final orden = sortedOrders[index];
                 return OrdenCard(
-                  numeroOrden: order['numeroOrden'].toString(),
-                  numeroMesa: order['numeroMesa'].toString(),
-                  horaPedido: order['horaPedido'].toString(),
-                  paraServir: order['paraServir'],
-                  productos: List<String>.from(order['productos']),
+                  orden: orden,
+                  numeroMesa: orden.numeroMesa.toString(),
                   onButtonPressed: () async {
-                    // Selecciona la orden a editar usando el número de orden
-                    int numOrden = order['numeroOrden'];
-                    int indexOrden = currentOrders.indexWhere(
-                        (orden) => orden['numeroOrden'] == numOrden);
-                    Map<String, dynamic> orden = currentOrders[indexOrden];
-
                     // Envía la orden a la página de edición y espera el resultado
-                    final cambiosOrden = await Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return EditarPedidoPage(orden: orden);
-                    }));
+                    // final cambiosOrden = await Navigator.push(context,
+                    //     MaterialPageRoute(builder: (context) {
+                    //   return EditarPedidoPage(orden: orden);
+                    // }));
 
                     // Si recibe un resultado, actualiza la orden
-                    if (cambiosOrden != null) {
-                      setState(() {
-                        orden['numeroMesa'] = cambiosOrden['numeroMesa'];
-                        orden['productos'] = cambiosOrden['productos'];
-                        currentOrders[indexOrden] = orden;
-                      });
-                    }
+                    // if (cambiosOrden != null) {
+                    //   setState(() {
+                    //     orden.numeroMesa = int.parse(cambiosOrden['numeroMesa']);
+                    //     // orden['productos'] = cambiosOrden['productos'];
+                    //     currentOrders[indexOrden] = orden;
+                    //   });
+                    // }
                   },
                   buttonLabel: "Editar",
                 );

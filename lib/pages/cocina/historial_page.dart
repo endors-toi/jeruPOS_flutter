@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/widgets/historial_tile.dart';
-import 'package:jerupos/data/orders.dart';
+import 'package:jerupos/data/ordenes.dart';
 
 class HistorialPage extends StatefulWidget {
   @override
@@ -11,7 +11,7 @@ class _HistorialPageState extends State<HistorialPage> {
   @override
   Widget build(BuildContext context) {
     // Ordena las órdenes por orden cronológico inverso (con el # de orden)
-    pastOrders.sort((a, b) => b['numeroOrden'].compareTo(a['numeroOrden']));
+    // pastOrders.sort((a, b) => b.idOrden.compareTo(a.idOrden));
 
     return Scaffold(
       appBar: AppBar(
@@ -30,14 +30,8 @@ class _HistorialPageState extends State<HistorialPage> {
               child: ListView.builder(
                 itemCount: pastOrders.length,
                 itemBuilder: (context, index) {
-                  final order = pastOrders[index];
-                  return HistorialTile(
-                    numeroOrden: order['numeroOrden'].toString(),
-                    numeroMesa: order['numeroMesa'].toString(),
-                    horaPedido: order['horaPedido'].toString(),
-                    paraServir: order['paraServir'],
-                    productos: List<String>.from(order['productos']),
-                  );
+                  // final order = pastOrders[index];
+                  // return HistorialTile();
                 },
               ),
             ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/data/models.dart';
 
 class EditarPedidoPage extends StatefulWidget {
-  final Map<String, dynamic> orden;
+  final Orden orden;
   EditarPedidoPage({required this.orden});
 
   @override
@@ -28,14 +29,8 @@ class _EditarPedidoPageState extends State<EditarPedidoPage> {
 
   @override
   void initState() {
-    // Inicializa el Widget con información existente de la orden
+    // Inicializar el Widget con información existente de la orden
     super.initState();
-    for (var producto in widget.orden['productos']) {
-      final cantidad = int.parse(producto.split(' ')[0]);
-      final nombre = producto.split(' ')[2];
-      productosSeleccionados[nombre] = cantidad;
-    }
-    mesa = widget.orden['numeroMesa'];
   }
 
   void addProducto(String producto) {
