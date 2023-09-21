@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/data/models.dart';
 
 class HistorialTile extends StatelessWidget {
-  final Orden orden;
+  // final Orden orden;
 
-  const HistorialTile({
-    required this.orden,
-  });
+  // const HistorialTile({
+  //   required this.orden,
+  // });
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +20,9 @@ class HistorialTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Text('Orden #$orden.idOrden'),
-            Spacer(),
-            Text('$orden.timeStamp'),
+            // Text('Orden #$orden.idOrden'),
+            // Spacer(),
+            // Text('$orden.timeStamp'),
           ]),
           // Text(
           //     textAlign: TextAlign.right,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/data/models.dart';
 import 'package:intl/intl.dart';
 
 class NuevoPedidoPage extends StatefulWidget {
