@@ -17,9 +17,10 @@ class _HomePageState extends State<HomePage> {
 
   static List<Widget> _pages = <Widget>[
     AdminPage(),
+    AdminPage(),
   ];
 
-  void _onItemTapped(int index) {
+  void _onBnbTap(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -39,6 +40,10 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(MdiIcons.shieldCrown),
             label: 'Admin',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(MdiIcons.shieldCrown),
+            label: 'Admin',
+          ),
           // BottomNavigationBarItem(
           //   icon: Icon(Icons.kitchen),
           //   label: 'Cocina',
@@ -53,7 +58,7 @@ class _HomePageState extends State<HomePage> {
           // ),
         ],
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: _onBnbTap,
       ),
     );
   }

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/data/models.dart';
 
 class EditarPedidoPage extends StatefulWidget {
-  final Orden orden;
-  EditarPedidoPage({required this.orden});
+  // final Orden orden;
+  // EditarPedidoPage({required this.orden});
 
   @override
   _EditarPedidoPageState createState() => _EditarPedidoPageState();

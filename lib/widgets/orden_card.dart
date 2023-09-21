@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/data/models.dart';
 
 class OrdenCard extends StatelessWidget {
-  final Orden orden;
+  // final Orden orden;
   final String? numeroMesa;
   final Function()? onButtonPressed;
   final String? buttonLabel;
 
   const OrdenCard({
-    required this.orden,
+    // required this.orden,
     this.numeroMesa,
     this.onButtonPressed,
     this.buttonLabel,
@@ -29,7 +28,7 @@ class OrdenCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text('#$orden.idOrden'),
+                  // Text('#$orden.idOrden'),
                   Spacer(),
                   Text('$numeroMesa ? "Mesa $numeroMesa" : "Para Llevar"}'),
                 ],
@@ -37,7 +36,7 @@ class OrdenCard extends StatelessWidget {
               Row(
                 children: [
                   Spacer(),
-                  Text('$orden.timeStamp'),
+                  // Text('$orden.timeStamp'),
                 ],
               ),
               // Expanded(

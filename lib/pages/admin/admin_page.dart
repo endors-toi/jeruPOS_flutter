@@ -11,6 +11,7 @@ class AdminPage extends StatelessWidget {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
+          title: SizedBox.shrink(),
           bottom: TabBar(
             tabs: [
               Tab(text: 'Ordenes'),
