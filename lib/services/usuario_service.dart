@@ -1,32 +1,26 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:jerupos/models/usuario.dart';
 
 class UsuarioService {
-  static Future<List<Usuario>> getUsuarios() async {
-    final response = await http.get(
-      Uri.parse('${dotenv.env['API_URL']}/usuarios'),
-    );
+  static final uri = Uri.parse('${dotenv.env['API_URL']}/usuarios');
+
+  static Future<List<dynamic>> list() async {
+    final response = await http.get(uri);
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> data = jsonDecode(response.body);
-      List<dynamic> jsonUsuarios = data['usuarios'];
-      List<Usuario> usuarios =
-          jsonUsuarios.map((json) => Usuario.fromJson(json)).toList();
-      return usuarios;
+      return json.decode(response.body);
     } else {
-      throw Exception('Error al cargar usuarios');
+      print(response.statusCode);
+      return [];
     }
   }
 
-  static Future<void> createUsuario(Usuario usuario) async {
+  static Future<void> create(Map<String, dynamic> usuario) async {
     final response = await http.post(
-      Uri.parse('${dotenv.env['API_URL']}/usuarios'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(usuario.toJson()),
+      uri,
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: json.encode(usuario),
     );
 
     if (response.statusCode != 201) {
@@ -35,42 +29,34 @@ class UsuarioService {
     }
   }
 
-  static Future<void> updateUsuario(Usuario usuario, int id) async {
+  static Future<Map<String, dynamic>> get(int id) async {
+    final response = await http.get(uri.replace(path: '${uri.path}/$id'));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Error al cargar usuario');
+    }
+  }
+
+  static Future<void> update(Map<String, dynamic> usuario, int id) async {
     final response = await http.put(
-      Uri.parse('${dotenv.env['API_URL']}/usuarios/$id'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(usuario.toJson()),
+      uri.replace(path: '${uri.path}/$id'),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: json.encode(usuario),
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode != 204) {
       print(response.body);
       throw Exception('Error al editar usuario');
     }
   }
 
-  static Future<void> deleteUsuario(int id) async {
-    final response = await http.delete(
-      Uri.parse('${dotenv.env['API_URL']}/usuarios/$id'),
-    );
+  static Future<void> delete(int id) async {
+    final response = await http.delete(uri.replace(path: '${uri.path}/$id'));
 
     if (response.statusCode != 204) {
       throw Exception('Error al eliminar usuario');
-    }
-  }
-
-  static Future<Usuario> getUsuario(int id) async {
-    final response = await http.get(
-      Uri.parse('${dotenv.env['API_URL']}/usuarios/$id'),
-    );
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> data = jsonDecode(response.body);
-      Usuario usuario = Usuario.fromJson(data['usuario']);
-      return usuario;
-    } else {
-      throw Exception('Error al cargar usuario');
     }
   }
 }

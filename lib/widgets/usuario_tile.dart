@@ -99,7 +99,7 @@ class _UsuarioTileState extends State<UsuarioTile> {
                     ),
                     TextButton(
                       onPressed: () async {
-                        await UsuarioService.deleteUsuario(widget.id);
+                        await UsuarioService.delete(widget.id);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
