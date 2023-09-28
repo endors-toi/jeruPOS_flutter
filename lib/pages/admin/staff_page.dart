@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/admin/usuario_form_page.dart';
 import 'package:jerupos/services/usuario_service.dart';
 import 'package:jerupos/widgets/usuario_tile.dart';
@@ -16,11 +15,11 @@ class _StaffPageState extends State<StaffPage> {
   @override
   void initState() {
     super.initState();
-    _usuariosFuture = _getUsuarios();
+    _usuariosFuture = _listUsuarios();
   }
 
-  Future<List<dynamic>> _getUsuarios() async {
-    return await UsuarioService.getUsuarios();
+  Future<List<dynamic>> _listUsuarios() async {
+    return await UsuarioService.list();
   }
 
   @override
@@ -45,7 +44,7 @@ class _StaffPageState extends State<StaffPage> {
                   MaterialPageRoute(builder: (context) => UsuarioFormPage()),
                 );
                 setState(() {
-                  _usuariosFuture = _getUsuarios();
+                  _usuariosFuture = _listUsuarios();
                 });
               },
               child: Icon(MdiIcons.plus),
@@ -58,24 +57,25 @@ class _StaffPageState extends State<StaffPage> {
         child: FutureBuilder<List<dynamic>>(
           future: _usuariosFuture,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (snapshot.connectionState == ConnectionState.waiting ||
+                !snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
               return Container(
                 child: ListView.builder(
-                  itemCount: snapshot.data?.length ?? 0,
+                  itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
-                    Usuario usuario = snapshot.data![index];
+                    var usuario = snapshot.data![index];
                     return UsuarioTile(
-                      id: usuario.id!,
-                      nombre: usuario.nombre,
-                      apellido: usuario.apellido,
-                      nombreUsuario: usuario.nombreUsuario!,
+                      id: usuario['id'],
+                      nombre: usuario['nombre'],
+                      apellido: usuario['apellido'],
+                      nombreUsuario: usuario['nombre_usuario'],
                       onActionCompleted: () {
                         setState(() {
-                          _usuariosFuture = _getUsuarios();
+                          _usuariosFuture = _listUsuarios();
                         });
                       },
                     );

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/services/usuario_service.dart';
 
 class UsuarioFormPage extends StatefulWidget {
@@ -13,7 +12,6 @@ class UsuarioFormPage extends StatefulWidget {
 class _UsuarioFormPageState extends State<UsuarioFormPage> {
   bool _editMode = false;
 
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _apellidoController = TextEditingController();
   final TextEditingController _contrasenaController = TextEditingController();
@@ -44,11 +42,11 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
     if (widget.id != null) {
       _editMode = true;
 
-      UsuarioService.getUsuario(widget.id!).then((usuario) {
+      UsuarioService.get(widget.id!).then((usuario) {
         setState(() {
-          _nombreController.text = usuario.nombre;
-          _apellidoController.text = usuario.apellido;
-          _idRol = usuario.idRol;
+          _nombreController.text = usuario['nombre'];
+          _apellidoController.text = usuario['apellido'];
+          _idRol = usuario['id_rol'];
         });
       }).catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +63,6 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
         title: Text(_editMode ? 'Editar Usuario' : 'Nuevo Usuario'),
       ),
       body: Form(
-        key: _formKey,
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: SingleChildScrollView(
@@ -105,6 +102,7 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
                 DropdownButtonFormField<int>(
                   decoration: InputDecoration(labelText: 'Rol'),
                   items: dropdownMenuEntries,
+                  value: _editMode ? _idRol : null,
                   onChanged: (value) {
                     setState(() {
                       _idRol = value;
@@ -131,62 +129,53 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
   }
 
   void _crearUsuario() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      try {
-        // Crea objeto usuario
-        Usuario nuevoUsuario = Usuario(
-          nombre: _nombreController.text,
-          apellido: _apellidoController.text,
-          contrasena: _contrasenaController.text,
-          idRol: _idRol!,
-        );
+    try {
+      // Crea objeto usuario
+      Map<String, dynamic> nuevoUsuario = {
+        'nombre': _nombreController.text,
+        'apellido': _apellidoController.text,
+        'contrasena': _contrasenaController.text,
+        'id_rol': _idRol,
+      };
 
-        // Llama al servicio de creación de usuario
-        await UsuarioService.createUsuario(nuevoUsuario);
+      // Llama al servicio de creación de usuario
+      await UsuarioService.create(nuevoUsuario);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Usuario creado exitosamente')),
-        );
-        Navigator.of(context).pop();
-      } catch (e) {
-        // Muestra error si la creación falla
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al crear el usuario: $e')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Usuario creado exitosamente')),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      // Muestra error si la creación falla
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al crear el usuario: $e')),
+      );
     }
   }
 
   void _editarUsuario() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      try {
-        Usuario usuarioEditado = await UsuarioService.getUsuario(widget.id!);
+    try {
+      Map<String, dynamic> datosEditados = {
+        'nombre': _nombreController.text,
+        'apellido': _apellidoController.text,
+        'id_rol': _idRol,
+      };
 
-        if (_nombreController.text != usuarioEditado.nombre) {
-          usuarioEditado.nombre = _nombreController.text;
-        }
-        if (_apellidoController.text != usuarioEditado.apellido) {
-          usuarioEditado.apellido = _apellidoController.text;
-        }
-        if (_contrasenaController.text.isNotEmpty) {
-          usuarioEditado.contrasena = _contrasenaController.text;
-        }
-        if (_idRol != null && _idRol != usuarioEditado.idRol) {
-          usuarioEditado.idRol = _idRol!;
-        }
-
-        await UsuarioService.updateUsuario(usuarioEditado, widget.id!);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Usuario actualizado exitosamente')),
-        );
-
-        Navigator.of(context).pop();
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al actualizar el usuario: $e')),
-        );
+      if (_contrasenaController.text.isNotEmpty) {
+        datosEditados['contrasena'] = _contrasenaController.text;
       }
+
+      await UsuarioService.update(datosEditados, widget.id!);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Usuario actualizado exitosamente')),
+      );
+
+      Navigator.of(context).pop();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al actualizar el usuario: $e')),
+      );
     }
   }
 }
