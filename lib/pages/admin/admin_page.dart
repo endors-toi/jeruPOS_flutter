@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/pages/admin/inventario_page.dart';
+import 'package:jerupos/pages/admin/ingredientes/ingredientes_index_page.dart';
+import 'package:jerupos/pages/admin/ingredientes/ingredientes_show_page.dart';
 import 'package:jerupos/pages/admin/menu_page.dart';
 import 'package:jerupos/pages/admin/ordenes_page.dart';
 import 'package:jerupos/pages/admin/staff_page.dart';
@@ -11,8 +12,13 @@ class AdminPage extends StatelessWidget {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          title: SizedBox.shrink(),
+          backgroundColor: Colors.orange,
+          title: Text('JeruPOS'),
           bottom: TabBar(
+            isScrollable: true,
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.black.withOpacity(0.5),
             tabs: [
               Tab(text: 'Ordenes'),
               Tab(text: 'Menu'),
@@ -25,7 +31,7 @@ class AdminPage extends StatelessWidget {
           children: [
             OrdenesPage(),
             MenuPage(),
-            InventarioPage(),
+            IngredientesIndexPage(),
             StaffPage(),
           ],
         ),
