@@ -34,8 +34,14 @@ class _ComandaPageState extends State<ComandaPage> {
     // }
 
     return Scaffold(
-        appBar: AppBar(
-          title: Stack(
+      appBar: AppBar(
+        title: Text('JeruPOS'),
+        backgroundColor: Colors.orange,
+      ),
+      body: Column(
+        children: [
+          // Moved the Stack here
+          Stack(
             alignment: Alignment.centerRight,
             children: [
               Center(
@@ -61,7 +67,6 @@ class _ComandaPageState extends State<ComandaPage> {
                 ),
               ),
               IconButton(
-                // Botón que alterna entre Orden cronológico y por número de mesa
                 icon: Icon(
                   sortByOrderNumber
                       ? MdiIcons.sortClockAscendingOutline
@@ -72,51 +77,55 @@ class _ComandaPageState extends State<ComandaPage> {
               ),
             ],
           ),
-        ),
-        body: // currentOrders.isEmpty ?
-            Center(
-          child: Text(
-            "Sin pedidos activos",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 40,
+          // Your remaining code
+          Expanded(
+            child: // currentOrders.isEmpty ?
+                Center(
+              child: Text(
+                "Sin pedidos activos",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 40,
+                ),
+              ),
             ),
-          ),
-        )
-        // : GridView.builder(
-        //     // Muestra las órdenes en formato Grid
-        //     padding: EdgeInsets.all(16.0),
-        //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        //       crossAxisCount: 2,
-        //       mainAxisSpacing: 16.0,
-        //       crossAxisSpacing: 16.0,
-        //     ),
-        //     itemCount: sortedOrders.length,
-        //     itemBuilder: (context, index) {
-        //       final orden = sortedOrders[index];
-        //       return OrdenCard(
-        //         orden: orden,
-        //         numeroMesa: orden.numeroMesa.toString(),
-        //         onButtonPressed: () async {
-        //           // Envía la orden a la página de edición y espera el resultado
-        //           // final cambiosOrden = await Navigator.push(context,
-        //           //     MaterialPageRoute(builder: (context) {
-        //           //   return EditarPedidoPage(orden: orden);
-        //           // }));
+            // : GridView.builder(
+            //     // Muestra las órdenes en formato Grid
+            //     padding: EdgeInsets.all(16.0),
+            //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            //       crossAxisCount: 2,
+            //       mainAxisSpacing: 16.0,
+            //       crossAxisSpacing: 16.0,
+            //     ),
+            //     itemCount: sortedOrders.length,
+            //     itemBuilder: (context, index) {
+            //       final orden = sortedOrders[index];
+            //       return OrdenCard(
+            //         orden: orden,
+            //         numeroMesa: orden.numeroMesa.toString(),
+            //         onButtonPressed: () async {
+            //           // Envía la orden a la página de edición y espera el resultado
+            //           // final cambiosOrden = await Navigator.push(context,
+            //           //     MaterialPageRoute(builder: (context) {
+            //           //   return EditarPedidoPage(orden: orden);
+            //           // }));
 
-        //           // Si recibe un resultado, actualiza la orden
-        //           // if (cambiosOrden != null) {
-        //           //   setState(() {
-        //           //     orden.numeroMesa = int.parse(cambiosOrden['numeroMesa']);
-        //           //     // orden['productos'] = cambiosOrden['productos'];
-        //           //     currentOrders[indexOrden] = orden;
-        //           //   });
-        //           // }
-        //         },
-        //         buttonLabel: "Editar",
-        //       );
-        //     },
-        //   ),
-        );
+            //           // Si recibe un resultado, actualiza la orden
+            //           // if (cambiosOrden != null) {
+            //           //   setState(() {
+            //           //     orden.numeroMesa = int.parse(cambiosOrden['numeroMesa']);
+            //           //     // orden['productos'] = cambiosOrden['productos'];
+            //           //     currentOrders[indexOrden] = orden;
+            //           //   });
+            //           // }
+            //         },
+            //         buttonLabel: "Editar",
+            //       );
+            //     },
+            //   ),
+          ),
+        ],
+      ),
+    );
   }
 }

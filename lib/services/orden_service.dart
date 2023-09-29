@@ -2,9 +2,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class UsuarioService {
+class OrdenService {
   static final uri = Uri.parse(
-      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/usuarios');
+      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/ordenes');
 
   static Future<List<dynamic>> list() async {
     final response = await http.get(uri);
@@ -17,16 +17,16 @@ class UsuarioService {
     }
   }
 
-  static Future<void> create(Map<String, dynamic> usuario) async {
+  static Future<void> create(Map<String, dynamic> orden) async {
     final response = await http.post(
       uri,
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: json.encode(usuario),
+      body: json.encode(orden),
     );
 
     if (response.statusCode != 201) {
       print('status code: ${response.statusCode}');
-      throw Exception('Error al crear usuario');
+      throw Exception('Error al crear orden');
     }
   }
 
@@ -36,20 +36,20 @@ class UsuarioService {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Error al cargar usuario');
+      throw Exception('Error al cargar orden');
     }
   }
 
-  static Future<void> update(Map<String, dynamic> usuario, int id) async {
+  static Future<void> update(Map<String, dynamic> orden, int id) async {
     final response = await http.put(
       uri.replace(path: '${uri.path}/$id'),
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: json.encode(usuario),
+      body: json.encode(orden),
     );
 
     if (response.statusCode != 204) {
       print(response.body);
-      throw Exception('Error al editar usuario');
+      throw Exception('Error al editar orden');
     }
   }
 
@@ -57,7 +57,7 @@ class UsuarioService {
     final response = await http.delete(uri.replace(path: '${uri.path}/$id'));
 
     if (response.statusCode != 204) {
-      throw Exception('Error al eliminar usuario');
+      throw Exception('Error al eliminar orden');
     }
   }
 }

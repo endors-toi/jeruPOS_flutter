@@ -14,51 +14,51 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-
-  static List<Widget> _pages = <Widget>[
-    AdminPage(),
-    AdminPage(),
-  ];
-
-  void _onBnbTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  Widget? destino;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: Text('JeruPOS'),
-      ),
-      body: _pages.elementAt(_selectedIndex),
+      body: destino,
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
             icon: Icon(MdiIcons.shieldCrown),
             label: 'Admin',
           ),
           BottomNavigationBarItem(
-            icon: Icon(MdiIcons.shieldCrown),
-            label: 'Admin',
+            icon: Icon(Icons.kitchen),
+            label: 'Cocina',
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.kitchen),
-          //   label: 'Cocina',
-          // ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.person),
-          //   label: 'Garzón',
-          // ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.money_off),
-          //   label: 'Caja',
-          // ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Garzón',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.money_off),
+            label: 'Caja',
+          ),
         ],
         currentIndex: _selectedIndex,
-        onTap: _onBnbTap,
+        onTap: (index) {
+          _selectedIndex = index;
+          switch (index) {
+            case 0:
+              destino = AdminPage();
+              break;
+            case 1:
+              destino = CocinaPage();
+              break;
+            case 2:
+              destino = ComandaPage();
+              break;
+            case 3:
+              destino = CajaPage();
+              break;
+          }
+          setState(() {});
+        },
       ),
     );
   }
