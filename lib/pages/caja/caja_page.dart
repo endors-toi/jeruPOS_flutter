@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/services/pedido_service.dart';
+import 'package:jerupos/widgets/pedido_tile.dart';
 
 class CajaPage extends StatefulWidget {
   @override
@@ -6,12 +8,7 @@ class CajaPage extends StatefulWidget {
 }
 
 class _CajaPageState extends State<CajaPage> {
-  List<Map<String, dynamic>> orders = [
-    {'id': 1, 'status': 'PENDING', 'table': 3},
-    {'id': 2, 'status': 'SERVED', 'table': 1},
-    {'id': 3, 'status': 'PAID', 'table': 2},
-    // Add more orders for demonstration
-  ];
+  Future<List<Map<String, dynamic>>>? futureOrders;
 
   @override
   Widget build(BuildContext context) {
@@ -20,20 +17,22 @@ class _CajaPageState extends State<CajaPage> {
         title: Text('Caja Dashboard'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView.builder(
-          itemCount: orders.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: ListTile(
-                title: Text('Order ID: ${orders[index]['id']}'),
-                subtitle: Text('Table: ${orders[index]['table']}'),
-                trailing: Text('Status: ${orders[index]['status']}'),
-                onTap: () {
-                  // Handle onTap, e.g., navigate to order details
+        padding: EdgeInsets.all(8.0),
+        child: FutureBuilder(
+          future: PedidoService.list(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return PedidoTile(pedido: snapshot.data![index]);
                 },
-              ),
-            );
+              );
+            }
           },
         ),
       ),

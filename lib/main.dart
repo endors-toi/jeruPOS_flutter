@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/pages/home_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:jerupos/pages/login_page.dart';
 
 Future main() async {
   await dotenv.load(fileName: ".env");
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
             ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 255, 145, 0)),
         useMaterial3: true,
       ),
-      home: HomePage(),
+      home: LoginPage(),
     );
   }
 }
