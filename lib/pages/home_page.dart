@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  Widget? destino;
+  Widget destino = AdminPage();
 
   @override
   Widget build(BuildContext context) {
