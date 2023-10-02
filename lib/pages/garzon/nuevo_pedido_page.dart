@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:jerupos/services/producto_service.dart';
 
 class NuevoPedidoPage extends StatefulWidget {
   @override
@@ -8,7 +8,7 @@ class NuevoPedidoPage extends StatefulWidget {
 
 class _NuevoPedidoPageState extends State<NuevoPedidoPage> {
   final Map<String, int> productosSeleccionados = {};
-  int mesa = 0;
+  int mesa = 1;
 
   void addProducto(String producto) {
     setState(() {
@@ -17,10 +17,7 @@ class _NuevoPedidoPageState extends State<NuevoPedidoPage> {
     });
   }
 
-  void enviarPedido() {
-    // Orden nuevaOrden = Orden(timestamp: DateTime.now(),idUsuario: ),
-    // Navigator.pop(context, nuevaOrden);
-  }
+  void enviarPedido() {}
 
   @override
   Widget build(BuildContext context) {
@@ -29,25 +26,39 @@ class _NuevoPedidoPageState extends State<NuevoPedidoPage> {
         margin: EdgeInsets.all(8),
         child: Column(
           children: [
-            // Expanded(
-            //   flex: 2,
-            //   child: GridView.builder(
-            //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            //       crossAxisCount: 4,
-            //       mainAxisExtent: 50,
-            //     ),
-            //     itemCount: productos.length,
-            //     itemBuilder: (context, index) {
-            //       return ElevatedButton(
-            //         style: ButtonStyle(
-            //             shape: MaterialStateProperty.all(RoundedRectangleBorder(
-            //                 borderRadius: BorderRadius.zero))),
-            //         onPressed: () => addProducto(productos[index]),
-            //         child: Text(productos[index]),
-            //       );
-            //     },
-            //   ),
-            // ),
+            Expanded(
+              flex: 2,
+              child: FutureBuilder(
+                future: ProductoService.list(),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    List<dynamic> productos = snapshot.data!;
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        mainAxisExtent: 50,
+                      ),
+                      itemCount: productos.length,
+                      itemBuilder: (context, index) {
+                        return ElevatedButton(
+                          style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.zero))),
+                          onPressed: () =>
+                              addProducto(productos[index]['abreviacion']),
+                          child: Text(productos[index]['abreviacion']),
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+            ),
             Expanded(
               flex: 2,
               child: Column(

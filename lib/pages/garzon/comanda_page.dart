@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/pages/garzon/editar_pedido_page.dart';
 import 'package:jerupos/pages/garzon/nuevo_pedido_page.dart';
-import 'package:jerupos/widgets/orden_card.dart';
+import 'package:jerupos/services/pedido_service.dart';
+import 'package:jerupos/widgets/pedido_card.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class ComandaPage extends StatefulWidget {
@@ -10,7 +10,6 @@ class ComandaPage extends StatefulWidget {
 }
 
 class _ComandaPageState extends State<ComandaPage> {
-  static int numeroOrden = 0;
   bool sortByOrderNumber = true;
 
   void toggleSort() {
@@ -40,28 +39,18 @@ class _ComandaPageState extends State<ComandaPage> {
       ),
       body: Column(
         children: [
-          // Moved the Stack here
           Stack(
             alignment: Alignment.centerRight,
             children: [
               Center(
                 child: ElevatedButton(
-                  onPressed: () async {
-                    // Abre página que construye un Nuevo Pedido y espera el resultado
-                    // final nuevaOrden = await Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => NuevoPedidoPage(),
-                    //   ),
-                    // );
-                    // Si recibe un resultado, agrega la orden a la lista compartida 'currentOrders' y asigna número de orden
-                    // if (nuevaOrden != null) {
-                    //   setState(() {
-                    //     numeroOrden++;
-                    //     nuevaOrden['numeroOrden'] = numeroOrden;
-                    //     currentOrders.add(nuevaOrden);
-                    //   });
-                    // }
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NuevoPedidoPage(),
+                      ),
+                    );
                   },
                   child: Text("Nuevo Pedido"),
                 ),
@@ -77,53 +66,88 @@ class _ComandaPageState extends State<ComandaPage> {
               ),
             ],
           ),
-          // Your remaining code
           Expanded(
-            child: // currentOrders.isEmpty ?
-                Center(
-              child: Text(
-                "Sin pedidos activos",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 40,
-                ),
-              ),
-            ),
-            // : GridView.builder(
-            //     // Muestra las órdenes en formato Grid
-            //     padding: EdgeInsets.all(16.0),
-            //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            //       crossAxisCount: 2,
-            //       mainAxisSpacing: 16.0,
-            //       crossAxisSpacing: 16.0,
-            //     ),
-            //     itemCount: sortedOrders.length,
-            //     itemBuilder: (context, index) {
-            //       final orden = sortedOrders[index];
-            //       return OrdenCard(
-            //         orden: orden,
-            //         numeroMesa: orden.numeroMesa.toString(),
-            //         onButtonPressed: () async {
-            //           // Envía la orden a la página de edición y espera el resultado
-            //           // final cambiosOrden = await Navigator.push(context,
-            //           //     MaterialPageRoute(builder: (context) {
-            //           //   return EditarPedidoPage(orden: orden);
-            //           // }));
+              child: Container(
+            padding: EdgeInsets.all(8),
+            child: FutureBuilder(
+              future: PedidoService.list(),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                    ),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return PedidoCard(
+                        pedido: snapshot.data![index],
+                        onButtonPressed: () {
+                          // Envía la orden a la página de edición y espera el resultado
+                          // final cambiosOrden = Navigator.push(context,
+                          //     MaterialPageRoute(builder: (context) {
+                          //   return EditarPedidoPage(
+                          //       pedido: snapshot.data![index]);
+                          // }));
 
-            //           // Si recibe un resultado, actualiza la orden
-            //           // if (cambiosOrden != null) {
-            //           //   setState(() {
-            //           //     orden.numeroMesa = int.parse(cambiosOrden['numeroMesa']);
-            //           //     // orden['productos'] = cambiosOrden['productos'];
-            //           //     currentOrders[indexOrden] = orden;
-            //           //   });
-            //           // }
-            //         },
-            //         buttonLabel: "Editar",
-            //       );
-            //     },
-            //   ),
-          ),
+                          // // Si recibe un resultado, actualiza la orden
+                          // setState(() {
+                          //   snapshot.data![index].numeroMesa =
+                          //       int.parse(cambiosOrden['numeroMesa']);
+                          //   // orden['productos'] = cambiosOrden['productos'];
+                          //   // currentOrders[indexOrden] = orden;
+                          // });
+                        },
+                        buttonLabel: "Editar",
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          )
+              // !! Este Grid necesita acceso al detalle de la orden.
+
+              // : GridView.builder(
+              //     // Muestra las órdenes en formato Grid
+              //     padding: EdgeInsets.all(16.0),
+              //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              //       crossAxisCount: 2,
+              //       mainAxisSpacing: 16.0,
+              //       crossAxisSpacing: 16.0,
+              //     ),
+              //     itemCount: sortedOrders.length,
+              //     itemBuilder: (context, index) {
+              //       final orden = sortedOrders[index];
+              //       return OrdenCard(
+              //         orden: orden,
+              //         numeroMesa: orden.numeroMesa.toString(),
+              //         onButtonPressed: () async {
+              //           // Envía la orden a la página de edición y espera el resultado
+              //           // final cambiosOrden = await Navigator.push(context,
+              //           //     MaterialPageRoute(builder: (context) {
+              //           //   return EditarPedidoPage(orden: orden);
+              //           // }));
+
+              //           // Si recibe un resultado, actualiza la orden
+              //           // if (cambiosOrden != null) {
+              //           //   setState(() {
+              //           //     orden.numeroMesa = int.parse(cambiosOrden['numeroMesa']);
+              //           //     // orden['productos'] = cambiosOrden['productos'];
+              //           //     currentOrders[indexOrden] = orden;
+              //           //   });
+              //           // }
+              //         },
+              //         buttonLabel: "Editar",
+              //       );
+              //     },
+              //   ),
+              ),
         ],
       ),
     );
