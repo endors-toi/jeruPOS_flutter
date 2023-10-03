@@ -8,13 +8,13 @@ class UsuarioTile extends StatefulWidget {
   final int id;
   final String nombre;
   final String apellido;
-  final String nombreUsuario;
+  final String email;
 
   UsuarioTile({
     required this.id,
     required this.nombre,
     required this.apellido,
-    required this.nombreUsuario,
+    required this.email,
     required this.onActionCompleted,
   });
 
@@ -46,7 +46,7 @@ class _UsuarioTileState extends State<UsuarioTile> {
             child: Text(
               widget.nombre.substring(0, 1),
             ),
-            backgroundColor: Colors.blue,
+            backgroundColor: Color.fromARGB(255, 0, 255, 149),
           ),
           SizedBox(width: 16.0),
           Column(
@@ -60,7 +60,7 @@ class _UsuarioTileState extends State<UsuarioTile> {
                 ),
               ),
               Text(
-                '@${widget.nombreUsuario}',
+                '${widget.email}',
                 style: TextStyle(
                   fontSize: 14.0,
                   color: Colors.grey,

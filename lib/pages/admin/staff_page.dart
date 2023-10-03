@@ -68,11 +68,12 @@ class _StaffPageState extends State<StaffPage> {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     var usuario = snapshot.data![index];
+                    print(snapshot);
                     return UsuarioTile(
                       id: usuario['id'],
                       nombre: usuario['nombre'],
                       apellido: usuario['apellido'],
-                      nombreUsuario: usuario['nombre_usuario'],
+                      email: usuario['email'],
                       onActionCompleted: () {
                         setState(() {
                           _usuariosFuture = _listUsuarios();
