@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class UsuarioService {
   static final uri = Uri.parse(
-      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/accounts/users');
+      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/accounts/users/');
 
   static Future<List<dynamic>> list() async {
     final response = await http.get(uri);
@@ -56,7 +56,8 @@ class UsuarioService {
   static Future<void> delete(int id) async {
     final response = await http.delete(uri.replace(path: '${uri.path}/$id'));
 
-    if (response.statusCode != 204) {
+    if (response.statusCode != 200) {
+      print(response.body);
       throw Exception('Error al eliminar usuario');
     }
   }
