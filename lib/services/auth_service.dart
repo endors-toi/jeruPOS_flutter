@@ -17,8 +17,10 @@ class AuthService {
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final String token = data['access'];
+      final String refreshToken = data['refresh'];
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
+      await prefs.setString('refresh_token', refreshToken);
     } else {
       throw Exception('Failed to login');
     }
