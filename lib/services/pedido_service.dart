@@ -67,7 +67,7 @@ class PedidoService {
     }
   }
 
-  static Future<void> update(Map<String, dynamic> pedido, int id) async {
+  static Future<void> updatePUT(Map<String, dynamic> pedido, int id) async {
     final response = await http.put(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
@@ -75,6 +75,19 @@ class PedidoService {
     );
 
     if (response.statusCode != 204) {
+      print(response.body);
+      throw Exception('Error al editar pedido');
+    }
+  }
+
+  static Future<void> updatePATCH(Map<String, dynamic> pedido, int id) async {
+    final response = await http.patch(
+      uri.replace(path: '${uri.path}$id/'),
+      headers: await _getHeaders(),
+      body: json.encode(pedido),
+    );
+
+    if (response.statusCode != 200) {
       print(response.body);
       throw Exception('Error al editar pedido');
     }

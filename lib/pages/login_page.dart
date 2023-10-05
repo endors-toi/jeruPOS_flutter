@@ -4,107 +4,75 @@ import 'package:jerupos/pages/caja/caja_page.dart';
 import 'package:jerupos/pages/cocina/cocina_page.dart';
 import 'package:jerupos/pages/garzon/comanda_page.dart';
 import 'package:jerupos/services/auth_service.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:jerupos/widgets/login_form.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class LoginPage extends StatelessWidget {
-  final TextEditingController _passCtrl = TextEditingController();
-  final TextEditingController _emailCtrl = TextEditingController();
+class LoginPage extends StatefulWidget {
+  final bool debug = true;
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  int _selectedIndex = 0;
+  Widget body = LoginForm();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.debug) {
+      AuthService.login("d@v.cl", "sudosudo");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Expanded(
-              flex: 1,
-              child:
-                  Container(child: Image.asset('assets/images/logo-min.png'))),
-          Expanded(
-              flex: 2,
-              child: ListView(children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: TextFormField(
-                    controller: _emailCtrl,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                    ),
-                  ),
+      bottomNavigationBar: widget.debug
+          ? BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(MdiIcons.shieldCrown),
+                  label: 'Admin',
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: TextFormField(
-                    controller: _passCtrl,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña',
-                    ),
-                  ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.kitchen),
+                  label: 'Cocina',
                 ),
-                Padding(
-                  padding: EdgeInsets.all(20),
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        await AuthService.login(
-                            _emailCtrl.text, _passCtrl.text);
-                        final String? token = await AuthService.getToken();
-                        if (token != null) {
-                          final Map<String, dynamic> decodedToken =
-                              JwtDecoder.decode(token);
-                          int rol = decodedToken['rol'];
-                          switch (rol) {
-                            case 1:
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ComandaPage()));
-                              break;
-                            case 2:
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => CocinaPage()));
-                              break;
-                            case 3:
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => CajaPage()));
-                              break;
-                            case 4:
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AdminPage()));
-                              break;
-                            default:
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      'No hay páginas asociadas a tu rol.'),
-                                ),
-                              );
-                              break;
-                          }
-                        }
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Error al iniciar sesión. Revisa tus credenciales.'),
-                          ),
-                        );
-                      }
-                    },
-                    child: Text('Login'),
-                  ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  label: 'Garzón',
                 ),
-              ])),
-        ]),
-      ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.money_off),
+                  label: 'Caja',
+                ),
+              ],
+              currentIndex: _selectedIndex,
+              onTap: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                  switch (index) {
+                    case 0:
+                      body = AdminPage();
+                      break;
+                    case 1:
+                      body = CocinaPage();
+                      break;
+                    case 2:
+                      body = ComandaPage();
+                      break;
+                    case 3:
+                      body = CajaPage();
+                      break;
+                  }
+                });
+              },
+            )
+          : null,
+      body: body,
     );
   }
 }
