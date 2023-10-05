@@ -5,10 +5,6 @@ class PedidoCard extends StatelessWidget {
   final Map<String, dynamic> pedido;
   final Function()? onButtonPressed;
   final String? buttonLabel;
-  final Map<String, dynamic> productos = {
-    '1': {'nombre': 'Grande Mixto', 'cantidad': 2, 'precio_salida': 15.99},
-    '2': {'nombre': 'Grande Pollo', 'cantidad': 1, 'precio_salida': 9.99},
-  };
 
   PedidoCard({
     required this.pedido,
@@ -18,6 +14,7 @@ class PedidoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<dynamic> productos = pedido['productos'] ?? [];
     final String fTimestamp =
         DateFormat('hh:mm').format(DateTime.parse(pedido['timestamp']));
     return AspectRatio(
@@ -49,12 +46,12 @@ class PedidoCard extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.builder(
-                  shrinkWrap: true, // this will make it as big as its content
+                  shrinkWrap: true,
                   itemCount: productos.length,
                   itemBuilder: (context, index) {
-                    String key = productos.keys.elementAt(index);
-                    return Text(
-                        "${productos[key]['cantidad']} x ${productos[key]['nombre']}");
+                    var producto = productos[index];
+                    int cantidadFalsa = 2;
+                    return Text("$cantidadFalsa x ${producto['nombre']}");
                   },
                 ),
               ),
