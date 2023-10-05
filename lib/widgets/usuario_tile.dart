@@ -48,25 +48,29 @@ class _UsuarioTileState extends State<UsuarioTile> {
             ),
             backgroundColor: Color.fromARGB(255, 0, 255, 149),
           ),
-          SizedBox(width: 16.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${widget.nombre} ${widget.apellido}',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
+          SizedBox(width: 16),
+          Expanded(
+            flex: 10,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${widget.nombre} ${widget.apellido}',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                '${widget.email}',
-                style: TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.grey,
+                Text(
+                  '${widget.email}',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.grey,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           Spacer(),
           IconButton(

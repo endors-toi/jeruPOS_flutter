@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/pages/garzon/nuevo_pedido_page.dart';
+import 'package:jerupos/pages/garzon/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -20,17 +20,7 @@ class _ComandaPageState extends State<ComandaPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Lógica de re-ordenamiento
-    // List<Orden> sortedOrders = [...currentOrders];
-    // if (sortByOrderNumber) {
-    //   sortedOrders.sort((a, b) {
-    //     return b.id.compareTo(a.id);
-    //   });
-    // } else {
-    //   sortedOrders.sort((a, b) {
-    //     return a.numeroMesa!.compareTo(b.numeroMesa!);
-    //   });
-    // }
+    // Lógica de re-ordenamiento PENDIENTE
 
     return Scaffold(
       appBar: AppBar(
@@ -44,13 +34,16 @@ class _ComandaPageState extends State<ComandaPage> {
             children: [
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => NuevoPedidoPage(),
+                        builder: (context) => PedidoFormPage(),
                       ),
                     );
+                    if (result != null && result == 'refresh') {
+                      setState(() {});
+                    }
                   },
                   child: Text("Nuevo Pedido"),
                 ),
@@ -87,21 +80,17 @@ class _ComandaPageState extends State<ComandaPage> {
                     itemBuilder: (BuildContext context, int index) {
                       return PedidoCard(
                         pedido: snapshot.data![index],
-                        onButtonPressed: () {
-                          // Envía la orden a la página de edición y espera el resultado
-                          // final cambiosOrden = Navigator.push(context,
-                          //     MaterialPageRoute(builder: (context) {
-                          //   return EditarPedidoPage(
-                          //       pedido: snapshot.data![index]);
-                          // }));
-
-                          // // Si recibe un resultado, actualiza la orden
-                          // setState(() {
-                          //   snapshot.data![index].numeroMesa =
-                          //       int.parse(cambiosOrden['numeroMesa']);
-                          //   // orden['productos'] = cambiosOrden['productos'];
-                          //   // currentOrders[indexOrden] = orden;
-                          // });
+                        onButtonPressed: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PedidoFormPage(
+                                  id: snapshot.data![index]['id']),
+                            ),
+                          );
+                          if (result != null && result == 'refresh') {
+                            setState(() {});
+                          }
                         },
                         buttonLabel: "Editar",
                       );
@@ -110,44 +99,7 @@ class _ComandaPageState extends State<ComandaPage> {
                 }
               },
             ),
-          )
-              // !! Este Grid necesita acceso al detalle de la orden.
-
-              // : GridView.builder(
-              //     // Muestra las órdenes en formato Grid
-              //     padding: EdgeInsets.all(16.0),
-              //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              //       crossAxisCount: 2,
-              //       mainAxisSpacing: 16.0,
-              //       crossAxisSpacing: 16.0,
-              //     ),
-              //     itemCount: sortedOrders.length,
-              //     itemBuilder: (context, index) {
-              //       final orden = sortedOrders[index];
-              //       return OrdenCard(
-              //         orden: orden,
-              //         numeroMesa: orden.numeroMesa.toString(),
-              //         onButtonPressed: () async {
-              //           // Envía la orden a la página de edición y espera el resultado
-              //           // final cambiosOrden = await Navigator.push(context,
-              //           //     MaterialPageRoute(builder: (context) {
-              //           //   return EditarPedidoPage(orden: orden);
-              //           // }));
-
-              //           // Si recibe un resultado, actualiza la orden
-              //           // if (cambiosOrden != null) {
-              //           //   setState(() {
-              //           //     orden.numeroMesa = int.parse(cambiosOrden['numeroMesa']);
-              //           //     // orden['productos'] = cambiosOrden['productos'];
-              //           //     currentOrders[indexOrden] = orden;
-              //           //   });
-              //           // }
-              //         },
-              //         buttonLabel: "Editar",
-              //       );
-              //     },
-              //   ),
-              ),
+          )),
         ],
       ),
     );

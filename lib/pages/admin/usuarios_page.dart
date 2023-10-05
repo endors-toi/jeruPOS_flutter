@@ -4,12 +4,12 @@ import 'package:jerupos/services/usuario_service.dart';
 import 'package:jerupos/widgets/usuario_tile.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class StaffPage extends StatefulWidget {
+class UsuariosPage extends StatefulWidget {
   @override
-  State<StaffPage> createState() => _StaffPageState();
+  State<UsuariosPage> createState() => _UsuariosPageState();
 }
 
-class _StaffPageState extends State<StaffPage> {
+class _UsuariosPageState extends State<UsuariosPage> {
   late Future<List<dynamic>> _usuariosFuture;
 
   @override
