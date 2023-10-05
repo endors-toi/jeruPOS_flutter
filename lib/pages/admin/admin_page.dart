@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/pages/admin/pedidos_page.dart';
-import 'package:jerupos/pages/admin/staff_page.dart';
+import 'package:jerupos/pages/admin/usuarios_page.dart';
 
-class AdminPage extends StatelessWidget {
+class AdminPage extends StatefulWidget {
+  @override
+  State<AdminPage> createState() => _AdminPageState();
+}
+
+class _AdminPageState extends State<AdminPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -17,15 +22,15 @@ class AdminPage extends StatelessWidget {
             labelColor: Colors.white,
             unselectedLabelColor: Colors.black.withOpacity(0.5),
             tabs: [
-              Tab(text: 'Ordenes'),
-              Tab(text: 'Staff'),
+              Tab(text: 'Pedidos'),
+              Tab(text: 'Usuarios'),
             ],
           ),
         ),
         body: TabBarView(
           children: [
             PedidosPage(),
-            StaffPage(),
+            UsuariosPage(),
           ],
         ),
       ),
