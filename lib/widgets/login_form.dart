@@ -45,56 +45,7 @@ class LoginForm extends StatelessWidget {
                 padding: EdgeInsets.all(20),
                 child: ElevatedButton(
                   onPressed: () async {
-                    try {
-                      await AuthService.login(_emailCtrl.text, _passCtrl.text);
-                      final String? token = await AuthService.getToken();
-                      if (token != null) {
-                        final Map<String, dynamic> decodedToken =
-                            JwtDecoder.decode(token);
-                        int rol = decodedToken['rol'];
-                        switch (rol) {
-                          case 1:
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ComandaPage()));
-                            break;
-                          case 2:
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CocinaPage()));
-                            break;
-                          case 3:
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CajaPage()));
-                            break;
-                          case 4:
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AdminPage()));
-                            break;
-                          default:
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('No hay páginas asociadas a tu rol.'),
-                              ),
-                            );
-                            break;
-                        }
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              'Error al iniciar sesión. Revisa tus credenciales.'),
-                        ),
-                      );
-                    }
+                    await Login(context);
                   },
                   child: Text('Login'),
                 ),
@@ -102,5 +53,47 @@ class LoginForm extends StatelessWidget {
             ])),
       ]),
     );
+  }
+
+  Future<void> Login(BuildContext context) async {
+    try {
+      await AuthService.login(_emailCtrl.text, _passCtrl.text);
+      final String? token = await AuthService.getToken();
+      if (token != null) {
+        final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+        int rol = decodedToken['rol'];
+        switch (rol) {
+          case 1:
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ComandaPage()));
+            break;
+          case 2:
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => CocinaPage()));
+            break;
+          case 3:
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => CajaPage()));
+            break;
+          case 4:
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => AdminPage()));
+            break;
+          default:
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('No hay páginas asociadas a tu rol.'),
+              ),
+            );
+            break;
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al iniciar sesión. Revisa tus credenciales.'),
+        ),
+      );
+    }
   }
 }

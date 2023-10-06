@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/services/pedido_service.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PedidoTile extends StatelessWidget {
   final Map<String, dynamic> pedido;
-  final Map<String, dynamic> productos = {
-    '1': {'nombre': 'Grande Mixto', 'cantidad': 2, 'precio_salida': 5890},
-    '2': {'nombre': 'Grande Pollo', 'cantidad': 1, 'precio_salida': 5690},
-  };
+  final Function onAction;
 
   PedidoTile({
     required this.pedido,
+    required this.onAction,
   });
 
-  int calcularTotal() {
-    int total = 0;
-    productos.forEach((key, value) {
-      int precioSalida = value['precio_salida'];
-      int cantidad = value['cantidad'];
-      total += precioSalida * cantidad;
+  num calcularTotal() {
+    num total = 0;
+    List<dynamic> productos = pedido['productos'];
+    productos.forEach((producto) {
+      total += producto['precio'] * producto['cantidad'];
     });
     return total;
   }
 
   @override
   Widget build(BuildContext context) {
-    final int total = calcularTotal();
+    final num total = calcularTotal();
     return Container(
         padding: EdgeInsets.all(12),
         margin: EdgeInsets.all(8),
@@ -44,6 +43,18 @@ class PedidoTile extends StatelessWidget {
             ),
             Spacer(),
             Text("${pedido['estado']}"),
+            IconButton(
+              icon: Icon(
+                MdiIcons.checkCircle,
+                color: const Color.fromARGB(255, 33, 161, 38),
+                size: 32,
+              ),
+              onPressed: () async {
+                pedido['estado'] = "PAGADO";
+                await PedidoService.updatePATCH(pedido);
+                onAction();
+              },
+            )
           ],
         ));
   }

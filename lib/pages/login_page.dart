@@ -8,7 +8,7 @@ import 'package:jerupos/widgets/login_form.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class LoginPage extends StatefulWidget {
-  final bool debug = true;
+  final bool debug = false;
 
   @override
   State<LoginPage> createState() => _LoginPageState();

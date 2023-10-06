@@ -29,7 +29,11 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
         setState(() {
           mesa = pedido['mesa'];
           pedido['productos'].forEach((producto) {
-            productosPedido[producto['abreviacion']] = producto['cantidad'];
+            productosPedido.add({
+              'id': producto['producto'],
+              'nombre': producto['nombre'],
+              'cantidad': producto['cantidad']
+            });
           });
         });
       }).catchError((e) {
@@ -43,6 +47,10 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(_editMode ? 'Editar Pedido' : 'Nuevo Pedido'),
+        backgroundColor: Colors.orange,
+      ),
       body: Container(
         margin: EdgeInsets.all(8),
         child: Column(
@@ -179,7 +187,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
       'usuario': await _getUserId(),
       'mesa': mesa,
       'estado': 'PENDIENTE',
-      'productos': productosPedido,
+      'productos_post': productosPedido,
     };
 
     await PedidoService.create(pedido);
@@ -188,11 +196,12 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
 
   void editarPedido() {
     Map<String, dynamic> pedido = {
+      'id': widget.id,
       'mesa': mesa,
-      'productos': productosPedido,
+      'productos_post': productosPedido,
     };
 
-    PedidoService.updatePATCH(pedido, widget.id!);
+    PedidoService.updatePATCH(pedido);
     Navigator.pop(context, 'refresh');
   }
 

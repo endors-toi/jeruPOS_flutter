@@ -80,9 +80,9 @@ class PedidoService {
     }
   }
 
-  static Future<void> updatePATCH(Map<String, dynamic> pedido, int id) async {
+  static Future<void> updatePATCH(Map<String, dynamic> pedido) async {
     final response = await http.patch(
-      uri.replace(path: '${uri.path}$id/'),
+      uri.replace(path: '${uri.path}${pedido['id']}/'),
       headers: await _getHeaders(),
       body: json.encode(pedido),
     );
