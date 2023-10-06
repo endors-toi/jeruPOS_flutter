@@ -4,6 +4,9 @@ import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../../services/auth_service.dart';
+import '../login_page.dart';
+
 class ComandaPage extends StatefulWidget {
   @override
   State<ComandaPage> createState() => _ComandaPageState();
@@ -26,6 +29,47 @@ class _ComandaPageState extends State<ComandaPage> {
       appBar: AppBar(
         title: Text('JeruPOS'),
         backgroundColor: Colors.orange,
+      ),
+      endDrawer: Drawer(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(children: [
+                DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 0, 255, 145),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 40.0,
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        "Usuario",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ]),
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: () {
+                AuthService.logout();
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    (Route route) => false);
+              },
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -70,22 +114,25 @@ class _ComandaPageState extends State<ComandaPage> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
+                  final List<dynamic> pedidosActivos = snapshot.data!
+                      .where((pedido) => pedido['estado'] != 'PAGADO')
+                      .toList();
                   return GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
                     ),
-                    itemCount: snapshot.data!.length,
+                    itemCount: pedidosActivos.length,
                     itemBuilder: (BuildContext context, int index) {
                       return PedidoCard(
-                        pedido: snapshot.data![index],
+                        pedido: pedidosActivos[index],
                         onButtonPressed: () async {
                           final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => PedidoFormPage(
-                                  id: snapshot.data![index]['id']),
+                                  id: pedidosActivos[index]['id']),
                             ),
                           );
                           if (result != null && result == 'refresh') {

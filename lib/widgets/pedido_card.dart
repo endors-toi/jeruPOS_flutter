@@ -50,8 +50,8 @@ class PedidoCard extends StatelessWidget {
                   itemCount: productos.length,
                   itemBuilder: (context, index) {
                     var producto = productos[index];
-                    int cantidadFalsa = 2;
-                    return Text("$cantidadFalsa x ${producto['nombre']}");
+                    return Text(
+                        "${producto['cantidad']} x ${producto['nombre']}");
                   },
                 ),
               ),
