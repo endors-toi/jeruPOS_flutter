@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
+import 'package:jerupos/widgets/user_drawer.dart';
 
 class CocinaPage extends StatefulWidget {
   @override
@@ -11,6 +12,11 @@ class _CocinaPageState extends State<CocinaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('JeruPOS'),
+        backgroundColor: Colors.orange,
+      ),
+      drawer: UserDrawer(),
       body: FutureBuilder(
         future: PedidoService.list(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/pages/admin/pedidos_page.dart';
 import 'package:jerupos/pages/admin/usuarios_page.dart';
+import 'package:jerupos/widgets/user_drawer.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -27,6 +28,7 @@ class _AdminPageState extends State<AdminPage> {
             ],
           ),
         ),
+        drawer: UserDrawer(),
         body: TabBarView(
           children: [
             PedidosPage(),

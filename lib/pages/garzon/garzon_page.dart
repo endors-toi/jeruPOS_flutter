@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:jerupos/pages/garzon/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
+import 'package:jerupos/widgets/user_drawer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class ComandaPage extends StatefulWidget {
+class GarzonPage extends StatefulWidget {
   @override
-  State<ComandaPage> createState() => _ComandaPageState();
+  State<GarzonPage> createState() => _GarzonPageState();
 }
 
-class _ComandaPageState extends State<ComandaPage> {
+class _GarzonPageState extends State<GarzonPage> {
   bool sortByOrderNumber = true;
 
   void toggleSort() {
@@ -20,13 +21,14 @@ class _ComandaPageState extends State<ComandaPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Lógica de re-ordenamiento PENDIENTE
+    // pendiente: Logica reordenamiento (cronologico/por numero mesa)
 
     return Scaffold(
       appBar: AppBar(
         title: Text('JeruPOS'),
         backgroundColor: Colors.orange,
       ),
+      drawer: UserDrawer(),
       body: Column(
         children: [
           Stack(
@@ -70,22 +72,25 @@ class _ComandaPageState extends State<ComandaPage> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
+                  final List<dynamic> pedidosActivos = snapshot.data!
+                      .where((pedido) => pedido['estado'] != 'PAGADO')
+                      .toList();
                   return GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
                     ),
-                    itemCount: snapshot.data!.length,
+                    itemCount: pedidosActivos.length,
                     itemBuilder: (BuildContext context, int index) {
                       return PedidoCard(
-                        pedido: snapshot.data![index],
+                        pedido: pedidosActivos[index],
                         onButtonPressed: () async {
                           final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => PedidoFormPage(
-                                  id: snapshot.data![index]['id']),
+                                  id: pedidosActivos[index]['id']),
                             ),
                           );
                           if (result != null && result == 'refresh') {
