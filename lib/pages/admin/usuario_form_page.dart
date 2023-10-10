@@ -23,11 +23,11 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
   List<DropdownMenuItem<int>> dropdownMenuEntries = [
     DropdownMenuItem(
       child: Text("Cocina"),
-      value: 4,
+      value: 2,
     ),
     DropdownMenuItem(
       child: Text("Garzón"),
-      value: 2,
+      value: 1,
     ),
     DropdownMenuItem(
       child: Text("Caja"),
@@ -35,7 +35,7 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
     ),
     DropdownMenuItem(
       child: Text("Administrador"),
-      value: 1,
+      value: 4,
     ),
   ];
 
@@ -50,7 +50,20 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
           _nombreController.text = usuario['nombre'];
           _apellidoController.text = usuario['apellido'];
           _emailController.text = usuario['email'];
-          _idRol = usuario['rol'];
+          switch (usuario['rol']) {
+            case 'Cocinero':
+              _idRol = 2;
+              break;
+            case 'Garzon':
+              _idRol = 1;
+              break;
+            case 'Cajero':
+              _idRol = 3;
+              break;
+            case 'Admin':
+              _idRol = 4;
+              break;
+          }
         });
       }).catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -191,7 +204,7 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
           'nombre': _nombreController.text,
           'apellido': _apellidoController.text,
           'email': _emailController.text,
-          'rol': _idRol,
+          'rol_id': _idRol,
         };
 
         if (_contrasenaController.text.isNotEmpty) {
