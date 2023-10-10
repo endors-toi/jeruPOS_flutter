@@ -49,7 +49,8 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
         setState(() {
           _nombreController.text = usuario['nombre'];
           _apellidoController.text = usuario['apellido'];
-          _idRol = usuario['id_rol'];
+          _emailController.text = usuario['email'];
+          _idRol = usuario['rol'];
         });
       }).catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -138,7 +139,7 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
                     });
                   },
                   validator: (value) {
-                    if (!_editMode && (value == null)) {
+                    if (value == null) {
                       return 'Por favor seleccione un rol';
                     }
                     return null;
@@ -166,7 +167,7 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
           'email': _emailController.text,
           'password': _contrasenaController.text,
           'password2': _contrasena2Controller.text,
-          'id_rol': _idRol,
+          'rol': _idRol,
         };
 
         await UsuarioService.create(nuevoUsuario);
@@ -189,6 +190,7 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
         Map<String, dynamic> datosEditados = {
           'nombre': _nombreController.text,
           'apellido': _apellidoController.text,
+          'email': _emailController.text,
           'rol': _idRol,
         };
 

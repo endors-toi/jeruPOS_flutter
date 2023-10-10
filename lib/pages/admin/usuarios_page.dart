@@ -51,6 +51,7 @@ class _UsuariosPageState extends State<UsuariosPage> {
             ),
           ],
         ),
+        automaticallyImplyLeading: false,
       ),
       body: Container(
         padding: EdgeInsets.all(8),

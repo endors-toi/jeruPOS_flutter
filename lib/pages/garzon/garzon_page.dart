@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:jerupos/pages/garzon/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
+import 'package:jerupos/widgets/user_drawer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import '../../services/auth_service.dart';
-import '../login_page.dart';
-
-class ComandaPage extends StatefulWidget {
+class GarzonPage extends StatefulWidget {
   @override
-  State<ComandaPage> createState() => _ComandaPageState();
+  State<GarzonPage> createState() => _GarzonPageState();
 }
 
-class _ComandaPageState extends State<ComandaPage> {
+class _GarzonPageState extends State<GarzonPage> {
   bool sortByOrderNumber = true;
 
   void toggleSort() {
@@ -23,54 +21,14 @@ class _ComandaPageState extends State<ComandaPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Lógica de re-ordenamiento PENDIENTE
+    // pendiente: Logica reordenamiento (cronologico/por numero mesa)
 
     return Scaffold(
       appBar: AppBar(
         title: Text('JeruPOS'),
         backgroundColor: Colors.orange,
       ),
-      endDrawer: Drawer(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(children: [
-                DrawerHeader(
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 0, 255, 145),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 40.0,
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "Usuario",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ]),
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: () {
-                AuthService.logout();
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                    (Route route) => false);
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: UserDrawer(),
       body: Column(
         children: [
           Stack(

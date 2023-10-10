@@ -20,6 +20,7 @@ class _PedidosPageState extends State<PedidosPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Pedidos Actuales'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: EdgeInsets.all(8.0),

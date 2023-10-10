@@ -76,7 +76,7 @@ class UsuarioService {
       body: json.encode(usuario),
     );
 
-    if (response.statusCode != 204) {
+    if (response.statusCode != 200) {
       print(response.body);
       throw Exception('Error al editar usuario');
     }
@@ -92,5 +92,14 @@ class UsuarioService {
       print(response.body);
       throw Exception('Error al eliminar usuario');
     }
+  }
+
+  static Future<Map<String, dynamic>> obtenerUsuario() async {
+    final String? token = await AuthService.getToken();
+    if (token != null) {
+      final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      return decodedToken;
+    }
+    return {};
   }
 }
