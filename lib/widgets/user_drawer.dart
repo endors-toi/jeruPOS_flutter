@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/pages/cocina/historial_page.dart';
 import 'package:jerupos/pages/login_page.dart';
 import 'package:jerupos/services/auth_service.dart';
 import 'package:jerupos/services/usuario_service.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class UserDrawer extends StatefulWidget {
   @override
@@ -59,6 +61,14 @@ class _UserDrawerState extends State<UserDrawer> {
                         ],
                       ),
                     ),
+              ListTile(
+                leading: Icon(MdiIcons.history),
+                title: Text('Historial de Pedidos'),
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HistorialPage()));
+                },
+              ),
             ]),
           ),
           ListTile(
