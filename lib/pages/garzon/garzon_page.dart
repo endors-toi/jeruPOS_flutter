@@ -12,17 +12,37 @@ class GarzonPage extends StatefulWidget {
 
 class _GarzonPageState extends State<GarzonPage> {
   bool sortByOrderNumber = true;
+  List<dynamic> pedidos = [];
+  List<dynamic> pedidosActivos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    PedidoService.list().then((value) {
+      setState(() {
+        pedidos.addAll(value);
+        pedidosActivos =
+            pedidos.where((pedido) => pedido['estado'] != 'PAGADO').toList();
+        pedidosActivos.sort((a, b) => (b['id'] ?? 0).compareTo(a['id'] ?? 0));
+      });
+    });
+  }
 
   void toggleSort() {
     setState(() {
       sortByOrderNumber = !sortByOrderNumber;
+      pedidosActivos.sort((a, b) {
+        if (sortByOrderNumber) {
+          return (b['id'] ?? 0).compareTo(a['id'] ?? 0);
+        } else {
+          return (a['mesa'] ?? 0).compareTo(b['mesa'] ?? 0);
+        }
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // pendiente: Logica reordenamiento (cronologico/por numero mesa)
-
     return Scaffold(
       appBar: AppBar(
         title: Text('JeruPOS'),
@@ -31,23 +51,27 @@ class _GarzonPageState extends State<GarzonPage> {
       drawer: UserDrawer(),
       body: Column(
         children: [
-          Stack(
-            alignment: Alignment.centerRight,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Center(
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PedidoFormPage(),
-                      ),
-                    );
-                    if (result != null && result == 'refresh') {
-                      setState(() {});
-                    }
-                  },
-                  child: Text("Nuevo Pedido"),
+              SizedBox(width: 56),
+              Expanded(
+                child: Center(
+                  child: ElevatedButton(
+                    style: ButtonStyle(elevation: MaterialStateProperty.all(4)),
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PedidoFormPage(),
+                        ),
+                      );
+                      if (result != null && result == 'refresh') {
+                        setState(() {});
+                      }
+                    },
+                    child: Text("Nuevo Pedido"),
+                  ),
                 ),
               ),
               IconButton(
@@ -64,44 +88,30 @@ class _GarzonPageState extends State<GarzonPage> {
           Expanded(
               child: Container(
             padding: EdgeInsets.all(8),
-            child: FutureBuilder(
-              future: PedidoService.list(),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  final List<dynamic> pedidosActivos = snapshot.data!
-                      .where((pedido) => pedido['estado'] != 'PAGADO')
-                      .toList();
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                    ),
-                    itemCount: pedidosActivos.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return PedidoCard(
-                        pedido: pedidosActivos[index],
-                        onButtonPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PedidoFormPage(
-                                  id: pedidosActivos[index]['id']),
-                            ),
-                          );
-                          if (result != null && result == 'refresh') {
-                            setState(() {});
-                          }
-                        },
-                        buttonLabel: "Editar",
-                      );
-                    },
-                  );
-                }
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+              ),
+              itemCount: pedidosActivos.length,
+              itemBuilder: (BuildContext context, int index) {
+                return PedidoCard(
+                  pedido: pedidosActivos[index],
+                  onTap: (TapUpDetails details) async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PedidoFormPage(id: pedidosActivos[index]['id']),
+                      ),
+                    );
+                    if (result == 'refresh') {
+                      setState(() {});
+                    }
+                  },
+                  buttonLabel: Text("Editar"),
+                );
               },
             ),
           )),
