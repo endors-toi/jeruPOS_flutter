@@ -9,11 +9,11 @@ class IngredienteService {
       '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/ingredientes/');
 
   static Future<String?> _getToken() async {
-    String? token = await AuthService.getToken();
+    String? token = await AuthService.getAccessToken();
 
     if (token != null && JwtDecoder.isExpired(token)) {
       await AuthService.refreshToken();
-      token = await AuthService.getToken();
+      token = await AuthService.getAccessToken();
     }
 
     return token;

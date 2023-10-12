@@ -206,7 +206,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
   }
 
   Future<int?> _getUserId() async {
-    String? token = await AuthService.getToken();
+    String? token = await AuthService.getAccessToken();
     if (token != null) {
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       return decodedToken['user_id'];

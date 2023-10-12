@@ -26,7 +26,7 @@ class AuthService {
     }
   }
 
-  static Future<void> refreshToken() async {
+  static Future<bool> refreshToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? refreshToken = prefs.getString('refresh_token');
 
@@ -41,13 +41,16 @@ class AuthService {
         final Map<String, dynamic> data = json.decode(response.body);
         final String newToken = data['access'];
         await prefs.setString('token', newToken);
+        return true;
       } else {
-        throw Exception('Failed to refresh token');
+        await prefs.remove('token');
+        await prefs.remove('refresh_token');
       }
     }
+    return false;
   }
 
-  static Future<String?> getToken() async {
+  static Future<String?> getAccessToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }

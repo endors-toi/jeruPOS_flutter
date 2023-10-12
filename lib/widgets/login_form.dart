@@ -118,7 +118,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<void> Login(BuildContext context) async {
     try {
       await AuthService.login(_emailCtrl.text, _passCtrl.text);
-      final String? token = await AuthService.getToken();
+      final String? token = await AuthService.getAccessToken();
       if (token != null) {
         final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
         int rol = decodedToken['rol'];

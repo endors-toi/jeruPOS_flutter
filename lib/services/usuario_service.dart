@@ -9,11 +9,11 @@ class UsuarioService {
       '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/accounts/users/');
 
   static Future<String?> _getToken() async {
-    String? token = await AuthService.getToken();
+    String? token = await AuthService.getAccessToken();
 
     if (token != null && JwtDecoder.isExpired(token)) {
       await AuthService.refreshToken();
-      token = await AuthService.getToken();
+      token = await AuthService.getAccessToken();
     }
 
     return token;
@@ -95,7 +95,7 @@ class UsuarioService {
   }
 
   static Future<Map<String, dynamic>> obtenerUsuario() async {
-    final String? token = await AuthService.getToken();
+    final String? token = await AuthService.getAccessToken();
     if (token != null) {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       return decodedToken;
