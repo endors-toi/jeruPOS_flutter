@@ -75,10 +75,13 @@ class _UserDrawerState extends State<UserDrawer> {
             leading: Icon(Icons.logout),
             title: Text('Logout'),
             onTap: () {
-              AuthService.logout();
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                  (Route route) => false);
+              AuthService.logout().then(
+                (value) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      (Route route) => false);
+                },
+              );
             },
           ),
         ],

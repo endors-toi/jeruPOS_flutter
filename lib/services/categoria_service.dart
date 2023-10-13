@@ -6,7 +6,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 
 class CategoriaService {
   static final uri = Uri.parse(
-      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/categorias/');
+      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/restaurant/categorias/');
 
   static Future<String?> _getToken() async {
     String? token = await AuthService.getAccessToken();
