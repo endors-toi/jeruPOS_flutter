@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/services/pedido_service.dart';
+import 'package:jerupos/widgets/error_retry_widget.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
 import 'package:jerupos/widgets/user_drawer.dart';
 
@@ -9,6 +10,29 @@ class CocinaPage extends StatefulWidget {
 }
 
 class _CocinaPageState extends State<CocinaPage> {
+  List<dynamic> pedidos = [];
+  String errorMsg = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPedidos();
+  }
+
+  // Function to fetch pedidos data
+  Future<void> _loadPedidos() async {
+    try {
+      final fetchedPedidos = await PedidoService.list();
+      setState(() {
+        pedidos = fetchedPedidos;
+      });
+    } catch (error) {
+      setState(() {
+        errorMsg = 'No se pudo cargar pedidos.\n$error';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,30 +41,28 @@ class _CocinaPageState extends State<CocinaPage> {
         backgroundColor: Colors.orange,
       ),
       drawer: UserDrawer(),
-      body: FutureBuilder(
-        future: PedidoService.list(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            return ListView.builder(
+      body: errorMsg.isNotEmpty
+          ? ErrorRetryWidget(
+              errorMsg: errorMsg,
+              onRetry: () {
+                setState(() {
+                  errorMsg = '';
+                  _loadPedidos();
+                });
+              })
+          : ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: snapshot.data.length,
+              itemCount: pedidos.length,
               itemBuilder: (BuildContext context, int index) {
                 return Container(
                   margin: EdgeInsets.symmetric(horizontal: 8, vertical: 24),
                   width: 200,
                   child: PedidoCard(
-                    pedido: snapshot.data[index],
+                    pedido: pedidos[index],
                   ),
                 );
               },
-            );
-          }
-        },
-      ),
+            ),
     );
   }
 }

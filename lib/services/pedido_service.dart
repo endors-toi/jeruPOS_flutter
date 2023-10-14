@@ -32,16 +32,15 @@ class PedidoService {
       uri,
       headers: await _getHeaders(),
     );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception(json.decode(response.body)['detail']);
     } else {
-      print(response.statusCode);
-      return [];
+      return json.decode(response.body);
     }
   }
 
-  static Future<void> create(Map<String, dynamic> pedido) async {
+  static Future<Map<String, dynamic>> create(
+      Map<String, dynamic> pedido) async {
     final response = await http.post(
       uri,
       headers: await _getHeaders(),
@@ -49,8 +48,13 @@ class PedidoService {
     );
 
     if (response.statusCode != 201) {
-      print('status code: ${response.statusCode}');
-      throw Exception('Error al crear pedido');
+      Map<String, dynamic> error = {
+        'status_code': response.statusCode,
+        'message': json.decode(response.body)['detail'],
+      };
+      return error;
+    } else {
+      return json.decode(response.body);
     }
   }
 
@@ -60,27 +64,38 @@ class PedidoService {
       headers: await _getHeaders(),
     );
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
+    if (response.statusCode != 200) {
+      Map<String, dynamic> error = {
+        'status_code': response.statusCode,
+        'message': json.decode(response.body)['detail'],
+      };
+      return error;
     } else {
-      throw Exception('Error al cargar pedido');
+      return json.decode(response.body);
     }
   }
 
-  static Future<void> updatePUT(Map<String, dynamic> pedido, int id) async {
+  static Future<Map<String, dynamic>> updatePUT(
+      Map<String, dynamic> pedido, int id) async {
     final response = await http.put(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
       body: json.encode(pedido),
     );
 
-    if (response.statusCode != 204) {
-      print(response.body);
-      throw Exception('Error al editar pedido');
+    if (response.statusCode != 200) {
+      Map<String, dynamic> error = {
+        'status_code': response.statusCode,
+        'message': json.decode(response.body)['detail'],
+      };
+      return error;
+    } else {
+      return json.decode(response.body);
     }
   }
 
-  static Future<void> updatePATCH(Map<String, dynamic> pedido) async {
+  static Future<Map<String, dynamic>> updatePATCH(
+      Map<String, dynamic> pedido) async {
     final response = await http.patch(
       uri.replace(path: '${uri.path}${pedido['id']}/'),
       headers: await _getHeaders(),
@@ -88,19 +103,30 @@ class PedidoService {
     );
 
     if (response.statusCode != 200) {
-      print(response.body);
-      throw Exception('Error al editar pedido');
+      Map<String, dynamic> error = {
+        'status_code': response.statusCode,
+        'message': json.decode(response.body)['detail'],
+      };
+      return error;
+    } else {
+      return json.decode(response.body);
     }
   }
 
-  static Future<void> delete(int id) async {
+  static Future<Map<String, dynamic>> delete(int id) async {
     final response = await http.delete(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
     );
 
     if (response.statusCode != 204) {
-      throw Exception('Error al eliminar pedido');
+      Map<String, dynamic> error = {
+        'status_code': response.statusCode,
+        'message': json.decode(response.body)['detail'],
+      };
+      return error;
+    } else {
+      return {'success': true};
     }
   }
 }

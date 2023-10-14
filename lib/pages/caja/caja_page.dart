@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/services/pedido_service.dart';
+import 'package:jerupos/widgets/error_retry_widget.dart';
 import 'package:jerupos/widgets/pedido_tile.dart';
 import 'package:jerupos/widgets/user_drawer.dart';
 
@@ -9,7 +10,28 @@ class CajaPage extends StatefulWidget {
 }
 
 class _CajaPageState extends State<CajaPage> {
-  Future<List<Map<String, dynamic>>>? futureOrders;
+  List<dynamic> pedidos = [];
+  String errorMsg = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPedidos();
+  }
+
+  // Function to fetch pedidos data
+  Future<void> _loadPedidos() async {
+    try {
+      final fetchedPedidos = await PedidoService.list();
+      setState(() {
+        pedidos = fetchedPedidos;
+      });
+    } catch (error) {
+      setState(() {
+        errorMsg = 'No se pudo cargar pedidos.\n$error';
+      });
+    }
+  }
 
   void refreshList() {
     setState(() {});
@@ -23,33 +45,28 @@ class _CajaPageState extends State<CajaPage> {
         backgroundColor: Colors.orange,
       ),
       drawer: UserDrawer(),
-      body: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: FutureBuilder(
-          future: PedidoService.list(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (BuildContext context, int index) {
-                  if (snapshot.data![index]['estado'] != 'PAGADO') {
-                    return PedidoTile(
-                      pedido: snapshot.data![index],
-                      onAction: refreshList,
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
-              );
-            }
-          },
-        ),
-      ),
+      body: errorMsg.isNotEmpty
+          ? ErrorRetryWidget(
+              errorMsg: errorMsg,
+              onRetry: () {
+                setState(() {
+                  errorMsg = '';
+                  _loadPedidos();
+                });
+              })
+          : ListView.builder(
+              itemCount: pedidos.length,
+              itemBuilder: (BuildContext context, int index) {
+                if (pedidos[index]['estado'] != 'PAGADO') {
+                  return PedidoTile(
+                    pedido: pedidos[index],
+                    onAction: refreshList,
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Handle new orders or other actions

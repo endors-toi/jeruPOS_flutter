@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:jerupos/pages/admin/admin_page.dart';
 import 'package:jerupos/pages/caja/caja_page.dart';
@@ -29,38 +31,58 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _initAsync() async {
-    if (await AuthService.refreshToken()) {
-      final String? token = await AuthService.getAccessToken();
-      if (token != null) {
-        final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-        int rol = decodedToken['rol'];
-        switch (rol) {
-          case 1:
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => GarzonPage()));
-            break;
-          case 2:
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => CocinaPage()));
-            break;
-          case 3:
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => CajaPage()));
-            break;
-          case 4:
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => AdminPage()));
-            break;
-          default:
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('No hay páginas asociadas a tu rol.'),
-              ),
-            );
-            break;
+    try {
+      if (await AuthService.refreshToken()) {
+        final String? token =
+            await AuthService.getAccessToken().timeout(Duration(seconds: 5));
+        if (token != null) {
+          final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+          int rol = decodedToken['rol'];
+          switch (rol) {
+            case 1:
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => GarzonPage()));
+              break;
+            case 2:
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => CocinaPage()));
+              break;
+            case 3:
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => CajaPage()));
+              break;
+            case 4:
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => AdminPage()));
+              break;
+            default:
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('No hay páginas asociadas a tu rol.'),
+                ),
+              );
+              break;
+          }
         }
+      } else {
+        setState(() {
+          body = LoginForm();
+        });
       }
-    } else {
+    } catch (e) {
+      if (e is TimeoutException) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No se pudo conectar con el servidor.'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+          ),
+        );
+      }
       setState(() {
         body = LoginForm();
       });

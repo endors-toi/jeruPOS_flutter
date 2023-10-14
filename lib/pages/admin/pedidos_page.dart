@@ -9,7 +9,28 @@ class PedidosPage extends StatefulWidget {
 }
 
 class _PedidosPageState extends State<PedidosPage> {
-  Future<List<Map<String, dynamic>>>? futureOrders;
+  List<dynamic> pedidos = [];
+  String errorMsg = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPedidos();
+  }
+
+  // Function to fetch pedidos data
+  Future<void> _loadPedidos() async {
+    try {
+      final fetchedPedidos = await PedidoService.list();
+      setState(() {
+        pedidos = fetchedPedidos;
+      });
+    } catch (error) {
+      setState(() {
+        errorMsg = 'Error: $error';
+      });
+    }
+  }
 
   void refreshList() {
     setState(() {});
@@ -22,29 +43,17 @@ class _PedidosPageState extends State<PedidosPage> {
         title: Text('Pedidos Actuales'),
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: FutureBuilder(
-          future: PedidoService.list(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return PedidoTile(
-                    pedido: snapshot.data![index],
-                    onDelete: refreshList,
-                  );
-                },
-              );
-            }
-          },
-        ),
-      ),
+      body: errorMsg.isNotEmpty
+          ? Center(child: Text(errorMsg))
+          : ListView.builder(
+              itemCount: pedidos.length,
+              itemBuilder: (BuildContext context, int index) {
+                return PedidoTile(
+                  pedido: pedidos[index],
+                  onDelete: refreshList,
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await Navigator.push(
@@ -90,31 +99,40 @@ class _PedidoTileState extends State<PedidoTile> {
   Widget build(BuildContext context) {
     final num total = calcularTotal();
     return Container(
-        padding: EdgeInsets.all(12),
-        margin: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          border:
-              Border.all(color: Color.fromARGB(255, 255, 222, 171), width: 1),
-          borderRadius: BorderRadius.circular(12),
-          color: Color.fromARGB(255, 255, 247, 234),
+      padding: EdgeInsets.all(12),
+      margin: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Color.fromARGB(255, 255, 222, 171),
+          width: 1,
         ),
-        child: Row(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("#${widget.pedido['id']}"),
-                Text('Total: $total'),
-              ],
-            ),
-            Spacer(),
-            IconButton(
-                onPressed: () async {
-                  await PedidoService.delete(widget.pedido['id']);
-                  widget.onDelete();
-                },
-                icon: Icon(MdiIcons.delete)),
-          ],
-        ));
+        borderRadius: BorderRadius.circular(12),
+        color: Color.fromARGB(255, 255, 247, 234),
+      ),
+      child: Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("#${widget.pedido['id']}"),
+              Text('Total: $total'),
+            ],
+          ),
+          Spacer(),
+          IconButton(
+            onPressed: () async {
+              try {
+                await PedidoService.delete(widget.pedido['id']);
+                widget.onDelete();
+              } catch (error) {
+                // Handle the error gracefully if needed
+                print('Error deleting pedido: $error');
+              }
+            },
+            icon: Icon(MdiIcons.delete),
+          ),
+        ],
+      ),
+    );
   }
 }

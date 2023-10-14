@@ -124,19 +124,19 @@ class _LoginFormState extends State<LoginForm> {
         int rol = decodedToken['rol'];
         switch (rol) {
           case 1:
-            Navigator.push(
+            Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => GarzonPage()));
             break;
           case 2:
-            Navigator.push(
+            Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => CocinaPage()));
             break;
           case 3:
-            Navigator.push(
+            Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => CajaPage()));
             break;
           case 4:
-            Navigator.push(
+            Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => AdminPage()));
             break;
           default:
