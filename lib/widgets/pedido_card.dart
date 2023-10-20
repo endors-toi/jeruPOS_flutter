@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jerupos/widgets/animated_ellipsis.dart';
 
 class PedidoCard extends StatelessWidget {
   final Map<String, dynamic> pedido;
@@ -46,7 +47,8 @@ class PedidoCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text('#${pedido['id']}'),
+                        Text('#${pedido['id']}',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
                         Text(pedido['mesa'] != null
                             ? "Mesa ${pedido['mesa']}"
@@ -55,7 +57,9 @@ class PedidoCard extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        Text('${pedido['estado']}'),
+                        pedido['estado'] == 'PENDIENTE'
+                            ? AnimatedEllipsis()
+                            : Text('🟢'),
                         Spacer(),
                         Text('$fTimestamp'),
                       ],

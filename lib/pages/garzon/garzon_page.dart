@@ -108,29 +108,57 @@ class _GarzonPageState extends State<GarzonPage> {
                 Expanded(
                     child: Container(
                   padding: EdgeInsets.all(8),
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                    ),
-                    itemCount: pedidosActivos.length,
+                  child: ListView.builder(
+                    itemCount: (pedidosActivos.length + 1) ~/ 2,
                     itemBuilder: (BuildContext context, int index) {
-                      return PedidoCard(
-                        pedido: pedidosActivos[index],
-                        onTap: (TapUpDetails details) async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PedidoFormPage(
-                                  id: pedidosActivos[index]['id']),
+                      int leftCardIndex = index * 2;
+                      int rightCardIndex = index * 2 + 1;
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: PedidoCard(
+                              pedido: pedidosActivos[leftCardIndex],
+                              onTap: (TapUpDetails details) async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PedidoFormPage(
+                                        id: pedidosActivos[leftCardIndex]
+                                            ['id']),
+                                  ),
+                                );
+                                if (result == 'refresh') {
+                                  setState(() {});
+                                }
+                              },
+                              buttonLabel: Text("Editar"),
                             ),
-                          );
-                          if (result == 'refresh') {
-                            setState(() {});
-                          }
-                        },
-                        buttonLabel: Text("Editar"),
+                          ),
+                          rightCardIndex >= pedidosActivos.length
+                              ? Expanded(flex: 1, child: SizedBox())
+                              : Expanded(
+                                  flex: 1,
+                                  child: PedidoCard(
+                                    pedido: pedidosActivos[rightCardIndex],
+                                    onTap: (TapUpDetails details) async {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PedidoFormPage(
+                                              id: pedidosActivos[rightCardIndex]
+                                                  ['id']),
+                                        ),
+                                      );
+                                      if (result == 'refresh') {
+                                        setState(() {});
+                                      }
+                                    },
+                                    buttonLabel: Text("Editar"),
+                                  ),
+                                ),
+                        ],
                       );
                     },
                   ),
