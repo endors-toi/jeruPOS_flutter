@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/widgets/error_retry_widget.dart';
 import 'package:jerupos/widgets/historial_tile.dart';
@@ -9,7 +10,7 @@ class HistorialPage extends StatefulWidget {
 }
 
 class _HistorialPageState extends State<HistorialPage> {
-  List<dynamic> pedidosPagados = [];
+  List<Pedido> pedidosPagados = [];
   String errorMsg = '';
 
   @override
@@ -24,7 +25,7 @@ class _HistorialPageState extends State<HistorialPage> {
       final pedidos = await PedidoService.list();
       setState(() {
         pedidosPagados =
-            pedidos.where((pedido) => pedido['estado'] == 'PAGADO').toList();
+            pedidos.where((pedido) => pedido.estado == 'PAGADO').toList();
       });
     } catch (error) {
       setState(() {
@@ -57,7 +58,7 @@ class _HistorialPageState extends State<HistorialPage> {
                   child: ListView.builder(
                     itemCount: pedidosPagados.length,
                     itemBuilder: (context, index) {
-                      final pedido = pedidosPagados[index];
+                      Pedido pedido = pedidosPagados[index];
                       return HistorialTile(
                         pedido: pedido,
                       );

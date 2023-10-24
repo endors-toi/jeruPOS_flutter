@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/pedido.dart';
+import 'package:jerupos/models/producto.dart';
 import 'package:jerupos/services/auth_service.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/services/producto_service.dart';
@@ -14,7 +16,7 @@ class PedidoFormPage extends StatefulWidget {
 
 class _PedidoFormPageState extends State<PedidoFormPage> {
   late Future _productosFuture;
-  final List<Map<String, dynamic>> productosPedido = [];
+  List<Producto> productosPedido = [];
   bool _editMode = false;
   int? mesa;
 
@@ -27,14 +29,8 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
 
       PedidoService.get(widget.id!).then((pedido) {
         setState(() {
-          mesa = pedido['mesa'];
-          pedido['productos'].forEach((producto) {
-            productosPedido.add({
-              'id': producto['producto'],
-              'nombre': producto['nombre'],
-              'cantidad': producto['cantidad']
-            });
-          });
+          mesa = pedido.mesa;
+          productosPedido = pedido.productos;
         });
       }).catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +61,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {
-                    List<dynamic> productos = snapshot.data!;
+                    List<Producto> productos = snapshot.data!;
                     return GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
@@ -78,10 +74,8 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
                               shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
                                       borderRadius: BorderRadius.zero))),
-                          onPressed: () => agregarProducto(
-                              productos[index]['id'],
-                              productos[index]['nombre']),
-                          child: Text(productos[index]['abreviacion']),
+                          onPressed: () => agregarProducto(productos[index]),
+                          child: Text(productos[index].abreviacion ?? 'N/A'),
                         );
                       },
                     );
@@ -99,13 +93,13 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
                     child: ListView.builder(
                       itemCount: productosPedido.length,
                       itemBuilder: (context, index) {
-                        final producto = productosPedido[index];
+                        Producto producto = productosPedido[index];
                         return ListTile(
-                          title: Text(
-                              '${producto['cantidad']} x ${producto['nombre']}'),
+                          title:
+                              Text('${producto.cantidad} x ${producto.nombre}'),
                           onTap: () {
                             setState(() {
-                              eliminarProducto(producto['id']);
+                              eliminarProducto(index);
                             });
                           },
                         );
@@ -156,50 +150,53 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     );
   }
 
-  void agregarProducto(int id, String nombre) {
+  void agregarProducto(Producto producto) {
     setState(() {
-      var productoExistente = productosPedido
-          .firstWhere((element) => element['id'] == id, orElse: () => {});
-
-      if (productoExistente.isNotEmpty) {
-        productoExistente['cantidad']++;
+      final indexProductoExistente =
+          productosPedido.indexWhere((p) => p.id == producto.id);
+      if (indexProductoExistente != -1) {
+        productosPedido[indexProductoExistente].incrementarCantidad();
       } else {
-        productosPedido.add({'id': id, 'nombre': nombre, 'cantidad': 1});
+        productosPedido.add(producto);
       }
     });
   }
 
-  void eliminarProducto(int id) {
+  void eliminarProducto(int index) {
     setState(() {
-      var productoExistente = productosPedido
-          .firstWhere((element) => element['id'] == id, orElse: () => {});
-
-      if (productoExistente.isNotEmpty && productoExistente['cantidad'] > 1) {
-        productoExistente['cantidad']--;
+      if (productosPedido[index].cantidad == 1) {
+        productosPedido.removeAt(index);
       } else {
-        productosPedido.remove(productoExistente);
+        productosPedido[index].decrementarCantidad();
       }
     });
   }
 
   void enviarPedido() async {
-    Map<String, dynamic> pedido = {
-      'usuario': await _getUserId(),
-      'mesa': mesa,
-      'estado': 'PENDIENTE',
-      'productos_post': productosPedido,
-    };
+    int? userId = await _getUserId();
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar el usuario')),
+      );
+      return;
+    }
+    Pedido pedido = Pedido(
+      idUsuario: userId,
+      mesa: mesa,
+      estado: 'PENDIENTE',
+      productos: productosPedido,
+    );
 
     await PedidoService.create(pedido);
     Navigator.pop(context, 'refresh');
   }
 
   void editarPedido() {
-    Map<String, dynamic> pedido = {
-      'id': widget.id,
-      'mesa': mesa,
-      'productos_post': productosPedido,
-    };
+    Pedido pedido = Pedido(
+      id: widget.id,
+      mesa: mesa,
+      productos: productosPedido,
+    );
 
     PedidoService.updatePATCH(pedido);
     Navigator.pop(context, 'refresh');

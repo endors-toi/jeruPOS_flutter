@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/services/auth_service.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -27,7 +28,7 @@ class PedidoService {
     };
   }
 
-  static Future<List<dynamic>> list() async {
+  static Future<List<Pedido>> list() async {
     final response = await http.get(
       uri,
       headers: await _getHeaders(),
@@ -35,98 +36,74 @@ class PedidoService {
     if (response.statusCode != 200) {
       throw Exception(json.decode(response.body)['detail']);
     } else {
-      return json.decode(response.body);
+      List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.map<Pedido>((json) => Pedido.fromJson(json)).toList();
     }
   }
 
-  static Future<Map<String, dynamic>> create(
-      Map<String, dynamic> pedido) async {
+  static Future<Pedido> create(Pedido pedido) async {
     final response = await http.post(
       uri,
       headers: await _getHeaders(),
-      body: json.encode(pedido),
+      body: json.encode(pedido.toJson()),
     );
 
     if (response.statusCode != 201) {
-      Map<String, dynamic> error = {
-        'status_code': response.statusCode,
-        'message': json.decode(response.body)['detail'],
-      };
-      return error;
+      throw Exception(json.decode(response.body)['detail']);
     } else {
-      return json.decode(response.body);
+      return Pedido.fromJson(json.decode(response.body));
     }
   }
 
-  static Future<Map<String, dynamic>> get(int id) async {
+  static Future<Pedido> get(int id) async {
     final response = await http.get(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
     );
 
     if (response.statusCode != 200) {
-      Map<String, dynamic> error = {
-        'status_code': response.statusCode,
-        'message': json.decode(response.body)['detail'],
-      };
-      return error;
+      throw Exception(json.decode(response.body)['detail']);
     } else {
-      return json.decode(response.body);
+      return Pedido.fromJson(json.decode(response.body));
     }
   }
 
-  static Future<Map<String, dynamic>> updatePUT(
-      Map<String, dynamic> pedido, int id) async {
+  static Future<Pedido> updatePUT(Pedido pedido, int id) async {
     final response = await http.put(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
-      body: json.encode(pedido),
+      body: json.encode(pedido.toJson()),
     );
 
     if (response.statusCode != 200) {
-      Map<String, dynamic> error = {
-        'status_code': response.statusCode,
-        'message': json.decode(response.body)['detail'],
-      };
-      return error;
+      throw Exception(json.decode(response.body)['detail']);
     } else {
-      return json.decode(response.body);
+      return Pedido.fromJson(json.decode(response.body));
     }
   }
 
-  static Future<Map<String, dynamic>> updatePATCH(
-      Map<String, dynamic> pedido) async {
+  static Future<Pedido> updatePATCH(Pedido pedido) async {
     final response = await http.patch(
-      uri.replace(path: '${uri.path}${pedido['id']}/'),
+      uri.replace(path: '${uri.path}${pedido.id}/'),
       headers: await _getHeaders(),
-      body: json.encode(pedido),
+      body: json.encode(pedido.toJson()),
     );
 
     if (response.statusCode != 200) {
-      Map<String, dynamic> error = {
-        'status_code': response.statusCode,
-        'message': json.decode(response.body)['detail'],
-      };
-      return error;
+      throw Exception(json.decode(response.body)['detail']);
     } else {
-      return json.decode(response.body);
+      return Pedido.fromJson(json.decode(response.body));
     }
   }
 
-  static Future<Map<String, dynamic>> delete(int id) async {
+  static Future<void> delete(int id) async {
     final response = await http.delete(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
     );
 
     if (response.statusCode != 204) {
-      Map<String, dynamic> error = {
-        'status_code': response.statusCode,
-        'message': json.decode(response.body)['detail'],
-      };
-      return error;
-    } else {
-      return {'success': true};
+      throw Exception(json.decode(response.body)['detail']);
     }
   }
 }

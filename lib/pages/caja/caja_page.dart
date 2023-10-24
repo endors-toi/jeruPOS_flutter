@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/widgets/error_retry_widget.dart';
 import 'package:jerupos/widgets/pedido_tile.dart';
@@ -10,7 +11,7 @@ class CajaPage extends StatefulWidget {
 }
 
 class _CajaPageState extends State<CajaPage> {
-  List<dynamic> pedidos = [];
+  List<Pedido> pedidos = [];
   String errorMsg = '';
 
   @override
@@ -57,7 +58,7 @@ class _CajaPageState extends State<CajaPage> {
           : ListView.builder(
               itemCount: pedidos.length,
               itemBuilder: (BuildContext context, int index) {
-                if (pedidos[index]['estado'] != 'PAGADO') {
+                if (pedidos[index].estado != 'PAGADO') {
                   return PedidoTile(
                     pedido: pedidos[index],
                     onAction: refreshList,

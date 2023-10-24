@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/pedido.dart';
+import 'package:jerupos/models/producto.dart';
 import 'package:jerupos/pages/garzon/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -9,7 +11,7 @@ class PedidosPage extends StatefulWidget {
 }
 
 class _PedidosPageState extends State<PedidosPage> {
-  List<dynamic> pedidos = [];
+  List<Pedido> pedidos = [];
   String errorMsg = '';
 
   @override
@@ -21,7 +23,7 @@ class _PedidosPageState extends State<PedidosPage> {
   // Function to fetch pedidos data
   Future<void> _loadPedidos() async {
     try {
-      final fetchedPedidos = await PedidoService.list();
+      List<Pedido> fetchedPedidos = await PedidoService.list();
       setState(() {
         pedidos = fetchedPedidos;
       });
@@ -73,7 +75,7 @@ class _PedidosPageState extends State<PedidosPage> {
 }
 
 class PedidoTile extends StatefulWidget {
-  final Map<String, dynamic> pedido;
+  final Pedido pedido;
   final Function onDelete;
 
   PedidoTile({
@@ -88,9 +90,9 @@ class PedidoTile extends StatefulWidget {
 class _PedidoTileState extends State<PedidoTile> {
   num calcularTotal() {
     num total = 0;
-    List<dynamic> productos = widget.pedido['productos'];
+    List<Producto> productos = widget.pedido.productos;
     productos.forEach((producto) {
-      total += producto['precio'] * producto['cantidad'];
+      total += producto.precio! * producto.cantidad;
     });
     return total;
   }
@@ -114,7 +116,7 @@ class _PedidoTileState extends State<PedidoTile> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("#${widget.pedido['id']}"),
+              Text("#${widget.pedido.id}"),
               Text('Total: $total'),
             ],
           ),
@@ -122,10 +124,9 @@ class _PedidoTileState extends State<PedidoTile> {
           IconButton(
             onPressed: () async {
               try {
-                await PedidoService.delete(widget.pedido['id']);
+                await PedidoService.delete(widget.pedido.id!);
                 widget.onDelete();
               } catch (error) {
-                // Handle the error gracefully if needed
                 print('Error deleting pedido: $error');
               }
             },

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/pedido.dart';
+import 'package:jerupos/models/producto.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PedidoTile extends StatelessWidget {
-  final Map<String, dynamic> pedido;
+  final Pedido pedido;
   final Function onAction;
 
   PedidoTile({
@@ -13,9 +15,9 @@ class PedidoTile extends StatelessWidget {
 
   num calcularTotal() {
     num total = 0;
-    List<dynamic> productos = pedido['productos'];
+    List<Producto> productos = pedido.productos;
     productos.forEach((producto) {
-      total += producto['precio'] * producto['cantidad'];
+      total += producto.precio! * producto.cantidad;
     });
     return total;
   }
@@ -37,12 +39,12 @@ class PedidoTile extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("#${pedido['id']}"),
+                Text("#${pedido.id}"),
                 Text('Total: $total'),
               ],
             ),
             Spacer(),
-            Text("${pedido['estado']}"),
+            Text("${pedido.estado}"),
             IconButton(
               icon: Icon(
                 MdiIcons.checkCircle,
@@ -50,7 +52,7 @@ class PedidoTile extends StatelessWidget {
                 size: 32,
               ),
               onPressed: () async {
-                pedido['estado'] = "PAGADO";
+                pedido.estado = "PAGADO";
                 await PedidoService.updatePATCH(pedido);
                 onAction();
               },

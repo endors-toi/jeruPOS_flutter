@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jerupos/models/pedido.dart';
+import 'package:jerupos/models/producto.dart';
 import 'package:jerupos/widgets/animated_ellipsis.dart';
 
 class PedidoCard extends StatelessWidget {
-  final Map<String, dynamic> pedido;
+  final Pedido pedido;
   final GestureTapUpCallback? onTap;
   final Widget? buttonLabel;
 
@@ -15,9 +17,8 @@ class PedidoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> productos = pedido['productos'] ?? [];
-    final String fTimestamp =
-        DateFormat('hh:mm').format(DateTime.parse(pedido['timestamp']));
+    List<Producto> productos = pedido.productos;
+    final String fTimestamp = DateFormat('hh:mm').format(pedido.timestamp!);
     return Padding(
       padding: EdgeInsets.only(right: 8),
       child: Container(
@@ -47,17 +48,17 @@ class PedidoCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text('#${pedido['id']}',
+                        Text('#${pedido.id}',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
-                        Text(pedido['mesa'] != null
-                            ? "Mesa ${pedido['mesa']}"
+                        Text(pedido.mesa != null
+                            ? "Mesa ${pedido.mesa}"
                             : "Para Llevar"),
                       ],
                     ),
                     Row(
                       children: [
-                        pedido['estado'] == 'PENDIENTE'
+                        pedido.estado == 'PENDIENTE'
                             ? AnimatedEllipsis()
                             : Text('🟢'),
                         Spacer(),
@@ -69,9 +70,9 @@ class PedidoCard extends StatelessWidget {
                         shrinkWrap: true,
                         itemCount: productos.length,
                         itemBuilder: (context, index) {
-                          var producto = productos[index];
+                          Producto producto = productos[index];
                           return Text(
-                              "${producto['cantidad']} x ${producto['nombre']}");
+                              "${producto.cantidad} x ${producto.nombre}");
                         },
                       ),
                     ),

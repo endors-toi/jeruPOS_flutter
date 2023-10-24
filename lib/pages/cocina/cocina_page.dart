@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/widgets/error_retry_widget.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
@@ -10,7 +11,7 @@ class CocinaPage extends StatefulWidget {
 }
 
 class _CocinaPageState extends State<CocinaPage> {
-  List<dynamic> pedidos = [];
+  List<Pedido> pedidos = [];
   String errorMsg = '';
 
   @override

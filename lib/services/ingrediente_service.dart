@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:jerupos/models/ingrediente.dart';
 import 'package:jerupos/services/auth_service.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -27,38 +28,41 @@ class IngredienteService {
     };
   }
 
-  static Future<List<dynamic>> list() async {
+  static Future<List<Ingrediente>> list() async {
     final response = await http.get(
       uri,
       headers: await _getHeaders(),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      List<dynamic> jsonData = json.decode(response.body);
+      return jsonData
+          .map<Ingrediente>((json) => Ingrediente.fromJson(json))
+          .toList();
     } else {
       print(response.statusCode);
       return [];
     }
   }
 
-  static Future<Map<String, dynamic>> get(int id) async {
+  static Future<Ingrediente> get(int id) async {
     final response = await http.get(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return Ingrediente.fromJson(json.decode(response.body));
     } else {
       throw Exception('Error al cargar ingrediente');
     }
   }
 
-  static Future<void> update(Map<String, dynamic> ingrediente, int id) async {
+  static Future<void> update(Ingrediente ingrediente, int id) async {
     final response = await http.put(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
-      body: json.encode(ingrediente),
+      body: json.encode(ingrediente.toJson()),
     );
 
     if (response.statusCode != 204) {

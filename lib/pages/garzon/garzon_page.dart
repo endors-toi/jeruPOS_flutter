@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/pages/garzon/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/widgets/error_retry_widget.dart';
@@ -13,8 +14,8 @@ class GarzonPage extends StatefulWidget {
 
 class _GarzonPageState extends State<GarzonPage> {
   bool sortByOrderNumber = true;
-  List<dynamic> pedidos = [];
-  List<dynamic> pedidosActivos = [];
+  List<Pedido> pedidos = [];
+  List<Pedido> pedidosActivos = [];
   String errorMsg = '';
 
   @override
@@ -28,8 +29,8 @@ class _GarzonPageState extends State<GarzonPage> {
       setState(() {
         pedidos.addAll(value);
         pedidosActivos =
-            pedidos.where((pedido) => pedido['estado'] != 'PAGADO').toList();
-        pedidosActivos.sort((a, b) => (b['id'] ?? 0).compareTo(a['id'] ?? 0));
+            pedidos.where((pedido) => pedido.estado != 'PAGADO').toList();
+        pedidosActivos.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
       });
     }).catchError((error) {
       setState(() {
@@ -43,9 +44,9 @@ class _GarzonPageState extends State<GarzonPage> {
       sortByOrderNumber = !sortByOrderNumber;
       pedidosActivos.sort((a, b) {
         if (sortByOrderNumber) {
-          return (b['id'] ?? 0).compareTo(a['id'] ?? 0);
+          return (b.id ?? 0).compareTo(a.id ?? 0);
         } else {
-          return (a['mesa'] ?? 0).compareTo(b['mesa'] ?? 0);
+          return (a.mesa ?? 0).compareTo(b.mesa ?? 0);
         }
       });
     });
@@ -125,8 +126,7 @@ class _GarzonPageState extends State<GarzonPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => PedidoFormPage(
-                                        id: pedidosActivos[leftCardIndex]
-                                            ['id']),
+                                        id: pedidosActivos[leftCardIndex].id),
                                   ),
                                 );
                                 if (result == 'refresh') {
@@ -148,7 +148,7 @@ class _GarzonPageState extends State<GarzonPage> {
                                         MaterialPageRoute(
                                           builder: (context) => PedidoFormPage(
                                               id: pedidosActivos[rightCardIndex]
-                                                  ['id']),
+                                                  .id),
                                         ),
                                       );
                                       if (result == 'refresh') {
