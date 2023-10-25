@@ -188,7 +188,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     );
 
     await PedidoService.create(pedido);
-    Navigator.pop(context, 'refresh');
+    Navigator.pop(context);
   }
 
   void editarPedido() {
@@ -198,8 +198,8 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
       productos: productosPedido,
     );
 
-    PedidoService.updatePATCH(pedido);
-    Navigator.pop(context, 'refresh');
+    PedidoService.update(pedido);
+    Navigator.pop(context);
   }
 
   Future<int?> _getUserId() async {

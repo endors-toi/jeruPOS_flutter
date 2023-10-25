@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/admin/usuario_form_page.dart';
 import 'package:jerupos/services/usuario_service.dart';
 import 'package:jerupos/widgets/usuario_tile.dart';
@@ -10,7 +11,7 @@ class UsuariosPage extends StatefulWidget {
 }
 
 class _UsuariosPageState extends State<UsuariosPage> {
-  late Future<List<dynamic>> _usuariosFuture;
+  late Future<List<Usuario>> _usuariosFuture;
 
   @override
   void initState() {
@@ -18,7 +19,7 @@ class _UsuariosPageState extends State<UsuariosPage> {
     _usuariosFuture = _listUsuarios();
   }
 
-  Future<List<dynamic>> _listUsuarios() async {
+  Future<List<Usuario>> _listUsuarios() async {
     return await UsuarioService.list();
   }
 
@@ -68,13 +69,10 @@ class _UsuariosPageState extends State<UsuariosPage> {
                 child: ListView.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
-                    var usuario = snapshot.data![index];
+                    Usuario usuario = snapshot.data![index];
                     print(snapshot);
                     return UsuarioTile(
-                      id: usuario['id'],
-                      nombre: usuario['nombre'],
-                      apellido: usuario['apellido'],
-                      email: usuario['email'],
+                      usuario: usuario,
                       onActionCompleted: () {
                         setState(() {
                           _usuariosFuture = _listUsuarios();

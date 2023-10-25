@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/cocina/historial_page.dart';
 import 'package:jerupos/pages/login_page.dart';
 import 'package:jerupos/services/auth_service.dart';
@@ -11,12 +12,12 @@ class UserDrawer extends StatefulWidget {
 }
 
 class _UserDrawerState extends State<UserDrawer> {
-  Map<String, dynamic>? usuario;
+  Usuario? usuario;
 
   @override
   void initState() {
     super.initState();
-    UsuarioService.obtenerUsuario().then((Map<String, dynamic> usuario) {
+    UsuarioService.obtenerUsuario().then((Usuario usuario) {
       setState(() {
         this.usuario = usuario;
       });
@@ -43,7 +44,7 @@ class _UserDrawerState extends State<UserDrawer> {
                           CircleAvatar(
                             radius: 40.0,
                             child: Text(
-                              '${usuario!['nombre'][0].toUpperCase()}',
+                              '${usuario!.nombre[0].toUpperCase()}',
                               style: TextStyle(
                                 fontSize: 40,
                                 fontWeight: FontWeight.bold,
@@ -52,7 +53,7 @@ class _UserDrawerState extends State<UserDrawer> {
                           ),
                           SizedBox(height: 10),
                           Text(
-                            '${usuario!['nombre']} ${usuario!['apellido']} (${usuario!['rol']})',
+                            '${usuario!.nombre} ${usuario!.apellido} (${usuario!.rol})',
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 18,

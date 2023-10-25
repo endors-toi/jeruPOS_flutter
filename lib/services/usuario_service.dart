@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:jerupos/models/usuario.dart'; // Import your Usuario model
 import 'package:jerupos/services/auth_service.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -27,26 +28,27 @@ class UsuarioService {
     };
   }
 
-  static Future<List<dynamic>> list() async {
+  static Future<List<Usuario>> list() async {
     final response = await http.get(
       uri,
       headers: await _getHeaders(),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.map((json) => Usuario.fromJson(json)).toList();
     } else {
       print(response.statusCode);
-      return [];
+      throw Exception('Failed to load users');
     }
   }
 
-  static Future<void> create(Map<String, dynamic> usuario) async {
+  static Future<void> create(Usuario usuario) async {
     final response = await http.post(
       Uri.parse(
           '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/accounts/register/'),
       headers: await _getHeaders(),
-      body: json.encode(usuario),
+      body: json.encode(usuario.toJson()),
     );
 
     if (response.statusCode != 201) {
@@ -55,21 +57,20 @@ class UsuarioService {
     }
   }
 
-  static Future<Map<String, dynamic>> get(int id) async {
+  static Future<Usuario> get(int id) async {
     final response = await http.get(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return Usuario.fromJson(json.decode(response.body));
     } else {
       throw Exception('Error al cargar usuario');
     }
   }
 
   static Future<void> update(Map<String, dynamic> usuario, int id) async {
-    // PUT
     final response = await http.put(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
@@ -94,12 +95,18 @@ class UsuarioService {
     }
   }
 
-  static Future<Map<String, dynamic>> obtenerUsuario() async {
+  static Future<Usuario> obtenerUsuario() async {
     final String? token = await AuthService.getAccessToken();
     if (token != null) {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-      return decodedToken;
+      Usuario usuario = Usuario(
+          id: decodedToken['user_id'],
+          rol: decodedToken['rol'],
+          nombre: decodedToken['nombre'],
+          apellido: decodedToken['apellido'],
+          email: decodedToken['email']);
+      return usuario;
     }
-    return {};
+    throw Exception('Token is null');
   }
 }

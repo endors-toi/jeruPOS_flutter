@@ -35,7 +35,6 @@ class Producto {
       'nombre': this._nombre,
       'cantidad': this._cantidad,
       'precio': this._precio,
-      'abreviacion': this._abreviacion,
     };
   }
 

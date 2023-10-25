@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/admin/usuario_form_page.dart';
 import 'package:jerupos/services/usuario_service.dart';
 
 class UsuarioTile extends StatefulWidget {
   final VoidCallback onActionCompleted;
 
-  final int id;
-  final String nombre;
-  final String apellido;
-  final String email;
+  final Usuario usuario;
 
   UsuarioTile({
-    required this.id,
-    required this.nombre,
-    required this.apellido,
-    required this.email,
+    required this.usuario,
     required this.onActionCompleted,
   });
 
@@ -44,7 +39,7 @@ class _UsuarioTileState extends State<UsuarioTile> {
         children: [
           CircleAvatar(
             child: Text(
-              widget.nombre.substring(0, 1),
+              widget.usuario.nombre.substring(0, 1),
             ),
             backgroundColor: Color.fromARGB(255, 0, 255, 149),
           ),
@@ -55,14 +50,14 @@ class _UsuarioTileState extends State<UsuarioTile> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${widget.nombre} ${widget.apellido}',
+                  '${widget.usuario.nombre} ${widget.usuario.apellido}',
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  '${widget.email}',
+                  '${widget.usuario.email}',
                   style: TextStyle(
                     fontSize: 14.0,
                     color: Colors.grey,
@@ -80,7 +75,7 @@ class _UsuarioTileState extends State<UsuarioTile> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => UsuarioFormPage(
-                            id: this.widget.id,
+                            id: this.widget.usuario.id,
                           )));
               widget.onActionCompleted();
             },
@@ -93,7 +88,7 @@ class _UsuarioTileState extends State<UsuarioTile> {
                 builder: (context) => AlertDialog(
                   title: Text('Eliminar'),
                   content: Text(
-                      '¿Seguro que quieres eliminar el usuario de ${widget.nombre} ${widget.apellido}?'),
+                      '¿Seguro que quieres eliminar el usuario de ${widget.usuario.nombre} ${widget.usuario.apellido}?'),
                   actions: [
                     TextButton(
                       onPressed: () {
@@ -103,11 +98,11 @@ class _UsuarioTileState extends State<UsuarioTile> {
                     ),
                     TextButton(
                       onPressed: () async {
-                        await UsuarioService.delete(widget.id);
+                        await UsuarioService.delete(widget.usuario.id!);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                                'Se ha eliminado el usuario de ${widget.nombre} ${widget.apellido}'),
+                                'Se ha eliminado el usuario de ${widget.usuario.nombre} ${widget.usuario.apellido}'),
                           ),
                         );
                         widget.onActionCompleted();

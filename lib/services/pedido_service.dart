@@ -37,15 +37,43 @@ class PedidoService {
       throw Exception(json.decode(response.body)['detail']);
     } else {
       List<dynamic> jsonData = json.decode(response.body);
-      return jsonData.map<Pedido>((json) => Pedido.fromJson(json)).toList();
+
+      // solución temporal
+      List<Map<String, dynamic>> adjustedJsonData =
+          jsonData.map<Map<String, dynamic>>((pedidoJson) {
+        List<Map<String, dynamic>> productos =
+            List<Map<String, dynamic>>.from(pedidoJson['productos']);
+        List<Map<String, dynamic>> adjustedProductos =
+            productos.map((producto) {
+          return {
+            ...producto,
+            'id': producto['producto'],
+          };
+        }).toList();
+        return {
+          ...pedidoJson,
+          'productos': adjustedProductos,
+        };
+      }).toList();
+
+      return adjustedJsonData
+          .map<Pedido>((json) => Pedido.fromJson(json))
+          .toList();
     }
   }
 
   static Future<Pedido> create(Pedido pedido) async {
+    // solución temporal
+    Map<String, dynamic> ped = {
+      'usuario': pedido.idUsuario,
+      'mesa': pedido.mesa,
+      'productos_post': pedido.productos,
+      'estado': pedido.estado,
+    };
     final response = await http.post(
       uri,
       headers: await _getHeaders(),
-      body: json.encode(pedido.toJson()),
+      body: json.encode(ped),
     );
 
     if (response.statusCode != 201) {
@@ -64,7 +92,26 @@ class PedidoService {
     if (response.statusCode != 200) {
       throw Exception(json.decode(response.body)['detail']);
     } else {
-      return Pedido.fromJson(json.decode(response.body));
+      // solución temporal
+      Map<String, dynamic> jsonData = json.decode(response.body);
+      var productosPost = jsonData['productos'];
+      List<Map<String, dynamic>> adjustedProductos = [];
+      if (productosPost != null) {
+        List<Map<String, dynamic>> productos =
+            List<Map<String, dynamic>>.from(productosPost);
+        adjustedProductos = productos.map((producto) {
+          return {
+            ...producto,
+            'id': producto['producto'], // Rename 'producto' to 'id'
+          };
+        }).toList();
+      }
+      Map<String, dynamic> adjustedJsonData = {
+        ...jsonData,
+        'productos': adjustedProductos,
+      };
+
+      return Pedido.fromJson(adjustedJsonData);
     }
   }
 
@@ -82,11 +129,19 @@ class PedidoService {
     }
   }
 
-  static Future<Pedido> updatePATCH(Pedido pedido) async {
+  static Future<Pedido> update(Pedido pedido) async {
+    // solución temporal (no funciona XD)
+    Map<String, dynamic> ped = {
+      'id': pedido.id,
+      'mesa': pedido.mesa,
+      'productos_post':
+          pedido.productos.map((producto) => producto.toJson()).toList(),
+    };
+    print(ped);
     final response = await http.patch(
       uri.replace(path: '${uri.path}${pedido.id}/'),
       headers: await _getHeaders(),
-      body: json.encode(pedido.toJson()),
+      body: json.encode(ped),
     );
 
     if (response.statusCode != 200) {

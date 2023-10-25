@@ -53,7 +53,7 @@ class PedidoTile extends StatelessWidget {
               ),
               onPressed: () async {
                 pedido.estado = "PAGADO";
-                await PedidoService.updatePATCH(pedido);
+                await PedidoService.update(pedido);
                 onAction();
               },
             )

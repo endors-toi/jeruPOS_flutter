@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/services/usuario_service.dart';
 
 class UsuarioFormPage extends StatefulWidget {
@@ -47,23 +48,10 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
 
       UsuarioService.get(widget.id!).then((usuario) {
         setState(() {
-          _nombreController.text = usuario['nombre'];
-          _apellidoController.text = usuario['apellido'];
-          _emailController.text = usuario['email'];
-          switch (usuario['rol']) {
-            case 'Cocinero':
-              _idRol = 2;
-              break;
-            case 'Garzon':
-              _idRol = 1;
-              break;
-            case 'Cajero':
-              _idRol = 3;
-              break;
-            case 'Admin':
-              _idRol = 4;
-              break;
-          }
+          _nombreController.text = usuario.nombre;
+          _apellidoController.text = usuario.apellido;
+          _emailController.text = usuario.email;
+          _idRol = usuario.rol;
         });
       }).catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -174,14 +162,14 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
   void _crearUsuario() async {
     if (_formKey.currentState!.validate()) {
       try {
-        Map<String, dynamic> nuevoUsuario = {
-          'nombre': _nombreController.text,
-          'apellido': _apellidoController.text,
-          'email': _emailController.text,
-          'password': _contrasenaController.text,
-          'password2': _contrasena2Controller.text,
-          'rol': _idRol,
-        };
+        Usuario nuevoUsuario = Usuario(
+          nombre: _nombreController.text,
+          apellido: _apellidoController.text,
+          email: _emailController.text,
+          password: _contrasenaController.text,
+          password2: _contrasena2Controller.text,
+          rol: _idRol!,
+        );
 
         await UsuarioService.create(nuevoUsuario);
 

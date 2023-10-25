@@ -80,16 +80,19 @@ class _GarzonPageState extends State<GarzonPage> {
                         child: ElevatedButton(
                           style: ButtonStyle(
                               elevation: MaterialStateProperty.all(4)),
-                          onPressed: () async {
-                            final result = await Navigator.push(
+                          onPressed: () {
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PedidoFormPage(),
                               ),
-                            );
-                            if (result != null && result == 'refresh') {
-                              setState(() {});
-                            }
+                            ).then((_) {
+                              setState(() {
+                                pedidos.clear();
+                                pedidosActivos.clear();
+                                _loadPedidos();
+                              });
+                            });
                           },
                           child: Text("Nuevo Pedido"),
                         ),
@@ -121,17 +124,20 @@ class _GarzonPageState extends State<GarzonPage> {
                             flex: 1,
                             child: PedidoCard(
                               pedido: pedidosActivos[leftCardIndex],
-                              onTap: (TapUpDetails details) async {
-                                final result = await Navigator.push(
+                              onTap: (TapUpDetails details) {
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => PedidoFormPage(
                                         id: pedidosActivos[leftCardIndex].id),
                                   ),
-                                );
-                                if (result == 'refresh') {
-                                  setState(() {});
-                                }
+                                ).then((_) {
+                                  setState(() {
+                                    pedidos.clear();
+                                    pedidosActivos.clear();
+                                    _loadPedidos();
+                                  });
+                                });
                               },
                               buttonLabel: Text("Editar"),
                             ),
