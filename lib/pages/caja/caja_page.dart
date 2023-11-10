@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
+import 'package:jerupos/widgets/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
-import 'package:jerupos/widgets/error_retry_widget.dart';
+import 'package:jerupos/utils/error_retry_widget.dart';
 import 'package:jerupos/widgets/pedido_tile.dart';
-import 'package:jerupos/widgets/user_drawer.dart';
+import 'package:jerupos/widgets/usuario_drawer.dart';
 
 class CajaPage extends StatefulWidget {
   @override
@@ -20,7 +21,6 @@ class _CajaPageState extends State<CajaPage> {
     _loadPedidos();
   }
 
-  // Function to fetch pedidos data
   Future<void> _loadPedidos() async {
     try {
       final fetchedPedidos = await PedidoService.list();
@@ -28,9 +28,11 @@ class _CajaPageState extends State<CajaPage> {
         pedidos = fetchedPedidos;
       });
     } catch (error) {
-      setState(() {
-        errorMsg = 'No se pudo cargar pedidos.\n$error';
-      });
+      if (mounted) {
+        setState(() {
+          errorMsg = 'No se pudo cargar pedidos.\n$error';
+        });
+      }
     }
   }
 
@@ -45,7 +47,7 @@ class _CajaPageState extends State<CajaPage> {
         title: Text('Caja Dashboard'),
         backgroundColor: Colors.orange,
       ),
-      drawer: UserDrawer(),
+      drawer: UsuarioDrawer(),
       body: errorMsg.isNotEmpty
           ? ErrorRetryWidget(
               errorMsg: errorMsg,
@@ -70,7 +72,8 @@ class _CajaPageState extends State<CajaPage> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Handle new orders or other actions
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => PedidoFormPage()));
         },
         child: Icon(Icons.add),
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/models/producto.dart';
-import 'package:jerupos/pages/garzon/pedido_form_page.dart';
+import 'package:jerupos/widgets/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 

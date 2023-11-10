@@ -70,4 +70,16 @@ class IngredienteService {
       throw Exception('Error al editar ingrediente');
     }
   }
+
+  static Future<void> patch(Map<String, dynamic> ingrediente, int id) async {
+    final response = await http.patch(
+      uri.replace(path: '${uri.path}$id/'),
+      headers: await _getHeaders(),
+      body: json.encode(ingrediente),
+    );
+
+    if (response.statusCode != 204) {
+      print(response.body);
+    }
+  }
 }

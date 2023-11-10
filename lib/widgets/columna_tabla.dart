@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class TableRowWidget extends StatelessWidget {
+class ColumnaTablaWidget extends StatelessWidget {
   final List<String> items;
   final bool header;
 
-  TableRowWidget({
+  ColumnaTablaWidget({
     required this.items,
     this.header = false,
   });

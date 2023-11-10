@@ -1,3 +1,34 @@
+class Rol {
+  int _id;
+  String _nombre;
+
+  Rol({
+    required int id,
+    required String nombre,
+  })  : _id = id,
+        _nombre = nombre;
+
+  factory Rol.fromJson(Map<String, dynamic> json) {
+    return Rol(
+      id: json['id'],
+      nombre: json['nombre'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': this._id,
+      'nombre': this._nombre,
+    };
+  }
+
+  int get id => this._id;
+  String get nombre => this._nombre;
+
+  set id(int id) => this._id = id;
+  set nombre(String nombre) => this._nombre = nombre;
+}
+
 class Usuario {
   int? _id;
   String _nombre;
@@ -31,7 +62,7 @@ class Usuario {
       nombre: json['nombre'],
       apellido: json['apellido'],
       email: json['email'],
-      rol: json['rol'],
+      rol: Rol.fromJson(json['rol']).id,
       password: json['password'],
       password2: json['password2'],
     );
@@ -66,6 +97,4 @@ class Usuario {
   set rol(int rol) => this._rol = rol;
   set password(String? password) => this._password = password;
   set password2(String? password2) => this._password2 = password2;
-
-  // Métodos
 }

@@ -43,7 +43,7 @@ class UsuarioService {
     }
   }
 
-  static Future<void> create(Usuario usuario) async {
+  static Future<String> create(Usuario usuario) async {
     final response = await http.post(
       Uri.parse(
           '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/accounts/register/'),
@@ -52,9 +52,9 @@ class UsuarioService {
     );
 
     if (response.statusCode != 201) {
-      print('status code: ${response.body}');
-      throw Exception('Error al crear usuario');
+      return response.body;
     }
+    return "";
   }
 
   static Future<Usuario> get(int id) async {
@@ -70,7 +70,7 @@ class UsuarioService {
     }
   }
 
-  static Future<void> update(Map<String, dynamic> usuario, int id) async {
+  static Future<String> update(Map<String, dynamic> usuario, int id) async {
     final response = await http.put(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
@@ -78,9 +78,9 @@ class UsuarioService {
     );
 
     if (response.statusCode != 200) {
-      print(response.body);
-      throw Exception('Error al editar usuario');
+      return response.body;
     }
+    return "";
   }
 
   static Future<void> delete(int id) async {

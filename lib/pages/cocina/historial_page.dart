@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/services/pedido_service.dart';
-import 'package:jerupos/widgets/error_retry_widget.dart';
+import 'package:jerupos/utils/error_retry_widget.dart';
 import 'package:jerupos/widgets/historial_tile.dart';
 
 class HistorialPage extends StatefulWidget {

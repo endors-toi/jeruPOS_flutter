@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/models/producto.dart';
-import 'package:jerupos/widgets/animated_ellipsis.dart';
+import 'package:jerupos/utils/animated_ellipsis.dart';
 
 class PedidoCard extends StatelessWidget {
   final Pedido pedido;

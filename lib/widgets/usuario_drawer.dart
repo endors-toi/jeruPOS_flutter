@@ -6,12 +6,12 @@ import 'package:jerupos/services/auth_service.dart';
 import 'package:jerupos/services/usuario_service.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class UserDrawer extends StatefulWidget {
+class UsuarioDrawer extends StatefulWidget {
   @override
-  State<UserDrawer> createState() => _UserDrawerState();
+  State<UsuarioDrawer> createState() => _UsuarioDrawerState();
 }
 
-class _UserDrawerState extends State<UserDrawer> {
+class _UsuarioDrawerState extends State<UsuarioDrawer> {
   Usuario? usuario;
 
   @override

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/pages/admin/ingreso_diario.dart';
 import 'package:jerupos/pages/admin/pedidos_page.dart';
 import 'package:jerupos/pages/admin/stock_page.dart';
 import 'package:jerupos/pages/admin/usuarios_page.dart';
-import 'package:jerupos/widgets/user_drawer.dart';
+import 'package:jerupos/widgets/usuario_drawer.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -13,7 +14,7 @@ class _AdminPageState extends State<AdminPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.orange,
@@ -27,15 +28,17 @@ class _AdminPageState extends State<AdminPage> {
               Tab(text: 'Pedidos'),
               Tab(text: 'Stock'),
               Tab(text: 'Usuarios'),
+              Tab(text: 'Ingreso'),
             ],
           ),
         ),
-        drawer: UserDrawer(),
+        drawer: UsuarioDrawer(),
         body: TabBarView(
           children: [
             PedidosPage(),
             StockPage(),
             UsuariosPage(),
+            IngresoDiario(),
           ],
         ),
       ),

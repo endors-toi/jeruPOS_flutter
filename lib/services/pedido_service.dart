@@ -73,7 +73,7 @@ class PedidoService {
     final response = await http.post(
       uri,
       headers: await _getHeaders(),
-      body: json.encode(ped),
+      body: json.encode(pedido.toJson()),
     );
 
     if (response.statusCode != 201) {
@@ -102,7 +102,7 @@ class PedidoService {
         adjustedProductos = productos.map((producto) {
           return {
             ...producto,
-            'id': producto['producto'], // Rename 'producto' to 'id'
+            'id': producto['producto'],
           };
         }).toList();
       }

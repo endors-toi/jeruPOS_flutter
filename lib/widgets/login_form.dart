@@ -4,6 +4,7 @@ import 'package:jerupos/pages/caja/caja_page.dart';
 import 'package:jerupos/pages/cocina/cocina_page.dart';
 import 'package:jerupos/pages/garzon/garzon_page.dart';
 import 'package:jerupos/services/auth_service.dart';
+import 'package:jerupos/utils/mostrar_snackbar.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -74,28 +75,30 @@ class _LoginFormState extends State<LoginForm> {
         padding: EdgeInsets.all(8.0),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Expanded(
-              flex: 1,
+              flex: 4,
               child:
                   Container(child: Image.asset('assets/images/logo-min.png'))),
           Expanded(
-              flex: 2,
+              flex: 5,
               child: ListView(children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: TextFormField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
+                      border: OutlineInputBorder(),
                       labelText: 'Email',
                     ),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: TextFormField(
                     controller: _passCtrl,
                     obscureText: true,
                     decoration: InputDecoration(
+                      border: OutlineInputBorder(),
                       labelText: 'Contraseña',
                     ),
                   ),
@@ -103,10 +106,17 @@ class _LoginFormState extends State<LoginForm> {
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: ElevatedButton(
+                    style: ButtonStyle(
+                      elevation: MaterialStateProperty.all(18),
+                      minimumSize: MaterialStateProperty.all(Size(0, 50)),
+                    ),
                     onPressed: () async {
                       await Login(context);
                     },
-                    child: Text('Login'),
+                    child: Text(
+                      'Log in',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ),
               ])),
@@ -140,20 +150,17 @@ class _LoginFormState extends State<LoginForm> {
                 context, MaterialPageRoute(builder: (context) => AdminPage()));
             break;
           default:
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('No hay páginas asociadas a tu rol.'),
-              ),
-            );
+            if (mounted) {
+              mostrarSnackBar(context, 'No hay páginas asociadas a tu rol.');
+            }
             break;
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al iniciar sesión. Revisa tus credenciales.'),
-        ),
-      );
+      if (mounted) {
+        mostrarSnackBar(
+            context, 'Error al iniciar sesión. Revisa tus credenciales.');
+      }
     }
   }
 }

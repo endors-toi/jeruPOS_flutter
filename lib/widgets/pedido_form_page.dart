@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/models/producto.dart';
-import 'package:jerupos/services/auth_service.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/services/producto_service.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:jerupos/services/usuario_service.dart';
 
 class PedidoFormPage extends StatefulWidget {
   final int? id;
@@ -18,12 +18,20 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
   late Future _productosFuture;
   List<Producto> productosPedido = [];
   bool _editMode = false;
-  int? mesa;
+  int? mesa = null;
+  String? cliente = null;
+  Usuario? usuario;
+  TextEditingController clienteCtrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _productosFuture = ProductoService.list();
+    UsuarioService.obtenerUsuario().then((usuario) {
+      setState(() {
+        this.usuario = usuario;
+      });
+    });
     if (widget.id != null) {
       _editMode = true;
 
@@ -106,39 +114,54 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
                       },
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Mesa:  ',
-                        style: TextStyle(fontSize: 24),
-                      ),
-                      DropdownButton<int>(
-                        value: mesa,
-                        items: List.generate(10, (index) => index + 1)
-                            .map<DropdownMenuItem<int>>((int valor) {
-                          return DropdownMenuItem<int>(
-                            value: valor,
-                            child: Text(valor.toString()),
-                          );
-                        }).toList(),
-                        onChanged: (int? valor) {
-                          setState(() {
-                            mesa = valor!;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
+                  usuario == null
+                      ? CircularProgressIndicator()
+                      : usuario!.rol == 1
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Mesa:  ',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                DropdownButton<int>(
+                                  value: mesa,
+                                  hint: Text("--",
+                                      style: TextStyle(fontSize: 24)),
+                                  items: List.generate(10, (index) => index + 1)
+                                      .map<DropdownMenuItem<int>>((int valor) {
+                                    return DropdownMenuItem<int>(
+                                      value: valor,
+                                      child: Text(valor.toString()),
+                                    );
+                                  }).toList(),
+                                  onChanged: (int? valor) {
+                                    setState(() {
+                                      mesa = valor!;
+                                    });
+                                  },
+                                ),
+                              ],
+                            )
+                          : Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 36, vertical: 8),
+                              child: TextFormField(
+                                controller: clienteCtrl,
+                                decoration: InputDecoration(
+                                  hintText: "Nombre cliente",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
                   Container(
                     height: 52,
                     margin: EdgeInsets.only(top: 8),
                     width: double.infinity,
                     child: FilledButton(
-                      child:
-                          Text(_editMode ? 'Editar Pedido' : 'Enviar Pedido'),
+                      child: Text(_editMode ? 'Editar Pedido' : 'Crear Pedido'),
                       onPressed: () =>
-                          _editMode ? editarPedido() : enviarPedido(),
+                          _editMode ? editarPedido() : crearPedido(),
                     ),
                   ),
                 ],
@@ -172,8 +195,9 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     });
   }
 
-  void enviarPedido() async {
-    int? userId = await _getUserId();
+  void crearPedido() async {
+    cliente = clienteCtrl.text.trim();
+    int? userId = usuario!.id;
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar el usuario')),
@@ -182,7 +206,8 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     }
     Pedido pedido = Pedido(
       idUsuario: userId,
-      mesa: mesa,
+      mesa: mesa != null ? mesa : null,
+      nombreCliente: cliente != null ? cliente : null,
       estado: 'PENDIENTE',
       productos: productosPedido,
     );
@@ -200,15 +225,5 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
 
     PedidoService.update(pedido);
     Navigator.pop(context);
-  }
-
-  Future<int?> _getUserId() async {
-    String? token = await AuthService.getAccessToken();
-    if (token != null) {
-      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-      return decodedToken['user_id'];
-    } else {
-      return null;
-    }
   }
 }

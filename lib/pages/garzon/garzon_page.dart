@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
-import 'package:jerupos/pages/garzon/pedido_form_page.dart';
+import 'package:jerupos/widgets/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
-import 'package:jerupos/widgets/error_retry_widget.dart';
+import 'package:jerupos/utils/error_retry_widget.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
-import 'package:jerupos/widgets/user_drawer.dart';
+import 'package:jerupos/widgets/usuario_drawer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class GarzonPage extends StatefulWidget {
@@ -59,7 +59,7 @@ class _GarzonPageState extends State<GarzonPage> {
         title: Text('JeruPOS'),
         backgroundColor: Colors.orange,
       ),
-      drawer: UserDrawer(),
+      drawer: UsuarioDrawer(),
       body: errorMsg.isNotEmpty
           ? ErrorRetryWidget(
               errorMsg: errorMsg,
