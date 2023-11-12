@@ -12,7 +12,7 @@ class IngresoDiario extends StatefulWidget {
 
 class _IngresoDiarioState extends State<IngresoDiario> {
   Map<int, TextEditingController> _controllers = {};
-  Map<int, int> _cantidades = {};
+  Map<int, int> _cantidadesActuales = {};
 
   @override
   void dispose() {
@@ -36,7 +36,7 @@ class _IngresoDiarioState extends State<IngresoDiario> {
               ingredientes.forEach((ingrediente) {
                 _controllers.putIfAbsent(
                     ingrediente.id, () => TextEditingController());
-                _cantidades.putIfAbsent(
+                _cantidadesActuales.putIfAbsent(
                     ingrediente.id, () => ingrediente.cantidadDisponible);
               });
               return Column(
@@ -81,7 +81,7 @@ class _IngresoDiarioState extends State<IngresoDiario> {
                               context, "Ingreso realizado correctamente.");
                           setState(() {
                             _controllers = {};
-                            _cantidades = {};
+                            _cantidadesActuales = {};
                           });
                         });
                       },
@@ -106,7 +106,7 @@ class _IngresoDiarioState extends State<IngresoDiario> {
       var controller = _controllers[id];
       if (controller != null) {
         int cantidadIngresada = int.tryParse(controller.text) ?? 0;
-        int cantidadActual = _cantidades[id] ?? 0;
+        int cantidadActual = _cantidadesActuales[id] ?? 0;
         int cantidadNueva = cantidadActual + cantidadIngresada;
         await IngredienteService.patch(
             {'cantidad_disponible': cantidadNueva}, id);

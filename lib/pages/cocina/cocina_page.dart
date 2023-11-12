@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
+import 'package:jerupos/pages/cocina/reporte_diario.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/utils/error_retry_widget.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
 import 'package:jerupos/widgets/usuario_drawer.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class CocinaPage extends StatefulWidget {
   @override
@@ -40,6 +42,15 @@ class _CocinaPageState extends State<CocinaPage> {
       appBar: AppBar(
         title: Text('JeruPOS'),
         backgroundColor: Colors.orange,
+        actions: [
+          IconButton(
+            icon: Icon(MdiIcons.launch),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ReporteDiario()));
+            },
+          )
+        ],
       ),
       drawer: UsuarioDrawer(),
       body: errorMsg.isNotEmpty
