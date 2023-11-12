@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/models/producto.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/services/pedido_service.dart';
+import 'package:jerupos/services/usuario_service.dart';
 import 'package:jerupos/utils/animated_ellipsis.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class PedidoTile extends StatelessWidget {
+class PedidoTile extends StatefulWidget {
   final Pedido pedido;
   final Function onAction;
 
@@ -14,13 +16,30 @@ class PedidoTile extends StatelessWidget {
     required this.onAction,
   });
 
+  @override
+  State<PedidoTile> createState() => _PedidoTileState();
+}
+
+class _PedidoTileState extends State<PedidoTile> {
+  Usuario? usuario;
+
   num calcularTotal() {
     num total = 0;
-    List<Producto> productos = pedido.productos;
+    List<Producto> productos = widget.pedido.productos;
     productos.forEach((producto) {
       total += producto.precio! * producto.cantidad;
     });
     return total;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    UsuarioService.obtenerUsuario().then((usuario) {
+      setState(() {
+        this.usuario = usuario;
+      });
+    });
   }
 
   @override
@@ -45,49 +64,54 @@ class PedidoTile extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text("#${pedido.id}",
+                      Text("#${widget.pedido.id}",
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
                       Text(
-                          "  ${pedido.timestamp!.hour}:${pedido.timestamp!.minute.toString().padLeft(2, '0')}")
+                          "  ${widget.pedido.timestamp!.hour}:${widget.pedido.timestamp!.minute.toString().padLeft(2, '0')}")
                     ],
                   ),
                   Text(
-                      pedido.nombreCliente != null
-                          ? "\"${pedido.nombreCliente}\""
-                          : pedido.mesa != null
-                              ? "MESA ${pedido.mesa}"
+                      widget.pedido.nombreCliente != null
+                          ? "\"${widget.pedido.nombreCliente}\""
+                          : widget.pedido.mesa != null
+                              ? "MESA ${widget.pedido.mesa}"
                               : "",
                       style: TextStyle(fontSize: 16)),
                 ],
               ),
             ),
             Expanded(flex: 1, child: Text('\$$total')),
-            pedido.estado != "PAGADO"
+            widget.pedido.estado != "PAGADO"
                 ? Expanded(flex: 1, child: AnimatedEllipsis())
-                : Text("${pedido.estado}"),
-            Expanded(
-              flex: 2,
-              child: InkWell(
-                child: Row(
-                  children: [
-                    Icon(
-                      MdiIcons.checkCircle,
-                      color: const Color.fromARGB(255, 33, 161, 38),
-                      size: 32,
-                    ),
-                    Text("PAGADO",
-                        style: TextStyle(
-                            color: Colors.green, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                onTap: () async {
-                  pedido.estado = "PAGADO";
-                  await PedidoService.update(pedido);
-                  onAction();
-                },
-              ),
-            )
+                : Text("${widget.pedido.estado}"),
+            usuario == null
+                ? Container()
+                : usuario!.rol != 4
+                    ? Expanded(
+                        flex: 2,
+                        child: InkWell(
+                          child: Row(
+                            children: [
+                              Icon(
+                                MdiIcons.checkCircle,
+                                color: const Color.fromARGB(255, 33, 161, 38),
+                                size: 32,
+                              ),
+                              Text("PAGADO",
+                                  style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          onTap: () async {
+                            widget.pedido.estado = "PAGADO";
+                            await PedidoService.update(widget.pedido);
+                            widget.onAction();
+                          },
+                        ),
+                      )
+                    : Container(),
           ],
         ));
   }

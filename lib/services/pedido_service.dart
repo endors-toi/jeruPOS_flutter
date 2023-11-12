@@ -38,7 +38,7 @@ class PedidoService {
     } else {
       List<dynamic> jsonData = json.decode(response.body);
 
-      // solución temporal
+      // solución parche
       List<Map<String, dynamic>> adjustedJsonData =
           jsonData.map<Map<String, dynamic>>((pedidoJson) {
         List<Map<String, dynamic>> productos =
@@ -64,12 +64,12 @@ class PedidoService {
 
   static Future<Pedido> create(Pedido pedido) async {
     // solución temporal
-    Map<String, dynamic> ped = {
-      'usuario': pedido.idUsuario,
-      'mesa': pedido.mesa,
-      'productos_post': pedido.productos,
-      'estado': pedido.estado,
-    };
+    // Map<String, dynamic> ped = {
+    //   'usuario': pedido.idUsuario,
+    //   'mesa': pedido.mesa,
+    //   'productos_post': pedido.productos,
+    //   'estado': pedido.estado,
+    // };
     final response = await http.post(
       uri,
       headers: await _getHeaders(),

@@ -19,7 +19,6 @@ class _HistorialPageState extends State<HistorialPage> {
     _loadPedidos();
   }
 
-  // Function to fetch pedidos data
   Future<void> _loadPedidos() async {
     try {
       final pedidos = await PedidoService.list();

@@ -18,6 +18,7 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final TextEditingController _passCtrl = TextEditingController();
   final TextEditingController _emailCtrl = TextEditingController();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -80,46 +81,63 @@ class _LoginFormState extends State<LoginForm> {
                   Container(child: Image.asset('assets/images/logo-min.png'))),
           Expanded(
               flex: 5,
-              child: ListView(children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: TextFormField(
-                    controller: _emailCtrl,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email',
+              child: Form(
+                key: _formKey,
+                child: ListView(children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: TextFormField(
+                      controller: _emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Email',
+                      ),
+                      validator: (email) {
+                        if (email == null || email.isEmpty) {
+                          return 'Ingresa un email.';
+                        }
+                        return null;
+                      },
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: TextFormField(
-                    controller: _passCtrl,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Contraseña',
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: TextFormField(
+                      controller: _passCtrl,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Contraseña',
+                      ),
+                      validator: (pass) {
+                        if (pass == null || pass.isEmpty) {
+                          return 'Ingresa una contraseña.';
+                        }
+                        return null;
+                      },
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(20),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      elevation: MaterialStateProperty.all(18),
-                      minimumSize: MaterialStateProperty.all(Size(0, 50)),
-                    ),
-                    onPressed: () async {
-                      await Login(context);
-                    },
-                    child: Text(
-                      'Log in',
-                      style: TextStyle(fontSize: 16),
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        elevation: MaterialStateProperty.all(18),
+                        minimumSize: MaterialStateProperty.all(Size(0, 50)),
+                      ),
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          await Login(context);
+                        }
+                      },
+                      child: Text(
+                        'Log in',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
                   ),
-                ),
-              ])),
+                ]),
+              )),
         ]),
       ),
     );
@@ -150,17 +168,13 @@ class _LoginFormState extends State<LoginForm> {
                 context, MaterialPageRoute(builder: (context) => AdminPage()));
             break;
           default:
-            if (mounted) {
-              mostrarSnackBar(context, 'No hay páginas asociadas a tu rol.');
-            }
+            mostrarSnackBar(context, 'No hay páginas asociadas a tu rol.');
             break;
         }
       }
     } catch (e) {
-      if (mounted) {
-        mostrarSnackBar(
-            context, 'Error al iniciar sesión. Revisa tus credenciales.');
-      }
+      mostrarSnackBar(
+          context, 'Error al iniciar sesión. Revisa tus credenciales.');
     }
   }
 }

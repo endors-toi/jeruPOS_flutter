@@ -5,6 +5,7 @@ import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/services/producto_service.dart';
 import 'package:jerupos/services/usuario_service.dart';
+import 'package:jerupos/utils/mostrar_snackbar.dart';
 
 class PedidoFormPage extends StatefulWidget {
   final int? id;
@@ -16,11 +17,11 @@ class PedidoFormPage extends StatefulWidget {
 
 class _PedidoFormPageState extends State<PedidoFormPage> {
   late Future _productosFuture;
-  List<Producto> productosPedido = [];
+  Usuario? usuario;
   bool _editMode = false;
   int? mesa = null;
   String? cliente = null;
-  Usuario? usuario;
+  List<Producto> productosPedido = [];
   TextEditingController clienteCtrl = TextEditingController();
 
   @override
@@ -41,9 +42,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
           productosPedido = pedido.productos;
         });
       }).catchError((e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cargar el pedido: $e')),
-        );
+        mostrarSnackBar(context, 'Error al cargar el pedido: $e');
       });
     }
   }
@@ -199,9 +198,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     cliente = clienteCtrl.text.trim();
     int? userId = usuario!.id;
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar el usuario')),
-      );
+      mostrarSnackBar(context, 'Error al cargar el usuario');
       return;
     }
     Pedido pedido = Pedido(

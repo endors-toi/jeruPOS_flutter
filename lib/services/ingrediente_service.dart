@@ -35,8 +35,8 @@ class IngredienteService {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonData = json.decode(response.body);
-      return jsonData
+      return json
+          .decode(response.body)
           .map<Ingrediente>((json) => Ingrediente.fromJson(json))
           .toList();
     } else {

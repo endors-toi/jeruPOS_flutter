@@ -35,8 +35,10 @@ class ProductoService {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonData = json.decode(response.body);
-      return jsonData.map<Producto>((json) => Producto.fromJson(json)).toList();
+      return json
+          .decode(response.body)
+          .map<Producto>((json) => Producto.fromJson(json))
+          .toList();
     } else {
       print(response.statusCode);
       return [];

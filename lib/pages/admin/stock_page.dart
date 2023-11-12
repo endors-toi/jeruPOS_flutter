@@ -13,7 +13,7 @@ class _StockPageState extends State<StockPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('Control de Stock'),
+        title: Text('Ajustes de Stock'),
       ),
       body: FutureBuilder(
         future: IngredienteService.list(),
