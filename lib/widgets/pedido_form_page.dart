@@ -4,8 +4,8 @@ import 'package:jerupos/models/producto.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/services/producto_service.dart';
-import 'package:jerupos/services/usuario_service.dart';
 import 'package:jerupos/utils/mostrar_snackbar.dart';
+import 'package:provider/provider.dart';
 
 class PedidoFormPage extends StatefulWidget {
   final int? id;
@@ -28,10 +28,9 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
   void initState() {
     super.initState();
     _productosFuture = ProductoService.list();
-    UsuarioService.obtenerUsuario().then((usuario) {
-      setState(() {
-        this.usuario = usuario;
-      });
+    setState(() {
+      this.usuario =
+          Provider.of<UsuarioProvider>(context, listen: false).usuario;
     });
     if (widget.id != null) {
       _editMode = true;

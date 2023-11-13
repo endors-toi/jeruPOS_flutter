@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Rol {
   int _id;
   String _nombre;
@@ -97,4 +99,15 @@ class Usuario {
   set rol(int rol) => this._rol = rol;
   set password(String? password) => this._password = password;
   set password2(String? password2) => this._password2 = password2;
+}
+
+class UsuarioProvider with ChangeNotifier {
+  Usuario? _usuario;
+
+  Usuario? get usuario => _usuario;
+
+  void setUsuario(Usuario usuario) {
+    _usuario = usuario;
+    notifyListeners();
+  }
 }

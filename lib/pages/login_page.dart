@@ -1,13 +1,15 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/admin/admin_page.dart';
 import 'package:jerupos/pages/caja/caja_page.dart';
 import 'package:jerupos/pages/cocina/cocina_page.dart';
 import 'package:jerupos/pages/garzon/garzon_page.dart';
 import 'package:jerupos/services/auth_service.dart';
+import 'package:jerupos/utils/mostrar_snackbar.dart';
 import 'package:jerupos/widgets/login_form.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -37,8 +39,15 @@ class _LoginPageState extends State<LoginPage> {
             await AuthService.getAccessToken().timeout(Duration(seconds: 5));
         if (token != null) {
           final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-          int rol = decodedToken['rol'];
-          switch (rol) {
+          Usuario usuario = Usuario(
+              id: decodedToken['user_id'],
+              rol: decodedToken['rol'],
+              nombre: decodedToken['nombre'],
+              apellido: decodedToken['apellido'],
+              email: decodedToken['email']);
+          Provider.of<UsuarioProvider>(context, listen: false)
+              .setUsuario(usuario);
+          switch (usuario.rol) {
             case 1:
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => GarzonPage()));
@@ -56,11 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                   MaterialPageRoute(builder: (context) => AdminPage()));
               break;
             default:
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('No hay páginas asociadas a tu rol.'),
-                ),
-              );
+              mostrarSnackBar(context, 'No hay páginas asociadas a tu rol.');
               break;
           }
         }
@@ -71,17 +76,9 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       if (e is TimeoutException) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('No se pudo conectar con el servidor.'),
-          ),
-        );
+        mostrarSnackBar(context, 'No se pudo conectar con el servidor.');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-          ),
-        );
+        mostrarSnackBar(context, "Error: $e");
       }
       setState(() {
         body = LoginForm();

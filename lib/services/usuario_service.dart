@@ -96,19 +96,4 @@ class UsuarioService {
       throw Exception('Error al eliminar usuario');
     }
   }
-
-  static Future<Usuario> obtenerUsuario() async {
-    final String? token = await AuthService.getAccessToken();
-    if (token != null) {
-      final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-      Usuario usuario = Usuario(
-          id: decodedToken['user_id'],
-          rol: decodedToken['rol'],
-          nombre: decodedToken['nombre'],
-          apellido: decodedToken['apellido'],
-          email: decodedToken['email']);
-      return usuario;
-    }
-    throw Exception('Token is null');
-  }
 }

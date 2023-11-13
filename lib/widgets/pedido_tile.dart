@@ -3,9 +3,9 @@ import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/models/producto.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/services/pedido_service.dart';
-import 'package:jerupos/services/usuario_service.dart';
 import 'package:jerupos/utils/animated_ellipsis.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
 
 class PedidoTile extends StatefulWidget {
   final Pedido pedido;
@@ -35,10 +35,8 @@ class _PedidoTileState extends State<PedidoTile> {
   @override
   void initState() {
     super.initState();
-    UsuarioService.obtenerUsuario().then((usuario) {
-      setState(() {
-        this.usuario = usuario;
-      });
+    setState(() {
+      this.usuario = Provider.of<UsuarioProvider>(context).usuario;
     });
   }
 

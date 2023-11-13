@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/ajuste_stock.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/cocina/inventario_page.dart';
 import 'package:jerupos/pages/cocina/pedido_diario_page.dart';
 import 'package:jerupos/services/ingrediente_service.dart';
@@ -31,13 +32,19 @@ class ReporteDiarioData extends ChangeNotifier {
 }
 
 class ReporteDiario extends StatefulWidget {
-  const ReporteDiario({super.key});
-
   @override
   State<ReporteDiario> createState() => _ReporteDiarioState();
 }
 
 class _ReporteDiarioState extends State<ReporteDiario> {
+  Usuario? usuario;
+
+  @override
+  void initState() {
+    super.initState();
+    this.usuario = Provider.of<UsuarioProvider>(context, listen: false).usuario;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -99,7 +106,7 @@ class _ReporteDiarioState extends State<ReporteDiario> {
           tipoAjuste: diferencia > 0 ? "SUMA" : "RESTA",
           cantidad: diferencia.abs(),
           motivo: "Reporte diario",
-          usuario: 8,
+          usuario: usuario!.id!,
         );
         await StockService.create(ajuste);
         await IngredienteService.patch(

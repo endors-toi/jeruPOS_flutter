@@ -3,8 +3,8 @@ import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/cocina/historial_page.dart';
 import 'package:jerupos/pages/login_page.dart';
 import 'package:jerupos/services/auth_service.dart';
-import 'package:jerupos/services/usuario_service.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
 
 class UsuarioDrawer extends StatefulWidget {
   @override
@@ -17,12 +17,8 @@ class _UsuarioDrawerState extends State<UsuarioDrawer> {
   @override
   void initState() {
     super.initState();
-    UsuarioService.obtenerUsuario().then((Usuario usuario) {
-      setState(() {
-        this.usuario = usuario;
-      });
-    }).catchError((error) {
-      print('An error occurred: $error');
+    setState(() {
+      this.usuario = Provider.of<UsuarioProvider>(context).usuario;
     });
   }
 
