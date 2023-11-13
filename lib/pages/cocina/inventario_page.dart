@@ -59,7 +59,8 @@ class _InventarioPageState extends State<InventarioPage>
                           _cantidadesReportadas[ingrediente.id] =
                               int.parse(value);
                           Provider.of<ReporteDiarioData>(context, listen: false)
-                              .updateStockReportado(_cantidadesReportadas);
+                              .updateInventario(
+                                  _cantidadesReportadas, _cantidadesActuales);
                         },
                       );
                     },
