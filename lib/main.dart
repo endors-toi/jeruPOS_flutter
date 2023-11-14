@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/login_page.dart';
+import 'package:jerupos/services/firebase_service.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -9,6 +10,7 @@ void main() async {
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await FirebaseService().initNotifications();
   runApp(MyApp());
 }
 
