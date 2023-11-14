@@ -33,8 +33,8 @@ class _PedidoTileState extends State<PedidoTile> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setState(() {
       this.usuario = Provider.of<UsuarioProvider>(context).usuario;
     });

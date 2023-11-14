@@ -28,10 +28,6 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
   void initState() {
     super.initState();
     _productosFuture = ProductoService.list();
-    setState(() {
-      this.usuario =
-          Provider.of<UsuarioProvider>(context, listen: false).usuario;
-    });
     if (widget.id != null) {
       _editMode = true;
 
@@ -44,6 +40,15 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
         mostrarSnackBar(context, 'Error al cargar el pedido: $e');
       });
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      this.usuario =
+          Provider.of<UsuarioProvider>(context, listen: false).usuario;
+    });
   }
 
   @override

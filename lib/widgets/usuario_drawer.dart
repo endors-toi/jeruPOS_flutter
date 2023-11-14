@@ -15,8 +15,8 @@ class _UsuarioDrawerState extends State<UsuarioDrawer> {
   Usuario? usuario;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setState(() {
       this.usuario = Provider.of<UsuarioProvider>(context).usuario;
     });

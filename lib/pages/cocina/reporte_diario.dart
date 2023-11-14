@@ -40,8 +40,8 @@ class _ReporteDiarioState extends State<ReporteDiario> {
   Usuario? usuario;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     this.usuario = Provider.of<UsuarioProvider>(context, listen: false).usuario;
   }
 

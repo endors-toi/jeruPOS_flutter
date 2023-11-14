@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/admin/admin_page.dart';
 import 'package:jerupos/pages/caja/caja_page.dart';
 import 'package:jerupos/pages/cocina/cocina_page.dart';
@@ -7,6 +10,7 @@ import 'package:jerupos/services/auth_service.dart';
 import 'package:jerupos/utils/mostrar_snackbar.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
   final bool debug = true;
@@ -19,6 +23,7 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController _passCtrl = TextEditingController();
   final TextEditingController _emailCtrl = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -76,11 +81,11 @@ class _LoginFormState extends State<LoginForm> {
         padding: EdgeInsets.all(8.0),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Expanded(
-              flex: 4,
+              flex: 2,
               child:
                   Container(child: Image.asset('assets/images/logo-min.png'))),
           Expanded(
-              flex: 5,
+              flex: 3,
               child: Form(
                 key: _formKey,
                 child: ListView(children: [
@@ -121,21 +126,44 @@ class _LoginFormState extends State<LoginForm> {
                   Padding(
                     padding: EdgeInsets.all(20),
                     child: ElevatedButton(
-                      style: ButtonStyle(
-                        elevation: MaterialStateProperty.all(18),
-                        minimumSize: MaterialStateProperty.all(Size(0, 50)),
-                      ),
-                      onPressed: () async {
+                      style: _loading
+                          ? ButtonStyle(
+                              elevation: MaterialStateProperty.all(0),
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.grey),
+                              minimumSize:
+                                  MaterialStateProperty.all(Size(0, 50)),
+                              splashFactory: NoSplash.splashFactory,
+                            )
+                          : ButtonStyle(
+                              elevation: MaterialStateProperty.all(18),
+                              minimumSize:
+                                  MaterialStateProperty.all(Size(0, 50)),
+                            ),
+                      onPressed: () {
+                        if (_loading) return;
                         if (_formKey.currentState!.validate()) {
-                          await Login(context);
+                          Login(context);
+                          setState(() {
+                            _loading = true;
+                          });
                         }
                       },
                       child: Text(
                         'Log in',
-                        style: TextStyle(fontSize: 16),
+                        style: _loading
+                            ? TextStyle(
+                                fontSize: 16,
+                                color: const Color.fromARGB(137, 73, 73, 73))
+                            : TextStyle(fontSize: 16),
                       ),
                     ),
                   ),
+                  _loading
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : Container(),
                 ]),
               )),
         ]),
@@ -145,12 +173,20 @@ class _LoginFormState extends State<LoginForm> {
 
   Future<void> Login(BuildContext context) async {
     try {
-      await AuthService.login(_emailCtrl.text, _passCtrl.text);
+      await AuthService.login(_emailCtrl.text, _passCtrl.text)
+          .timeout(Duration(seconds: 4));
       final String? token = await AuthService.getAccessToken();
       if (token != null) {
         final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-        int rol = decodedToken['rol'];
-        switch (rol) {
+        Usuario usuario = Usuario(
+            id: decodedToken['user_id'],
+            rol: decodedToken['rol'],
+            nombre: decodedToken['nombre'],
+            apellido: decodedToken['apellido'],
+            email: decodedToken['email']);
+        Provider.of<UsuarioProvider>(context, listen: false)
+            .setUsuario(usuario);
+        switch (usuario.rol) {
           case 1:
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => GarzonPage()));
@@ -173,8 +209,15 @@ class _LoginFormState extends State<LoginForm> {
         }
       }
     } catch (e) {
-      mostrarSnackBar(
-          context, 'Error al iniciar sesión. Revisa tus credenciales.');
+      if (e is TimeoutException) {
+        mostrarSnackBar(context, 'Error de conexión.');
+        setState(() {
+          _loading = false;
+        });
+      } else {
+        mostrarSnackBar(
+            context, 'Error al iniciar sesión. Revisa tus credenciales.');
+      }
     }
   }
 }

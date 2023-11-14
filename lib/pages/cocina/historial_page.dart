@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/services/pedido_service.dart';
-import 'package:jerupos/utils/error_retry_widget.dart';
+import 'package:jerupos/utils/error_retry.dart';
 import 'package:jerupos/widgets/historial_tile.dart';
 
 class HistorialPage extends StatefulWidget {
@@ -40,7 +40,7 @@ class _HistorialPageState extends State<HistorialPage> {
         title: Text('Historial de Pedidos'),
       ),
       body: errorMsg.isNotEmpty
-          ? ErrorRetryWidget(
+          ? ErrorRetry(
               errorMsg: errorMsg,
               onRetry: () => _loadPedidos(),
             )

@@ -34,9 +34,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _initAsync() async {
     try {
-      if (await AuthService.refreshToken()) {
+      if (await AuthService.refreshToken().timeout(Duration(seconds: 1))) {
         final String? token =
-            await AuthService.getAccessToken().timeout(Duration(seconds: 5));
+            await AuthService.getAccessToken().timeout(Duration(seconds: 1));
         if (token != null) {
           final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
           Usuario usuario = Usuario(
@@ -76,13 +76,12 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       if (e is TimeoutException) {
-        mostrarSnackBar(context, 'No se pudo conectar con el servidor.');
+        setState(() {
+          body = LoginForm();
+        });
       } else {
-        mostrarSnackBar(context, "Error: $e");
+        mostrarSnackBar(context, 'Error desconocido.');
       }
-      setState(() {
-        body = LoginForm();
-      });
     }
   }
 }

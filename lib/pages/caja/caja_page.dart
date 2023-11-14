@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/widgets/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
-import 'package:jerupos/utils/error_retry_widget.dart';
+import 'package:jerupos/utils/error_retry.dart';
 import 'package:jerupos/widgets/pedido_tile.dart';
 import 'package:jerupos/widgets/usuario_drawer.dart';
 
@@ -49,7 +49,7 @@ class _CajaPageState extends State<CajaPage> {
       ),
       drawer: UsuarioDrawer(),
       body: errorMsg.isNotEmpty
-          ? ErrorRetryWidget(
+          ? ErrorRetry(
               errorMsg: errorMsg,
               onRetry: () {
                 setState(() {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -8,21 +10,25 @@ class AuthService {
       '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/accounts/');
 
   static Future<void> login(String email, String password) async {
-    final response = await http.post(
-      uri.replace(path: '${uri.path}login/'),
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: json.encode({'email': email, 'password': password}),
-    );
+    try {
+      final response = await http.post(
+        uri.replace(path: '${uri.path}login/'),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: json.encode({'email': email, 'password': password}),
+      );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      final String token = data['access'];
-      final String refreshToken = data['refresh'];
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', token);
-      await prefs.setString('refresh_token', refreshToken);
-    } else {
-      throw Exception('Failed to login');
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final String token = data['access'];
+        final String refreshToken = data['refresh'];
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+        await prefs.setString('refresh_token', refreshToken);
+      }
+    } catch (e) {
+      if (e is TimeoutException) {
+        print("Error de conexión.");
+      }
     }
   }
 
@@ -31,20 +37,27 @@ class AuthService {
     final String? refreshToken = prefs.getString('refresh_token');
 
     if (refreshToken != null) {
-      final response = await http.post(
-        uri.replace(path: '${uri.path}token/refresh/'),
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        body: json.encode({'refresh': refreshToken}),
-      );
+      try {
+        final response = await http.post(
+          uri.replace(path: '${uri.path}token/refresh/'),
+          headers: {'Content-Type': 'application/json; charset=UTF-8'},
+          body: json.encode({'refresh': refreshToken}),
+        );
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final String newToken = data['access'];
-        await prefs.setString('token', newToken);
-        return true;
-      } else {
-        await prefs.remove('token');
-        await prefs.remove('refresh_token');
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = json.decode(response.body);
+          final String newToken = data['access'];
+          await prefs.setString('token', newToken);
+          return true;
+        } else {
+          await prefs.remove('token');
+          await prefs.remove('refresh_token');
+        }
+      } catch (e) {
+        if (e is TimeoutException) {
+          prefs.remove('token');
+          prefs.remove('refresh_token');
+        }
       }
     }
     return false;
