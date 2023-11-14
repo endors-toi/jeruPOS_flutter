@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "205160145666",
+    "project_id": "jeru-pos",
+    "storage_bucket": "jeru-pos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:205160145666:android:e1949014b7abbde961181b",
+        "android_client_info": {
+          "package_name": "com.jerusalen.jerupos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrUPcz5gYf8OcadxeUfjpO_VP4ljF2JYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

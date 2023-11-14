@@ -1,4 +1,4 @@
-package com.example.jerupos
+package com.jerusalen.jerupos
 
 import io.flutter.embedding.android.FlutterActivity
 
