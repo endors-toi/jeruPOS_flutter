@@ -35,10 +35,10 @@ class UsuarioService {
     );
 
     if (response.statusCode == 200) {
-      return json
-          .decode(response.body)
-          .map((json) => Usuario.fromJson(json))
-          .toList();
+      List<dynamic> body = json.decode(response.body);
+      List<Usuario> usuarios =
+          body.map((dynamic item) => Usuario.fromJson(item)).toList();
+      return usuarios;
     } else {
       print(response.statusCode);
       throw Exception('Failed to load users');
