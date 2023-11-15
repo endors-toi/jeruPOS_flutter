@@ -217,14 +217,14 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     Navigator.pop(context);
   }
 
-  void editarPedido() {
+  void editarPedido() async {
     Pedido pedido = Pedido(
       id: widget.id,
       mesa: mesa,
       productos: productosPedido,
     );
 
-    PedidoService.update(pedido);
+    await PedidoService.update(pedido);
     Navigator.pop(context);
   }
 }

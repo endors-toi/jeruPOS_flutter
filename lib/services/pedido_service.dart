@@ -62,25 +62,30 @@ class PedidoService {
     }
   }
 
-  static Future<Pedido> create(Pedido pedido) async {
-    // solución temporal
-    // Map<String, dynamic> ped = {
-    //   'usuario': pedido.idUsuario,
-    //   'mesa': pedido.mesa,
-    //   'productos_post': pedido.productos,
-    //   'estado': pedido.estado,
-    // };
+  static Future<Map<String, dynamic>> create(Pedido pedido) async {
+    // solución parche, debería poder el modelo hacer esto
+    List<Map<String, dynamic>> productos = pedido.productos.map((producto) {
+      return {
+        'producto': producto.id,
+        'cantidad': producto.cantidad,
+      };
+    }).toList();
+    Map<String, dynamic> ped = {
+      'usuario': pedido.idUsuario,
+      'mesa': pedido.mesa,
+      'productos': productos,
+      'estado': pedido.estado,
+    };
     final response = await http.post(
-      uri,
+      uri.replace(path: '${uri.path}create_pedido_with_productos/'),
       headers: await _getHeaders(),
-      body: json.encode(pedido.toJson()),
+      body: json.encode(ped),
     );
 
     if (response.statusCode != 201) {
-      throw Exception(json.decode(response.body)['detail']);
-    } else {
-      return Pedido.fromJson(json.decode(response.body));
+      print(response.body);
     }
+    return json.decode(response.body);
   }
 
   static Future<Pedido> get(int id) async {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:jerupos/models/pedido.dart';
+import 'package:jerupos/utils/mostrar_toast.dart';
 import 'package:jerupos/widgets/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/utils/error_retry.dart';
@@ -13,7 +15,7 @@ class GarzonPage extends StatefulWidget {
 }
 
 class _GarzonPageState extends State<GarzonPage> {
-  bool sortByOrderNumber = true;
+  bool ordenarPorNumOrden = true;
   List<Pedido> pedidos = [];
   List<Pedido> pedidosActivos = [];
   String errorMsg = '';
@@ -24,12 +26,13 @@ class _GarzonPageState extends State<GarzonPage> {
     _loadPedidos();
   }
 
-  void _loadPedidos() {
-    PedidoService.list().then((value) {
+  void _loadPedidos() async {
+    await PedidoService.list().then((value) {
       setState(() {
         pedidos.addAll(value);
-        pedidosActivos =
-            pedidos.where((pedido) => pedido.estado != 'PAGADO').toList();
+        pedidosActivos = pedidos
+            .where((pedido) => pedido.estado != 'PAGADO' && pedido.mesa != null)
+            .toList();
         pedidosActivos.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
       });
     }).catchError((error) {
@@ -41,15 +44,16 @@ class _GarzonPageState extends State<GarzonPage> {
 
   void toggleSort() {
     setState(() {
-      sortByOrderNumber = !sortByOrderNumber;
+      ordenarPorNumOrden = !ordenarPorNumOrden;
       pedidosActivos.sort((a, b) {
-        if (sortByOrderNumber) {
+        if (ordenarPorNumOrden) {
           return (b.id ?? 0).compareTo(a.id ?? 0);
         } else {
           return (a.mesa ?? 0).compareTo(b.mesa ?? 0);
         }
       });
     });
+    mostrarToast("Ordenar por ${ordenarPorNumOrden ? 'tiempo' : 'mesa'}");
   }
 
   @override
@@ -94,16 +98,18 @@ class _GarzonPageState extends State<GarzonPage> {
                               });
                             });
                           },
-                          child: Text("Nuevo Pedido"),
+                          child: Text("Nuevo Pedido",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ),
                     IconButton(
                       icon: Icon(
-                        sortByOrderNumber
+                        ordenarPorNumOrden
                             ? MdiIcons.sortClockAscendingOutline
                             : MdiIcons.sortNumericAscending,
-                        size: 32,
+                        size: 36,
                       ),
                       onPressed: toggleSort,
                     ),
@@ -112,62 +118,43 @@ class _GarzonPageState extends State<GarzonPage> {
                 Expanded(
                     child: Container(
                   padding: EdgeInsets.all(8),
-                  child: ListView.builder(
-                    itemCount: (pedidosActivos.length + 1) ~/ 2,
-                    itemBuilder: (BuildContext context, int index) {
-                      int leftCardIndex = index * 2;
-                      int rightCardIndex = index * 2 + 1;
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: PedidoCard(
-                              pedido: pedidosActivos[leftCardIndex],
-                              onTap: (TapUpDetails details) {
+                  child: pedidosActivos.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No hay pedidos activos',
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      : MasonryGridView.builder(
+                          gridDelegate:
+                              SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2),
+                          itemCount: pedidosActivos.length,
+                          itemBuilder: (context, index) {
+                            Pedido pedido = pedidosActivos[index];
+                            return PedidoCard(
+                              pedido: pedido,
+                              onLongPress: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => PedidoFormPage(
-                                        id: pedidosActivos[leftCardIndex].id),
+                                      id: pedido.id!,
+                                    ),
                                   ),
                                 ).then((_) {
                                   setState(() {
                                     pedidos.clear();
                                     pedidosActivos.clear();
-                                    _loadPedidos();
                                   });
+                                  _loadPedidos();
                                 });
                               },
-                              buttonLabel: Text("Editar"),
-                            ),
-                          ),
-                          rightCardIndex >= pedidosActivos.length
-                              ? Expanded(flex: 1, child: SizedBox())
-                              : Expanded(
-                                  flex: 1,
-                                  child: PedidoCard(
-                                    pedido: pedidosActivos[rightCardIndex],
-                                    onTap: (TapUpDetails details) async {
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => PedidoFormPage(
-                                              id: pedidosActivos[rightCardIndex]
-                                                  .id),
-                                        ),
-                                      );
-                                      if (result == 'refresh') {
-                                        setState(() {});
-                                      }
-                                    },
-                                    buttonLabel: Text("Editar"),
-                                  ),
-                                ),
-                        ],
-                      );
-                    },
-                  ),
+                              ordenarPorNumOrden: ordenarPorNumOrden,
+                            );
+                          },
+                        ),
                 )),
               ],
             ),

@@ -30,7 +30,7 @@ class _AnimatedEllipsisState extends State<AnimatedEllipsis>
       animation: _controller,
       builder: (context, child) {
         String ellipsis = '●' * ((_controller.value * 3).toInt() + 1);
-        return Text('$ellipsis', style: TextStyle(fontSize: 18));
+        return Text('$ellipsis', style: TextStyle(fontSize: 20));
       },
     );
   }
