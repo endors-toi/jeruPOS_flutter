@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/admin/usuario_form_page.dart';
 import 'package:jerupos/services/usuario_service.dart';
+import 'package:jerupos/utils/mostrar_snackbar.dart';
 
 class UsuarioTile extends StatefulWidget {
   final VoidCallback onActionCompleted;
@@ -70,14 +71,13 @@ class _UsuarioTileState extends State<UsuarioTile> {
           Spacer(),
           IconButton(
             icon: Icon(Icons.edit),
-            onPressed: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => UsuarioFormPage(
-                            id: this.widget.usuario.id,
-                          )));
-              widget.onActionCompleted();
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        UsuarioFormPage(id: this.widget.usuario.id)),
+              ).then((_) => widget.onActionCompleted());
             },
           ),
           IconButton(
@@ -99,12 +99,8 @@ class _UsuarioTileState extends State<UsuarioTile> {
                     TextButton(
                       onPressed: () async {
                         await UsuarioService.delete(widget.usuario.id!);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Se ha eliminado el usuario de ${widget.usuario.nombre} ${widget.usuario.apellido}'),
-                          ),
-                        );
+                        mostrarSnackbar(context,
+                            'Se ha eliminado el usuario de ${widget.usuario.nombre} ${widget.usuario.apellido}');
                         widget.onActionCompleted();
                         Navigator.pop(context);
                       },

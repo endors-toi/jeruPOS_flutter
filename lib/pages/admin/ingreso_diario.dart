@@ -77,7 +77,7 @@ class _IngresoDiarioState extends State<IngresoDiario> {
                           minimumSize: MaterialStateProperty.all(Size(0, 50))),
                       onPressed: () {
                         _enviarIngreso().then((_) {
-                          mostrarSnackBar(
+                          mostrarSnackbar(
                               context, "Ingreso realizado correctamente.");
                           setState(() {
                             _controllers = {};

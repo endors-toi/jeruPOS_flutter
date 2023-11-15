@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/widgets/usuario_drawer.dart';
+
 import 'package:jerupos/pages/admin/ingreso_diario.dart';
 import 'package:jerupos/pages/admin/pedidos_page.dart';
+import 'package:jerupos/pages/admin/productos_page.dart';
 import 'package:jerupos/pages/admin/reporte_diario_page.dart';
-import 'package:jerupos/pages/admin/stock_page.dart';
+import 'package:jerupos/pages/admin/ingredientes_page.dart';
 import 'package:jerupos/pages/admin/usuarios_page.dart';
-import 'package:jerupos/widgets/usuario_drawer.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -15,7 +17,7 @@ class _AdminPageState extends State<AdminPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 6,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.orange,
@@ -27,7 +29,8 @@ class _AdminPageState extends State<AdminPage> {
             unselectedLabelColor: Colors.black.withOpacity(0.5),
             tabs: [
               Tab(text: 'Pedidos'),
-              Tab(text: 'Stock'),
+              Tab(text: 'Ingredientes'),
+              Tab(text: 'Productos'),
               Tab(text: 'Usuarios'),
               Tab(text: 'Ingreso'),
               Tab(text: 'Pedido Diario'),
@@ -38,7 +41,8 @@ class _AdminPageState extends State<AdminPage> {
         body: TabBarView(
           children: [
             PedidosPage(),
-            StockPage(),
+            IngredientesPage(),
+            ProductosPage(),
             UsuariosPage(),
             IngresoDiario(),
             ReporteDiarioPage(),

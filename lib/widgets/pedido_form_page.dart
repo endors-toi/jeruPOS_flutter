@@ -37,7 +37,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
           productosPedido = pedido.productos;
         });
       }).catchError((e) {
-        mostrarSnackBar(context, 'Error al cargar el pedido: $e');
+        mostrarSnackbar(context, 'Error al cargar el pedido: $e');
       });
     }
   }
@@ -202,7 +202,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     cliente = clienteCtrl.text.trim();
     int? userId = usuario!.id;
     if (userId == null) {
-      mostrarSnackBar(context, 'Error al cargar el usuario');
+      mostrarSnackbar(context, 'Error al cargar el usuario');
       return;
     }
     Pedido pedido = Pedido(

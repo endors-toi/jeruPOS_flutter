@@ -58,6 +58,16 @@ class IngredienteService {
     }
   }
 
+  static Future<void> create(Ingrediente ingrediente) async {
+    final response = await http.post(uri,
+        headers: await _getHeaders(), body: json.encode(ingrediente.toJson()));
+
+    if (response.statusCode != 201) {
+      print(response.body);
+      throw Exception('Error al crear ingrediente');
+    }
+  }
+
   static Future<void> update(Ingrediente ingrediente, int id) async {
     final response = await http.put(
       uri.replace(path: '${uri.path}$id/'),
@@ -80,6 +90,18 @@ class IngredienteService {
 
     if (response.statusCode != 204) {
       print(response.body);
+    }
+  }
+
+  static Future<void> delete(int id) async {
+    final response = await http.delete(
+      uri.replace(path: '${uri.path}$id/'),
+      headers: await _getHeaders(),
+    );
+
+    if (response.statusCode != 204) {
+      print(response.body);
+      throw Exception('Error al eliminar ingrediente');
     }
   }
 }

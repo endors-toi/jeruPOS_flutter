@@ -62,8 +62,6 @@ class _UsuariosPageState extends State<UsuariosPage> {
             if (snapshot.connectionState == ConnectionState.waiting ||
                 !snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
             } else {
               return Container(
                 child: ListView.builder(

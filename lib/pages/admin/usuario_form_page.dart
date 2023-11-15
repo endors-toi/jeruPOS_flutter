@@ -12,21 +12,21 @@ class UsuarioFormPage extends StatefulWidget {
 }
 
 class _UsuarioFormPageState extends State<UsuarioFormPage> {
-  final _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _editMode = false;
 
-  final TextEditingController _nombreController = TextEditingController();
-  final TextEditingController _apellidoController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _contrasenaController = TextEditingController();
-  final TextEditingController _contrasena2Controller = TextEditingController();
+  TextEditingController _nombreController = TextEditingController();
+  TextEditingController _apellidoController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _contrasenaController = TextEditingController();
+  TextEditingController _contrasena2Controller = TextEditingController();
   int? _idRol;
 
   String errNombre = '';
   String errApellido = '';
   String errEmail = '';
 
-  List<DropdownMenuItem<int>> dropdownMenuEntries = [
+  List<DropdownMenuItem<int>> roles = [
     DropdownMenuItem(
       child: Text("Cocina"),
       value: 2,
@@ -59,7 +59,7 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
           _idRol = usuario.rol;
         });
       }).catchError((e) {
-        mostrarSnackBar(context, 'Error al cargar el usuario: $e');
+        mostrarSnackbar(context, 'Error al cargar el usuario: $e');
       });
     }
   }
@@ -135,7 +135,7 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
                 ),
                 DropdownButtonFormField<int>(
                   decoration: InputDecoration(labelText: 'Rol'),
-                  items: dropdownMenuEntries,
+                  items: roles,
                   value: _editMode ? _idRol : null,
                   onChanged: (value) {
                     setState(() {
@@ -175,10 +175,10 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
 
       UsuarioService.create(nuevoUsuario).then((resp) {
         if (resp.isEmpty) {
-          mostrarSnackBar(context, 'Usuario creado existosamente.');
+          mostrarSnackbar(context, 'Usuario creado exitosamente.');
           Navigator.pop(context);
         } else {
-          mostrarSnackBar(context, 'Ingrese un email válido.');
+          mostrarSnackbar(context, 'Ingrese un email válido.');
         }
       });
     }
@@ -199,9 +199,10 @@ class _UsuarioFormPageState extends State<UsuarioFormPage> {
 
       UsuarioService.update(datosEditados, widget.id!).then((resp) {
         if (resp.isEmpty) {
+          mostrarSnackbar(context, 'Usuario editado exitosamente.');
           Navigator.pop(context);
         } else {
-          mostrarSnackBar(context, 'Ingrese un email válido.');
+          mostrarSnackbar(context, 'Ingrese un email válido.');
         }
       });
     }

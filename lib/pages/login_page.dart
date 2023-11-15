@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                   MaterialPageRoute(builder: (context) => AdminPage()));
               break;
             default:
-              mostrarSnackBar(context, 'No hay páginas asociadas a tu rol.');
+              mostrarSnackbar(context, 'No hay páginas asociadas a tu rol.');
               break;
           }
         }
@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
           body = LoginForm();
         });
       } else {
-        mostrarSnackBar(context, 'Error desconocido.');
+        mostrarSnackbar(context, 'Error desconocido.');
       }
     }
   }

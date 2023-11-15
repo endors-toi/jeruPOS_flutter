@@ -204,18 +204,18 @@ class _LoginFormState extends State<LoginForm> {
                 context, MaterialPageRoute(builder: (context) => AdminPage()));
             break;
           default:
-            mostrarSnackBar(context, 'No hay páginas asociadas a tu rol.');
+            mostrarSnackbar(context, 'No hay páginas asociadas a tu rol.');
             break;
         }
       }
     } catch (e) {
       if (e is TimeoutException) {
-        mostrarSnackBar(context, 'Error de conexión.');
+        mostrarSnackbar(context, 'Error de conexión.');
         setState(() {
           _loading = false;
         });
       } else {
-        mostrarSnackBar(
+        mostrarSnackbar(
             context, 'Error al iniciar sesión. Revisa tus credenciales.');
       }
     }
