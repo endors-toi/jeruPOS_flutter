@@ -102,6 +102,10 @@ class _LoginFormState extends State<LoginForm> {
                         if (email == null || email.isEmpty) {
                           return 'Ingresa un email.';
                         }
+                        if (email.contains('@') == false ||
+                            email.contains('.') == false) {
+                          return 'Ingresa un email válido.';
+                        }
                         return null;
                       },
                     ),
@@ -173,39 +177,47 @@ class _LoginFormState extends State<LoginForm> {
 
   Future<void> Login(BuildContext context) async {
     try {
-      await AuthService.login(_emailCtrl.text, _passCtrl.text)
-          .timeout(Duration(seconds: 4));
-      final String? token = await AuthService.getAccessToken();
-      if (token != null) {
-        final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-        Usuario usuario = Usuario(
-            id: decodedToken['user_id'],
-            rol: decodedToken['rol'],
-            nombre: decodedToken['nombre'],
-            apellido: decodedToken['apellido'],
-            email: decodedToken['email']);
-        Provider.of<UsuarioProvider>(context, listen: false)
-            .setUsuario(usuario);
-        switch (usuario.rol) {
-          case 1:
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => GarzonPage()));
-            break;
-          case 2:
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => CocinaPage()));
-            break;
-          case 3:
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => CajaPage()));
-            break;
-          case 4:
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => AdminPage()));
-            break;
-          default:
-            mostrarSnackbar(context, 'No hay páginas asociadas a tu rol.');
-            break;
+      Map<String, dynamic> resp =
+          await AuthService.login(_emailCtrl.text, _passCtrl.text)
+              .timeout(Duration(seconds: 4));
+      if (resp['detail'] != null) {
+        final String? token = await AuthService.getAccessToken();
+        if (token != null) {
+          final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+          Usuario usuario = Usuario(
+              id: decodedToken['user_id'],
+              rol: decodedToken['rol'],
+              nombre: decodedToken['nombre'],
+              apellido: decodedToken['apellido'],
+              email: decodedToken['email']);
+          Provider.of<UsuarioProvider>(context, listen: false)
+              .setUsuario(usuario);
+          switch (usuario.rol) {
+            case 1:
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => GarzonPage()));
+              break;
+            case 2:
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => CocinaPage()));
+              break;
+            case 3:
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => CajaPage()));
+              break;
+            case 4:
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => AdminPage()));
+              break;
+            default:
+              mostrarSnackbar(context, 'No hay páginas asociadas a tu rol.');
+              break;
+          }
+        } else {
+          mostrarSnackbar(context, 'Error al iniciar sesión.');
+          setState(() {
+            _loading = false;
+          });
         }
       }
     } catch (e) {

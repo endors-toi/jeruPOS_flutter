@@ -9,7 +9,8 @@ class AuthService {
   static final uri = Uri.parse(
       '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/accounts/');
 
-  static Future<void> login(String email, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String email, String password) async {
     try {
       final response = await http.post(
         uri.replace(path: '${uri.path}login/'),
@@ -18,18 +19,22 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final String token = data['access'];
-        final String refreshToken = data['refresh'];
+        Map<String, dynamic> data = json.decode(response.body);
+        String token = data['access'];
+        String refreshToken = data['refresh'];
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
         await prefs.setString('refresh_token', refreshToken);
+      } else {
+        Map<String, dynamic> resp = json.decode(response.body);
+        return resp;
       }
     } catch (e) {
       if (e is TimeoutException) {
         print("Error de conexión.");
       }
     }
+    return {};
   }
 
   static Future<bool> refreshToken() async {
