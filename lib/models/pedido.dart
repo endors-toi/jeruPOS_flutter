@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:jerupos/models/producto.dart';
 
 class Pedido {
@@ -72,4 +73,26 @@ class Pedido {
   set mesa(int? mesa) => this._mesa = mesa;
   set idUsuario(int? idUsuario) => this._idUsuario = idUsuario;
   set productos(List<Producto> productos) => this._productos = productos;
+}
+
+class PedidoProvider with ChangeNotifier {
+  List<Pedido> _pedidos = [];
+
+  List<Pedido> get pedidos => this._pedidos;
+
+  void addPedido(Pedido nuevoPedido) {
+    this._pedidos.insert(0, nuevoPedido);
+    notifyListeners();
+  }
+
+  void updatePedido(Pedido pedido) {
+    int index = this._pedidos.indexWhere((p) => p.id == pedido.id);
+    this._pedidos[index] = pedido;
+    notifyListeners();
+  }
+
+  void deletePedido(int id) {
+    this._pedidos.removeWhere((p) => p.id == id);
+    notifyListeners();
+  }
 }

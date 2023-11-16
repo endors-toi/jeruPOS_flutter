@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/services/auth_service.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class PedidoService {
   static final uri = Uri.parse(
@@ -165,5 +166,10 @@ class PedidoService {
     if (response.statusCode != 204) {
       throw Exception(json.decode(response.body)['detail']);
     }
+  }
+
+  static WebSocketChannel connect() {
+    return WebSocketChannel.connect(
+        Uri.parse('ws://localhost:8000/ws/pedidos/'));
   }
 }

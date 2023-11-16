@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,11 +9,13 @@ class AuthService {
       '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/accounts/');
 
   static Future<void> login(String email, String password) async {
-    final response = await http.post(
-      uri.replace(path: '${uri.path}login/'),
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: json.encode({'email': email, 'password': password}),
-    );
+    final response = await http
+        .post(
+          uri.replace(path: '${uri.path}login/'),
+          headers: {'Content-Type': 'application/json; charset=UTF-8'},
+          body: json.encode({'email': email, 'password': password}),
+        )
+        .timeout(Duration(seconds: 5));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = json.decode(response.body);
