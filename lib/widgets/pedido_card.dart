@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jerupos/models/pedido.dart';
+import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/utils/animated_ellipsis.dart';
+import 'package:jerupos/utils/mostrar_toast.dart';
+import 'package:provider/provider.dart';
+import 'package:swipe_cards/swipe_cards.dart';
 
 class PedidoCard extends StatefulWidget {
   final Pedido pedido;
-  final GestureLongPressCallback? onLongPress;
+  final bool? allowDiscard;
   final bool? ordenarPorNumOrden;
+  final Function? onDiscard;
+  final GestureLongPressCallback? onLongPress;
 
   PedidoCard({
     required this.pedido,
-    this.onLongPress,
+    this.allowDiscard,
     this.ordenarPorNumOrden,
+    this.onDiscard,
+    this.onLongPress,
   });
 
   @override
@@ -19,41 +27,78 @@ class PedidoCard extends StatefulWidget {
 }
 
 class _PedidoCardState extends State<PedidoCard> {
+  bool _esGarzon = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    var usuario = Provider.of<UsuarioProvider>(context);
+    setState(() {
+      _esGarzon = usuario.usuario!.rol == 1;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(right: 8),
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(.5),
-              blurRadius: 2,
-              offset: Offset(4, 4),
-              spreadRadius: -3,
-            )
-          ],
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Card(
-          child: GestureDetector(
-            onLongPress: widget.onLongPress,
-            child: Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 255, 246, 227),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _header(),
-                  _body(),
-                ],
+    MatchEngine matchEngine = MatchEngine(
+      swipeItems: [
+        SwipeItem(
+          nopeAction: widget.allowDiscard == null
+              ? widget.onDiscard
+              : widget.allowDiscard!
+                  ? widget.onDiscard
+                  : () {
+                      mostrarToast("Demasiado pronto para marcar como listo.");
+                    },
+        )
+      ],
+    );
+    return Container(
+      width: 200,
+      child: SwipeCards(
+        leftSwipeAllowed: widget.allowDiscard ?? true,
+        upSwipeAllowed: false,
+        rightSwipeAllowed: false,
+        matchEngine: matchEngine,
+        itemBuilder: (BuildContext context, _) {
+          return Container(
+            padding: EdgeInsets.only(right: 8),
+            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 24),
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(.5),
+                  blurRadius: 2,
+                  offset: Offset(4, 4),
+                  spreadRadius: -3,
+                )
+              ],
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Card(
+              child: GestureDetector(
+                onLongPress: widget.onLongPress,
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 255, 246, 227),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _header(),
+                      _body(),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
+        onStackFinished: () {
+          // descartar SwipeCards widget
+        },
       ),
     );
   }
@@ -99,14 +144,23 @@ class _PedidoCardState extends State<PedidoCard> {
     );
   }
 
-  Column _body() {
-    List<Widget> productos = widget.pedido.productos.map((producto) {
-      return Text("${producto.cantidad}x ${producto.nombre}");
+  Widget _body() {
+    List<Text> productos = widget.pedido.productos.map((producto) {
+      return Text("${producto.cantidad} ${producto.nombre}");
     }).toList();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: productos,
-    );
+    return Container(
+        child: _esGarzon
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: productos,
+              )
+            : Expanded(
+                child: ListView.builder(
+                    itemCount: productos.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return productos[index];
+                    }),
+              ));
   }
 }

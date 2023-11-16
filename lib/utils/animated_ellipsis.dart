@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/animations.dart';
+import 'package:provider/provider.dart';
 
 class AnimatedEllipsis extends StatefulWidget {
   @override
@@ -10,28 +12,23 @@ class _AnimatedEllipsisState extends State<AnimatedEllipsis>
   late AnimationController _controller;
 
   @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: Duration(milliseconds: 1800),
-      vsync: this,
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller = Provider.of<AnimatedEllipsisProvider>(context, listen: false)
+        .controller;
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        String ellipsis = '●' * ((_controller.value * 3).toInt() + 1);
-        return Text('$ellipsis', style: TextStyle(fontSize: 20));
-      },
-    );
+    if (mounted) {
+      return AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          String ellipsis = '●' * ((_controller.value * 3).toInt() + 1);
+          return Text('$ellipsis', style: TextStyle(fontSize: 20));
+        },
+      );
+    }
+    return Container();
   }
 }

@@ -28,151 +28,160 @@ class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     int _selectedIndex = 0;
+    List<Widget> formBody = [
+      Expanded(
+          flex: 2,
+          child: Container(child: Image.asset('assets/images/logo-min.png'))),
+      Expanded(
+        flex: 3,
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: TextFormField(
+                  controller: _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Email',
+                  ),
+                  validator: (email) {
+                    if (email == null || email.isEmpty) {
+                      return 'Ingresa un email.';
+                    }
+                    if (email.contains('@') == false ||
+                        email.contains('.') == false) {
+                      return 'Ingresa un email válido.';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: TextFormField(
+                  controller: _passCtrl,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Contraseña',
+                  ),
+                  validator: (pass) {
+                    if (pass == null || pass.isEmpty) {
+                      return 'Ingresa una contraseña.';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: ElevatedButton(
+                  style: _loading
+                      ? ButtonStyle(
+                          elevation: MaterialStateProperty.all(0),
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.grey),
+                          minimumSize: MaterialStateProperty.all(Size(0, 50)),
+                          splashFactory: NoSplash.splashFactory,
+                        )
+                      : ButtonStyle(
+                          elevation: MaterialStateProperty.all(18),
+                          minimumSize: MaterialStateProperty.all(Size(0, 50)),
+                        ),
+                  onPressed: () {
+                    if (_loading) return;
+                    if (_formKey.currentState!.validate()) {
+                      Login(context);
+                      setState(() {
+                        _loading = true;
+                      });
+                    }
+                  },
+                  child: Text(
+                    'Log in',
+                    style: _loading
+                        ? TextStyle(
+                            fontSize: 16,
+                            color: const Color.fromARGB(137, 73, 73, 73))
+                        : TextStyle(fontSize: 16),
+                  ),
+                ),
+              ),
+              _loading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Container(),
+            ],
+          ),
+        ),
+      ),
+    ];
 
     return Scaffold(
-      bottomNavigationBar: widget.debug
-          ? BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(MdiIcons.shieldCrown),
-                  label: 'Admin',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.kitchen),
-                  label: 'Cocina',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Garzón',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.money_off),
-                  label: 'Caja',
-                ),
-              ],
-              currentIndex: _selectedIndex,
-              onTap: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                  switch (index) {
-                    case 0:
-                      _emailCtrl.text = 'd@v.cl';
-                      _passCtrl.text = 'sudosudo';
-                      break;
-                    case 1:
-                      _emailCtrl.text = 'cocina@jerusalen.cl';
-                      _passCtrl.text = 'mm';
-                      break;
-                    case 2:
-                      _emailCtrl.text = 'garzon@jerusalen.cl';
-                      _passCtrl.text = 'bv';
-                      break;
-                    case 3:
-                      _emailCtrl.text = 'caja@jerusalen.cl';
-                      _passCtrl.text = 'mm';
-                      break;
-                  }
-                });
-              },
-            )
-          : null,
-      body: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Expanded(
-              flex: 2,
-              child:
-                  Container(child: Image.asset('assets/images/logo-min.png'))),
-          Expanded(
-              flex: 3,
-              child: Form(
-                key: _formKey,
-                child: ListView(children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: TextFormField(
-                      controller: _emailCtrl,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Email',
-                      ),
-                      validator: (email) {
-                        if (email == null || email.isEmpty) {
-                          return 'Ingresa un email.';
-                        }
-                        if (email.contains('@') == false ||
-                            email.contains('.') == false) {
-                          return 'Ingresa un email válido.';
-                        }
-                        return null;
-                      },
-                    ),
+        bottomNavigationBar: widget.debug
+            ? BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Icon(MdiIcons.shieldCrown),
+                    label: 'Admin',
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: TextFormField(
-                      controller: _passCtrl,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Contraseña',
-                      ),
-                      validator: (pass) {
-                        if (pass == null || pass.isEmpty) {
-                          return 'Ingresa una contraseña.';
-                        }
-                        return null;
-                      },
-                    ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.kitchen),
+                    label: 'Cocina',
                   ),
-                  Padding(
-                    padding: EdgeInsets.all(20),
-                    child: ElevatedButton(
-                      style: _loading
-                          ? ButtonStyle(
-                              elevation: MaterialStateProperty.all(0),
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.grey),
-                              minimumSize:
-                                  MaterialStateProperty.all(Size(0, 50)),
-                              splashFactory: NoSplash.splashFactory,
-                            )
-                          : ButtonStyle(
-                              elevation: MaterialStateProperty.all(18),
-                              minimumSize:
-                                  MaterialStateProperty.all(Size(0, 50)),
-                            ),
-                      onPressed: () {
-                        if (_loading) return;
-                        if (_formKey.currentState!.validate()) {
-                          Login(context);
-                          setState(() {
-                            _loading = true;
-                          });
-                        }
-                      },
-                      child: Text(
-                        'Log in',
-                        style: _loading
-                            ? TextStyle(
-                                fontSize: 16,
-                                color: const Color.fromARGB(137, 73, 73, 73))
-                            : TextStyle(fontSize: 16),
-                      ),
-                    ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Garzón',
                   ),
-                  _loading
-                      ? Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : Container(),
-                ]),
-              )),
-        ]),
-      ),
-    );
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.money_off),
+                    label: 'Caja',
+                  ),
+                ],
+                currentIndex: _selectedIndex,
+                onTap: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                    switch (index) {
+                      case 0:
+                        _emailCtrl.text = 'd@v.cl';
+                        _passCtrl.text = 'sudosudo';
+                        break;
+                      case 1:
+                        _emailCtrl.text = 'cocina@jerusalen.cl';
+                        _passCtrl.text = 'mm';
+                        break;
+                      case 2:
+                        _emailCtrl.text = 'garzon@jerusalen.cl';
+                        _passCtrl.text = 'bv';
+                        break;
+                      case 3:
+                        _emailCtrl.text = 'caja@jerusalen.cl';
+                        _passCtrl.text = 'mm';
+                        break;
+                    }
+                  });
+                },
+              )
+            : null,
+        body: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: OrientationBuilder(builder: (context, orientation) {
+              return orientation == Orientation.portrait
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: formBody,
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: formBody,
+                    );
+            })));
   }
 
   Future<void> Login(BuildContext context) async {

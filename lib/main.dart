@@ -18,8 +18,10 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => UsuarioProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UsuarioProvider())
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         builder: BotToastInit(),
