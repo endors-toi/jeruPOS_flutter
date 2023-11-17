@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jerupos/models/pedido.dart';
-import 'package:jerupos/models/producto.dart';
+import 'package:jerupos/models/producto_pedido.dart';
 
 class HistorialTile extends StatelessWidget {
   final Pedido pedido;
@@ -12,7 +12,7 @@ class HistorialTile extends StatelessWidget {
 
   String get total {
     num total = 0;
-    List<Producto> productos = pedido.productos;
+    List<ProductoPedido> productos = pedido.productos!;
     productos.forEach((producto) {
       total += producto.precio! * producto.cantidad;
     });
@@ -58,7 +58,7 @@ class HistorialTile extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10.0),
-            ...List<Widget>.from((pedido.productos).map((producto) {
+            ...List<Widget>.from((pedido.productos!).map((producto) {
               return Text('${producto.cantidad} x ${producto.nombre}',
                   style: TextStyle(fontSize: 18));
             }).toList()),

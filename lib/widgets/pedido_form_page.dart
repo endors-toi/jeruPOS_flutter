@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
-import 'package:jerupos/models/producto.dart';
+import 'package:jerupos/models/producto_pedido.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/services/producto_service.dart';
@@ -21,7 +21,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
   bool _editMode = false;
   int? mesa = null;
   String? cliente = null;
-  List<Producto> productosPedido = [];
+  List<ProductoPedido> productosPedido = [];
   TextEditingController clienteCtrl = TextEditingController();
 
   @override
@@ -34,7 +34,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
       PedidoService.get(widget.id!).then((pedido) {
         setState(() {
           mesa = pedido.mesa;
-          productosPedido = pedido.productos;
+          productosPedido = pedido.productos!;
         });
       }).catchError((e) {
         mostrarSnackbar(context, 'Error al cargar el pedido: $e');
@@ -72,7 +72,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else {
-                    List<Producto> productos = snapshot.data!;
+                    List<ProductoPedido> productos = snapshot.data!;
                     return GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
@@ -104,7 +104,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
                     child: ListView.builder(
                       itemCount: productosPedido.length,
                       itemBuilder: (context, index) {
-                        Producto producto = productosPedido[index];
+                        ProductoPedido producto = productosPedido[index];
                         return ListTile(
                           title:
                               Text('${producto.cantidad} x ${producto.nombre}'),
@@ -176,7 +176,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     );
   }
 
-  void agregarProducto(Producto producto) {
+  void agregarProducto(ProductoPedido producto) {
     setState(() {
       final indexProductoExistente =
           productosPedido.indexWhere((p) => p.id == producto.id);
@@ -224,7 +224,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
       productos: productosPedido,
     );
 
-    await PedidoService.update(pedido);
+    await PedidoService.updatePATCH(pedido);
     Navigator.pop(context);
   }
 }

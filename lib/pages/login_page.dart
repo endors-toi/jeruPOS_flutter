@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _initAsync();
+    _refreshLogin();
   }
 
   @override
@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> _initAsync() async {
+  Future<void> _refreshLogin() async {
     try {
       if (await AuthService.refreshToken().timeout(Duration(seconds: 1))) {
         final String? token =

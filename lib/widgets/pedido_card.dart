@@ -39,9 +39,10 @@ class _PedidoCardState extends State<PedidoCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200,
+      height: _esGarzon ? null : 200,
+      width: _esGarzon ? 200 : 300,
       padding: EdgeInsets.only(right: 8),
-      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 24),
+      margin: EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -79,6 +80,7 @@ class _PedidoCardState extends State<PedidoCard> {
     final String fTimestamp =
         DateFormat('hh:mm').format(widget.pedido.timestamp!);
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -98,15 +100,14 @@ class _PedidoCardState extends State<PedidoCard> {
                     widget.pedido.mesa != null
                         ? "Mesa ${widget.pedido.mesa}"
                         : "Para Llevar",
-                    style: TextStyle(fontSize: 16))
+                    style: TextStyle(fontSize: 16),
+                  )
                 : Text("Pedido ${widget.pedido.id}"),
           ],
         ),
         Row(
           children: [
-            widget.pedido.estado == 'PENDIENTE'
-                ? AnimatedEllipsis()
-                : Text('🟢'),
+            widget.pedido.estado == 'PENDIENTE' ? AnimatedEllipsis() : Text(''),
             Spacer(),
             Text('$fTimestamp'),
           ],
@@ -117,22 +118,28 @@ class _PedidoCardState extends State<PedidoCard> {
   }
 
   Widget _body() {
-    List<Text> productos = widget.pedido.productos.map((producto) {
-      return Text("${producto.cantidad} ${producto.nombre}");
+    List<Text> productos = widget.pedido.productos!.map((producto) {
+      return Text(
+        "${producto.cantidad} ${producto.nombre}",
+        style: TextStyle(fontSize: 18),
+        overflow: TextOverflow.ellipsis,
+      );
     }).toList();
 
     return Container(
-        child: _esGarzon
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: productos,
-              )
-            : Expanded(
-                child: ListView.builder(
-                    itemCount: productos.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return productos[index];
-                    }),
-              ));
+      child: _esGarzon
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: productos,
+            )
+          : Expanded(
+              child: ListView.builder(
+                itemCount: productos.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return productos[index];
+                },
+              ),
+            ),
+    );
   }
 }

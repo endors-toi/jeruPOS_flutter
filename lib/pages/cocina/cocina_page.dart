@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/models/animations.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/pages/cocina/reporte_diario.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/utils/error_retry.dart';
-import 'package:jerupos/utils/mostrar_snackbar.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
 import 'package:jerupos/widgets/usuario_drawer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:provider/provider.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+
+import 'dart:math';
 
 class CocinaPage extends StatefulWidget {
   @override
@@ -17,31 +15,123 @@ class CocinaPage extends StatefulWidget {
 }
 
 class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
-  late AnimatedEllipsisProvider _ellipsisProvider;
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
-  late WebSocketChannel _channel;
-  ScrollController _pedidosListController = ScrollController(
-    initialScrollOffset: 0,
-    keepScrollOffset: true,
-  );
-  String errorMsg = '';
+  List<Pedido> _pedidos = [];
+  List<Pedido> _pedidosAnimados = [];
+  final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey();
+  ScrollController _pedidosListController = ScrollController();
 
-  List<Pedido> pedidos = [];
-  Future<void> _loadPedidos() async {
-    try {
-      final fetchedPedidos = await PedidoService.list();
-      setState(() {
-        pedidos = fetchedPedidos
-            .where((pedido) => pedido.estado != "PAGADO")
-            .toList();
-      });
-    } catch (error) {
-      setState(() {
-        errorMsg = 'No se pudo cargar pedidos.\n$error';
-      });
-    }
+  String _errorMsg = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPedidos();
   }
 
+  @override
+  void dispose() {
+    _pedidosListController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('JeruPOS'),
+        backgroundColor: Colors.orange,
+        actions: [
+          IconButton(
+            icon: Icon(MdiIcons.plus),
+            onPressed: () {
+              Random random = new Random();
+              _addItem(_pedidos[random.nextInt(_pedidos.length)]);
+            },
+          ),
+          IconButton(
+            icon: Icon(MdiIcons.minus),
+            onPressed: () {
+              _removeItem(0);
+            },
+          ),
+          IconButton(
+            icon: Icon(MdiIcons.launch),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ReporteDiario()));
+            },
+          )
+        ],
+      ),
+      drawer: UsuarioDrawer(),
+      body: Column(
+        children: [
+          Expanded(
+            flex: 4,
+            child: _errorMsg.isNotEmpty
+                ? Center(
+                    child: ErrorRetry(
+                        errorMsg: _errorMsg,
+                        onRetry: () {
+                          setState(() {
+                            _errorMsg = '';
+                            _loadPedidos();
+                          });
+                        }),
+                  )
+                : AnimatedList(
+                    key: _animatedListKey,
+                    scrollDirection: Axis.horizontal,
+                    controller: _pedidosListController,
+                    physics: NeverScrollableScrollPhysics(),
+                    initialItemCount: _pedidos.length,
+                    itemBuilder: (context, index, animation) {
+                      return SlideTransition(
+                        key: UniqueKey(),
+                        position: Tween<Offset>(
+                          begin: Offset(1, 0),
+                          end: Offset(0, 0),
+                        ).animate(animation),
+                        child: PedidoCard(pedido: _pedidos[index]),
+                      );
+                    },
+                  ),
+          ),
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              onHorizontalDragUpdate: (details) => _onScroll(details),
+              onHorizontalDragEnd: (details) => _onScrollEnd(details),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.orange,
+                      Colors.white,
+                    ],
+                    radius: 10,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /* MÉTODOS */
+
+  // inicializaciones
+  Future<void> _loadPedidos() async {
+    List<Pedido> pedidos = await PedidoService.list();
+    setState(() {
+      _pedidos =
+          pedidos.where((pedido) => pedido.estado == "PENDIENTE").toList();
+    });
+  }
+
+  // scroll de pedidos
   void _onScroll(DragUpdateDetails details) {
     int scrollSpeed = 2;
 
@@ -69,112 +159,29 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
         curve: Curves.easeOutCubic);
   }
 
-  void _initWebSocket() {
-    _channel = PedidoService.connect();
-    _channel.stream.listen((event) {
-      switch (event['action']) {
-        case 'create':
-          Pedido pedido = Pedido.fromJson(event);
-          Provider.of<PedidoProvider>(context, listen: false).addPedido(pedido);
-          break;
-        case 'update':
-          Pedido pedido = Pedido.fromJson(event);
-          Provider.of<PedidoProvider>(context, listen: false)
-              .updatePedido(pedido);
-          break;
-        case 'delete':
-          Provider.of<PedidoProvider>(context, listen: false)
-              .deletePedido(event['id']);
-          break;
-        default:
-          mostrarSnackbar(context, 'Acción desconocida: ${event['action']}');
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _initWebSocket();
-    _loadPedidos();
-    _ellipsisProvider = AnimatedEllipsisProvider(this);
-  }
-
-  @override
-  void dispose() {
-    _pedidosListController.dispose();
-    _ellipsisProvider.dispose();
-    _channel.sink.close();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider<AnimatedEllipsisProvider>(
-      create: (_) => _ellipsisProvider,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('JeruPOS'),
-          backgroundColor: Colors.orange,
-          actions: [
-            IconButton(
-              icon: Icon(MdiIcons.launch),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ReporteDiario()));
-              },
-            )
-          ],
-        ),
-        drawer: UsuarioDrawer(),
-        body: Column(
-          children: [
-            Expanded(
-              flex: 4,
-              child: errorMsg.isNotEmpty
-                  ? Center(
-                      child: ErrorRetry(
-                          errorMsg: errorMsg,
-                          onRetry: () {
-                            setState(() {
-                              errorMsg = '';
-                              _loadPedidos();
-                            });
-                          }),
-                    )
-                  : AnimatedList(
-                      key: _listKey,
-                      controller: _pedidosListController,
-                      physics: NeverScrollableScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      initialItemCount: pedidos.length,
-                      itemBuilder:
-                          (BuildContext context, int index, animation) {
-                        Pedido pedido = pedidos[index];
-                        return PedidoCard(pedido: pedido);
-                      },
-                    ),
-            ),
-            Expanded(
-                flex: 1,
-                child: GestureDetector(
-                  onHorizontalDragUpdate: (details) => _onScroll(details),
-                  onHorizontalDragEnd: (details) => _onScrollEnd(details),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        colors: [
-                          Colors.orange,
-                          Colors.white,
-                        ],
-                        radius: 10,
-                      ),
-                    ),
-                  ),
-                )),
-          ],
-        ),
-      ),
+  // métodos AnimatedList
+  void _addItem(Pedido pedido) {
+    _pedidosAnimados.add(pedido);
+    _animatedListKey.currentState!.insertItem(
+      _pedidosAnimados.length - 1,
+      duration: Duration(milliseconds: 1000),
     );
+  }
+
+  void _removeItem(int index) {
+    _animatedListKey.currentState!.removeItem(
+      index,
+      (_, animation) {
+        return SizeTransition(
+          sizeFactor: animation,
+          child: Card(
+            color: Colors.orange,
+            child: Container(color: Colors.orange),
+          ),
+        );
+      },
+      duration: Duration(milliseconds: 500),
+    );
+    _pedidosAnimados.removeAt(index);
   }
 }

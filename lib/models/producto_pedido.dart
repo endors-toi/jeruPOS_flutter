@@ -1,4 +1,4 @@
-class Producto {
+class ProductoPedido {
   int? _id;
   String? _nombre;
   int _cantidad;
@@ -6,7 +6,7 @@ class Producto {
   String? _abreviacion;
 
   // Constructor principal
-  Producto({
+  ProductoPedido({
     int? id,
     String? nombre,
     int cantidad = 1,
@@ -19,8 +19,8 @@ class Producto {
         _abreviacion = abreviacion;
 
   // Factories
-  factory Producto.fromJson(Map<String, dynamic> json) {
-    return Producto(
+  factory ProductoPedido.fromJson(Map<String, dynamic> json) {
+    return ProductoPedido(
       id: json['id'],
       nombre: json['nombre'],
       cantidad: json['cantidad'] ?? 1,

@@ -29,14 +29,18 @@ class _LoginFormState extends State<LoginForm> {
   Widget build(BuildContext context) {
     int _selectedIndex = 0;
     List<Widget> formBody = [
-      Expanded(
+      Flexible(
           flex: 2,
           child: Container(child: Image.asset('assets/images/logo-min.png'))),
-      Expanded(
-        flex: 3,
+      Flexible(
+        flex: 2,
         child: Form(
           key: _formKey,
           child: ListView(
+            padding: EdgeInsets.only(
+                top: MediaQuery.of(context).orientation == Orientation.landscape
+                    ? MediaQuery.of(context).size.height * 0.3
+                    : 0),
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -175,10 +179,12 @@ class _LoginFormState extends State<LoginForm> {
               return orientation == Orientation.portrait
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: formBody,
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: formBody,
                     );
             })));

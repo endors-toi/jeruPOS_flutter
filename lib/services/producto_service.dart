@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:jerupos/models/producto.dart';
+import 'package:jerupos/models/producto_pedido.dart';
 import 'package:jerupos/services/auth_service.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -28,7 +28,7 @@ class ProductoService {
     };
   }
 
-  static Future<List<Producto>> list() async {
+  static Future<List<ProductoPedido>> list() async {
     final response = await http.get(
       uri,
       headers: await _getHeaders(),
@@ -37,7 +37,7 @@ class ProductoService {
     if (response.statusCode == 200) {
       return json
           .decode(response.body)
-          .map<Producto>((json) => Producto.fromJson(json))
+          .map<ProductoPedido>((json) => ProductoPedido.fromJson(json))
           .toList();
     } else {
       print(response.statusCode);
@@ -45,14 +45,14 @@ class ProductoService {
     }
   }
 
-  static Future<Producto> get(int id) async {
+  static Future<ProductoPedido> get(int id) async {
     final response = await http.get(
       uri.replace(path: '${uri.path}$id/'),
       headers: await _getHeaders(),
     );
 
     if (response.statusCode == 200) {
-      return Producto.fromJson(json.decode(response.body));
+      return ProductoPedido.fromJson(json.decode(response.body));
     } else {
       throw Exception('Error al cargar producto');
     }
