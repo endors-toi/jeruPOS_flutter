@@ -52,7 +52,7 @@ class PedidoService {
     final response = await http.post(
       uri.replace(path: '${uri.path}create_pedido_with_productos/'),
       headers: await _getHeaders(),
-      body: json.encode(pedido),
+      body: json.encode(pedido.post()),
     );
 
     if (response.statusCode != 201) {

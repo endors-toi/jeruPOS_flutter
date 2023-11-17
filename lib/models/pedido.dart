@@ -77,6 +77,21 @@ class Pedido {
   void fetchProductos() async {
     this._productos = await PedidoService.getProductosPedido(this._id!);
   }
+
+  Map<String, dynamic> post() {
+    List<int> productosId =
+        this.productos!.map((producto) => producto.id!).toList();
+    List<int> cantidades =
+        this.productos!.map((producto) => producto.cantidad).toList();
+    String mesaOcliente = this.mesa != null ? 'mesa' : 'cliente';
+    return {
+      'usuario': this.idUsuario,
+      mesaOcliente: this.mesa ?? this.nombreCliente,
+      'productos': productosId,
+      'cantidades': cantidades,
+      'estado': 'PENDIENTE',
+    };
+  }
 }
 
 class PedidoProvider with ChangeNotifier {
