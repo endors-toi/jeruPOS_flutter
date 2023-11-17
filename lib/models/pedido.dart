@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jerupos/models/producto.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:jerupos/models/producto_pedido.dart';
+import 'package:jerupos/services/pedido_service.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class Pedido {
   int? _id;
@@ -8,7 +11,7 @@ class Pedido {
   String? _nombreCliente;
   int? _mesa;
   int? _idUsuario;
-  List<Producto> _productos;
+  List<ProductoPedido>? _productos;
 
   // Constructor principal
   Pedido({
@@ -18,7 +21,7 @@ class Pedido {
     String? nombreCliente,
     int? mesa,
     int? idUsuario,
-    required List<Producto> productos,
+    List<ProductoPedido>? productos,
   })  : _id = id,
         _estado = estado,
         _timestamp = timestamp,
@@ -30,16 +33,12 @@ class Pedido {
   // Factories
   factory Pedido.fromJson(Map<String, dynamic> json) {
     return Pedido(
-      id: json['id'],
-      estado: json['estado'],
-      timestamp: DateTime.parse(json['timestamp']),
-      nombreCliente: json['nombre_cliente'],
-      mesa: json['mesa'],
-      idUsuario: json['id_usuario'],
-      productos: json['productos']
-          .map<Producto>((producto) => Producto.fromJson(producto))
-          .toList(),
-    );
+        id: json['id'],
+        estado: json['estado'],
+        timestamp: DateTime.parse(json['timestamp']),
+        nombreCliente: json['nombre_cliente'] ?? null,
+        mesa: json['mesa'] ?? null,
+        idUsuario: json['usuario']);
   }
 
   Map<String, dynamic> toJson() {
@@ -51,7 +50,7 @@ class Pedido {
       'mesa': this._mesa,
       'id_usuario': this._idUsuario,
       'productos':
-          this._productos.map((producto) => producto.toJson()).toList(),
+          this._productos!.map((producto) => producto.toJson()).toList(),
     };
   }
 
@@ -62,7 +61,7 @@ class Pedido {
   String? get nombreCliente => this._nombreCliente;
   int? get mesa => this._mesa;
   int? get idUsuario => this._idUsuario;
-  List<Producto> get productos => this._productos;
+  List<ProductoPedido>? get productos => this._productos;
 
   // Setters
   set id(int? id) => this._id = id;
@@ -72,7 +71,12 @@ class Pedido {
       this._nombreCliente = nombreCliente;
   set mesa(int? mesa) => this._mesa = mesa;
   set idUsuario(int? idUsuario) => this._idUsuario = idUsuario;
-  set productos(List<Producto> productos) => this._productos = productos;
+  set productos(List<ProductoPedido>? productos) => this._productos = productos;
+
+  // Métodos
+  void fetchProductos() async {
+    this._productos = await PedidoService.getProductosPedido(this._id!);
+  }
 }
 
 class PedidoProvider with ChangeNotifier {
@@ -94,5 +98,20 @@ class PedidoProvider with ChangeNotifier {
   void deletePedido(int id) {
     this._pedidos.removeWhere((p) => p.id == id);
     notifyListeners();
+  }
+}
+
+class PedidoWebSocket with ChangeNotifier {
+  static WebSocketChannel channel = WebSocketChannel.connect(Uri.parse(
+      '${dotenv.env['WS_URL_${dotenv.env['CURRENT_DEVICE']}']}/pedidos/'));
+
+  void enviarMensaje(String mensaje) {
+    channel.sink.add(mensaje);
+  }
+
+  @override
+  void dispose() {
+    channel.sink.close();
+    super.dispose();
   }
 }
