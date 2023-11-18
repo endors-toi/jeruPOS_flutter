@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/admin/admin_page.dart';
 import 'package:jerupos/pages/caja/caja_page.dart';
 import 'package:jerupos/pages/cocina/cocina_page.dart';
 import 'package:jerupos/pages/garzon/garzon_page.dart';
 import 'package:jerupos/services/auth_service.dart';
+import 'package:jerupos/services/network_service.dart';
 import 'package:jerupos/utils/mostrar_snackbar.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -192,7 +192,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<void> Login(BuildContext context) async {
     try {
       await AuthService.login(_emailCtrl.text, _passCtrl.text);
-      final String? token = await AuthService.getAccessToken();
+      final String? token = await getAccessToken();
       if (token != null) {
         final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
         Usuario usuario = Usuario(
@@ -234,7 +234,7 @@ class _LoginFormState extends State<LoginForm> {
       if (e is TimeoutException) {
         mostrarSnackbar(context, 'No se pudo conectar al servidor.');
       } else {
-        mostrarSnackbar(context, 'Error al iniciar sesión.');
+        mostrarSnackbar(context, 'Error al iniciar sesión.\n$e');
       }
       setState(() {
         _loading = false;

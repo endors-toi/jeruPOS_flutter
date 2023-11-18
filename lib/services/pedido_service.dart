@@ -1,38 +1,19 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/models/producto_pedido.dart';
-import 'package:jerupos/services/auth_service.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:jerupos/services/network_service.dart';
 
 class PedidoService {
-  static final uri = Uri.parse(
-      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/restaurant/pedidos/');
-
-  static Future<String?> _getToken() async {
-    String? token = await AuthService.getAccessToken();
-
-    if (token != null && JwtDecoder.isExpired(token)) {
-      await AuthService.refreshToken();
-      token = await AuthService.getAccessToken();
-    }
-
-    return token;
-  }
-
-  static Future<Map<String, String>> _getHeaders() async {
-    String? token = await _getToken();
-    return {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $token',
-    };
-  }
+  static final String url =
+      'http://' + getServerIP() + '/api/restaurant/pedidos/';
 
   static Future<List<Pedido>> list() async {
+    final uri = Uri.parse(url);
+
     final response = await http.get(
       uri,
-      headers: await _getHeaders(),
+      headers: await getHeaders(),
     );
     if (response.statusCode != 200) {
       throw Exception(json.decode(response.body)['error']);
@@ -49,9 +30,10 @@ class PedidoService {
   }
 
   static Future<Map<String, dynamic>> create(Pedido pedido) async {
+    final uri = Uri.parse(url + 'create_pedido_with_productos/');
     final response = await http.post(
-      uri.replace(path: '${uri.path}create_pedido_with_productos/'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
       body: json.encode(pedido.post()),
     );
 
@@ -62,9 +44,10 @@ class PedidoService {
   }
 
   static Future<Pedido> get(int id) async {
+    final uri = Uri.parse(url + '$id/');
     final response = await http.get(
-      uri.replace(path: '${uri.path}$id/'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
     );
 
     if (response.statusCode != 200) {
@@ -77,9 +60,10 @@ class PedidoService {
   }
 
   static Future<Pedido> updatePUT(Pedido pedido, int id) async {
+    final uri = Uri.parse(url + '$id/');
     final response = await http.put(
-      uri.replace(path: '${uri.path}$id/'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
       body: json.encode(pedido.toJson()),
     );
 
@@ -91,9 +75,10 @@ class PedidoService {
   }
 
   static Future<Pedido> updatePATCH(Pedido pedido) async {
+    final uri = Uri.parse(url + '${pedido.id}/');
     final response = await http.patch(
-      uri.replace(path: '${uri.path}${pedido.id}/'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
       body: json.encode(pedido),
     );
 
@@ -105,9 +90,10 @@ class PedidoService {
   }
 
   static Future<void> delete(int id) async {
+    final uri = Uri.parse(url + '$id/');
     final response = await http.delete(
-      uri.replace(path: '${uri.path}$id/'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
     );
 
     if (response.statusCode != 204) {
@@ -116,10 +102,12 @@ class PedidoService {
   }
 
   static Future<List<ProductoPedido>> getProductosPedido(int idPedido) async {
+    final uri = Uri.parse('http://' +
+        getServerIP() +
+        '/api/restaurant/pedidos-productos/?producto=&pedido=$idPedido');
     final response = await http.get(
-      Uri.parse(
-          '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/restaurant/pedidos-productos/?producto=&pedido=$idPedido'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
     );
 
     if (response.statusCode == 200) {

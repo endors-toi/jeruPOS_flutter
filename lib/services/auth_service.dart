@@ -1,18 +1,19 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:jerupos/services/network_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static final uri = Uri.parse(
-      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/accounts/');
+  static final String url = 'http://' + getServerIP() + '/api/accounts/';
 
   static Future<void> login(String email, String password) async {
+    final uri = Uri.parse(url + 'login/');
+
     final response = await http
         .post(
-          uri.replace(path: '${uri.path}login/'),
+          uri,
           headers: {'Content-Type': 'application/json; charset=UTF-8'},
           body: json.encode({'email': email, 'password': password}),
         )
@@ -31,13 +32,14 @@ class AuthService {
   }
 
   static Future<bool> refreshToken() async {
+    final uri = Uri.parse(url + 'token/refresh/');
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? refreshToken = prefs.getString('refresh_token');
 
+    final String? refreshToken = prefs.getString('refresh_token');
     if (refreshToken != null) {
       try {
         final response = await http.post(
-          uri.replace(path: '${uri.path}token/refresh/'),
+          uri,
           headers: {'Content-Type': 'application/json; charset=UTF-8'},
           body: json.encode({'refresh': refreshToken}),
         );
@@ -59,11 +61,6 @@ class AuthService {
       }
     }
     return false;
-  }
-
-  static Future<String?> getAccessToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
   }
 
   static Future<void> logout() async {

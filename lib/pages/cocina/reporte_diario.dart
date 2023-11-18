@@ -6,6 +6,7 @@ import 'package:jerupos/pages/cocina/pedido_diario_page.dart';
 import 'package:jerupos/services/ingrediente_service.dart';
 import 'package:jerupos/services/pedido_diario_service.dart';
 import 'package:jerupos/services/stock_service.dart';
+import 'package:jerupos/utils/mostrar_snackbar.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -78,6 +79,8 @@ class _ReporteDiarioState extends State<ReporteDiario> {
                 _enviarPedidoDiario(reporteDiario.pedidoDiario);
                 _enviarInventario(
                     reporteDiario.inventario, reporteDiario.stockActual);
+                mostrarSnackbar(context, "Reporte diario enviado con éxito");
+                Navigator.pop(context);
               },
               child: Text(
                 "ENVIAR",

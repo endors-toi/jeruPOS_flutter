@@ -1,36 +1,16 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:jerupos/services/auth_service.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:jerupos/services/network_service.dart';
 
 class CategoriaService {
-  static final uri = Uri.parse(
-      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/restaurant/categorias/');
-
-  static Future<String?> _getToken() async {
-    String? token = await AuthService.getAccessToken();
-
-    if (token != null && JwtDecoder.isExpired(token)) {
-      await AuthService.refreshToken();
-      token = await AuthService.getAccessToken();
-    }
-
-    return token;
-  }
-
-  static Future<Map<String, String>> _getHeaders() async {
-    String? token = await _getToken();
-    return {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $token',
-    };
-  }
+  static final String url =
+      'http://' + getServerIP() + '/api/restaurant/categorias/';
 
   static Future<List<dynamic>> list() async {
+    final uri = Uri.parse(url);
     final response = await http.get(
       uri,
-      headers: await _getHeaders(),
+      headers: await getHeaders(),
     );
 
     if (response.statusCode == 200) {
@@ -42,9 +22,10 @@ class CategoriaService {
   }
 
   static Future<Map<String, dynamic>> get(int id) async {
+    final uri = Uri.parse(url + '$id/');
     final response = await http.get(
-      uri.replace(path: '${uri.path}$id/'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
     );
 
     if (response.statusCode == 200) {

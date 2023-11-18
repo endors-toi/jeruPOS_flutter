@@ -6,6 +6,7 @@ import 'package:jerupos/pages/caja/caja_page.dart';
 import 'package:jerupos/pages/cocina/cocina_page.dart';
 import 'package:jerupos/pages/garzon/garzon_page.dart';
 import 'package:jerupos/services/auth_service.dart';
+import 'package:jerupos/services/network_service.dart';
 import 'package:jerupos/utils/mostrar_snackbar.dart';
 import 'package:jerupos/widgets/login_form.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -36,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (await AuthService.refreshToken().timeout(Duration(seconds: 1))) {
         final String? token =
-            await AuthService.getAccessToken().timeout(Duration(seconds: 1));
+            await getAccessToken().timeout(Duration(seconds: 1));
         if (token != null) {
           final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
           Usuario usuario = Usuario(
@@ -80,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
           body = LoginForm();
         });
       } else {
-        mostrarSnackbar(context, 'Error desconocido.');
+        mostrarSnackbar(context, 'Error desconocido.\n$e');
       }
     }
   }

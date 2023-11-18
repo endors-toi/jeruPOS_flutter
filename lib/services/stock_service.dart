@@ -1,37 +1,17 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jerupos/models/ajuste_stock.dart';
-import 'package:jerupos/services/auth_service.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:jerupos/services/network_service.dart';
 
 class StockService {
-  static final uri = Uri.parse(
-      '${dotenv.env['API_URL_${dotenv.env['CURRENT_DEVICE']}']}/restaurant/ajuste-stock/');
-
-  static Future<String?> _getToken() async {
-    String? token = await AuthService.getAccessToken();
-
-    if (token != null && JwtDecoder.isExpired(token)) {
-      await AuthService.refreshToken();
-      token = await AuthService.getAccessToken();
-    }
-
-    return token;
-  }
-
-  static Future<Map<String, String>> _getHeaders() async {
-    String? token = await _getToken();
-    return {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $token',
-    };
-  }
+  static final String url =
+      'http://' + getServerIP() + '/api/restaurant/ajuste-stock/';
 
   static Future<List<AjusteStock>> list() async {
+    final uri = Uri.parse(url);
     final response = await http.get(
       uri,
-      headers: await _getHeaders(),
+      headers: await getHeaders(),
     );
 
     if (response.statusCode == 200) {
@@ -46,9 +26,10 @@ class StockService {
   }
 
   static Future<AjusteStock> get(int id) async {
+    final uri = Uri.parse(url + '$id/');
     final response = await http.get(
-      uri.replace(path: '${uri.path}$id/'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
     );
 
     if (response.statusCode == 200) {
@@ -59,9 +40,10 @@ class StockService {
   }
 
   static Future<void> create(AjusteStock ajusteStock) async {
+    final uri = Uri.parse(url);
     final response = await http.post(
       uri,
-      headers: await _getHeaders(),
+      headers: await getHeaders(),
       body: json.encode(ajusteStock.toJson()),
     );
 
@@ -72,9 +54,10 @@ class StockService {
   }
 
   static Future<void> update(AjusteStock ajusteStock, int id) async {
+    final uri = Uri.parse(url + '$id/');
     final response = await http.put(
-      uri.replace(path: '${uri.path}$id/'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
       body: json.encode(ajusteStock.toJson()),
     );
 
@@ -85,9 +68,10 @@ class StockService {
   }
 
   static Future<void> patch(Map<String, dynamic> ajusteStock, int id) async {
+    final uri = Uri.parse(url + '$id/');
     final response = await http.patch(
-      uri.replace(path: '${uri.path}$id/'),
-      headers: await _getHeaders(),
+      uri,
+      headers: await getHeaders(),
       body: json.encode(ajusteStock),
     );
 
