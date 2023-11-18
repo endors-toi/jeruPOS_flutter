@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AnimatedEllipsis extends StatefulWidget {
+  final double? size;
+
+  AnimatedEllipsis({double? size}) : this.size = size ?? 24;
+
   @override
   _AnimatedEllipsisState createState() => _AnimatedEllipsisState();
 }
@@ -30,7 +34,7 @@ class _AnimatedEllipsisState extends State<AnimatedEllipsis>
       animation: _controller,
       builder: (context, child) {
         String ellipsis = '●' * ((_controller.value * 3).toInt() + 1);
-        return Text(ellipsis, style: TextStyle(fontSize: 20));
+        return Text(ellipsis, style: TextStyle(fontSize: widget.size));
       },
     );
   }

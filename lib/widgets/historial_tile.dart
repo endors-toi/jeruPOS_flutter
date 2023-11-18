@@ -25,7 +25,7 @@ class HistorialTile extends StatelessWidget {
         DateFormat('dd/MM/yyyy HH:mm').format(pedido.timestamp!);
     return Container(
       padding: EdgeInsets.all(16.0),
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: EdgeInsets.fromLTRB(0, 0, 12, 16),
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 255, 246, 227),
         boxShadow: [
@@ -59,7 +59,7 @@ class HistorialTile extends StatelessWidget {
             ),
             SizedBox(height: 10.0),
             ...List<Widget>.from((pedido.productos!).map((producto) {
-              return Text('${producto.cantidad} x ${producto.nombre}',
+              return Text('${producto.cantidad} ${producto.nombre}',
                   style: TextStyle(fontSize: 18));
             }).toList()),
           ],

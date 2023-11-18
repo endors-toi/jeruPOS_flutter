@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/widgets/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
@@ -18,10 +19,11 @@ class _CajaPageState extends State<CajaPage> {
   @override
   void initState() {
     super.initState();
-    _loadPedidos();
+    _setOrientation();
+    _initializePedidos();
   }
 
-  Future<void> _loadPedidos() async {
+  Future<void> _initializePedidos() async {
     try {
       final fetchedPedidos = await PedidoService.list();
       setState(() {
@@ -54,7 +56,7 @@ class _CajaPageState extends State<CajaPage> {
               onRetry: () {
                 setState(() {
                   errorMsg = '';
-                  _loadPedidos();
+                  _initializePedidos();
                 });
               })
           : ListView.builder(
@@ -78,5 +80,12 @@ class _CajaPageState extends State<CajaPage> {
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  void _setOrientation() async {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 }

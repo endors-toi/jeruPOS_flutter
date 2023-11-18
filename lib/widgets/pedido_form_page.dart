@@ -205,6 +205,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
       mostrarSnackbar(context, 'Error al cargar el usuario');
       return;
     }
+
     Pedido pedido = Pedido(
       idUsuario: userId,
       mesa: mesa != null ? mesa : null,

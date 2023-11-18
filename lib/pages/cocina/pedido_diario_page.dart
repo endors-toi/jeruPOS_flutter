@@ -39,11 +39,25 @@ class _PedidoDiarioPageState extends State<PedidoDiarioPage>
       return Center(child: CircularProgressIndicator());
     }
 
-    return ListView.builder(
+    return GridView.builder(
+      gridDelegate: MediaQuery.of(context).orientation == Orientation.landscape
+          ? SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8,
+              childAspectRatio: 6,
+            )
+          : SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 1,
+              mainAxisSpacing: 8,
+              childAspectRatio: 6,
+            ),
       itemCount: _items.length,
       itemBuilder: (context, index) {
         ItemPedido item = _items[index];
         return CheckboxListTile(
+          enableFeedback: true,
+          selectedTileColor: Colors.orange,
+          controlAffinity: ListTileControlAffinity.leading,
           title: Text(item.nombre),
           value: _itemsSeleccionados.contains(item.id),
           onChanged: (value) {

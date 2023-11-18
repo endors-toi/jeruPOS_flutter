@@ -38,13 +38,21 @@ class _InventarioPageState extends State<InventarioPage>
                 return CircularProgressIndicator();
               } else {
                 var ingredientes = snapshot.data;
-                _inicializarMaps(ingredientes);
+                _initializeMaps(ingredientes);
                 return Expanded(
-                  child: ListView.separated(
-                    separatorBuilder: (context, index) => Divider(
-                      height: 8,
-                      color: Colors.transparent,
-                    ),
+                  child: GridView.builder(
+                    gridDelegate: MediaQuery.of(context).orientation ==
+                            Orientation.landscape
+                        ? SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            childAspectRatio: 6,
+                          )
+                        : SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 1,
+                            mainAxisSpacing: 8,
+                            childAspectRatio: 6,
+                          ),
                     itemCount: ingredientes.length,
                     itemBuilder: (context, index) {
                       var ingrediente = ingredientes[index];
@@ -74,7 +82,7 @@ class _InventarioPageState extends State<InventarioPage>
     );
   }
 
-  void _inicializarMaps(ingredientes) {
+  void _initializeMaps(ingredientes) {
     ingredientes.forEach((ingrediente) {
       _controllers.putIfAbsent(ingrediente.id, () => TextEditingController());
       _cantidadesActuales.putIfAbsent(

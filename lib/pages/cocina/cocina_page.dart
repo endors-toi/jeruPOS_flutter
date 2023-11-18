@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/pages/cocina/reporte_diario.dart';
 import 'package:jerupos/services/pedido_service.dart';
@@ -16,7 +17,6 @@ class CocinaPage extends StatefulWidget {
 
 class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   List<Pedido> _pedidos = [];
-  List<Pedido> _pedidosAnimados = [];
   final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey();
   ScrollController _pedidosListController = ScrollController();
 
@@ -25,7 +25,8 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _loadPedidos();
+    _setOrientation();
+    _initializePedidos();
   }
 
   @override
@@ -75,7 +76,7 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
                         onRetry: () {
                           setState(() {
                             _errorMsg = '';
-                            _loadPedidos();
+                            _initializePedidos();
                           });
                         }),
                   )
@@ -89,7 +90,8 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
                       return SlideTransition(
                         key: UniqueKey(),
                         position: Tween<Offset>(
-                          begin: Offset(1, 0),
+                          begin: Offset(
+                              MediaQuery.of(context).size.width / 100, 0),
                           end: Offset(0, 0),
                         ).animate(animation),
                         child: PedidoCard(pedido: _pedidos[index]),
@@ -123,12 +125,13 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   /* MÉTODOS */
 
   // inicializaciones
-  Future<void> _loadPedidos() async {
+  Future<void> _initializePedidos() async {
     List<Pedido> pedidos = await PedidoService.list();
-    setState(() {
-      _pedidos =
-          pedidos.where((pedido) => pedido.estado == "PENDIENTE").toList();
-    });
+    pedidos = pedidos.where((pedido) => pedido.estado == "PENDIENTE").toList();
+    for (Pedido pedido in pedidos) {
+      _addItem(pedido);
+      await Future.delayed(Duration(milliseconds: 500));
+    }
   }
 
   // scroll de pedidos
@@ -161,9 +164,9 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
 
   // métodos AnimatedList
   void _addItem(Pedido pedido) {
-    _pedidosAnimados.add(pedido);
+    _pedidos.add(pedido);
     _animatedListKey.currentState!.insertItem(
-      _pedidosAnimados.length - 1,
+      _pedidos.length - 1,
       duration: Duration(milliseconds: 1000),
     );
   }
@@ -182,6 +185,13 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
       },
       duration: Duration(milliseconds: 500),
     );
-    _pedidosAnimados.removeAt(index);
+    _pedidos.removeAt(index);
+  }
+
+  void _setOrientation() async {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
   }
 }

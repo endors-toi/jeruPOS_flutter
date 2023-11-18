@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/utils/mostrar_toast.dart';
@@ -23,7 +24,8 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _loadPedidos();
+    _setOrientation();
+    _initializePedidos();
   }
 
   @override
@@ -40,7 +42,7 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
               onRetry: () {
                 setState(() {
                   errorMsg = '';
-                  _loadPedidos();
+                  _initializePedidos();
                 });
               })
           : Column(
@@ -64,7 +66,7 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
                               setState(() {
                                 pedidos.clear();
                                 pedidosActivos.clear();
-                                _loadPedidos();
+                                _initializePedidos();
                               });
                             });
                           },
@@ -118,7 +120,7 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
                                     pedidos.clear();
                                     pedidosActivos.clear();
                                   });
-                                  _loadPedidos();
+                                  _initializePedidos();
                                 });
                               },
                               ordenarPorNumOrden: ordenarPorNumOrden,
@@ -131,7 +133,7 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
     );
   }
 
-  void _loadPedidos() async {
+  void _initializePedidos() async {
     await PedidoService.list().then((value) {
       setState(() {
         pedidos.addAll(value);
@@ -159,5 +161,12 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
       });
     });
     mostrarToast("Ordenar por ${ordenarPorNumOrden ? 'tiempo' : 'mesa'}");
+  }
+
+  void _setOrientation() async {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/admin/admin_page.dart';
 import 'package:jerupos/pages/caja/caja_page.dart';
@@ -37,10 +38,7 @@ class _LoginFormState extends State<LoginForm> {
         child: Form(
           key: _formKey,
           child: ListView(
-            padding: EdgeInsets.only(
-                top: MediaQuery.of(context).orientation == Orientation.landscape
-                    ? MediaQuery.of(context).size.height * 0.3
-                    : 0),
+            padding: EdgeInsets.all(8),
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -173,8 +171,9 @@ class _LoginFormState extends State<LoginForm> {
                 },
               )
             : null,
-        body: Padding(
-            padding: EdgeInsets.all(8.0),
+        body: Container(
+            padding: EdgeInsets.all(8),
+            margin: EdgeInsets.only(top: 12),
             child: OrientationBuilder(builder: (context, orientation) {
               return orientation == Orientation.portrait
                   ? Column(

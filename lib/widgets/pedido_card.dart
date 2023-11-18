@@ -26,6 +26,8 @@ class PedidoCard extends StatefulWidget {
 
 class _PedidoCardState extends State<PedidoCard> {
   bool _esGarzon = false;
+  double _screenWidth = 0;
+  double _scaledSize = 0;
 
   @override
   void didChangeDependencies() {
@@ -38,108 +40,142 @@ class _PedidoCardState extends State<PedidoCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: _esGarzon ? null : 200,
-      width: _esGarzon ? 200 : 300,
-      padding: EdgeInsets.only(right: 8),
-      margin: EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(.5),
-            blurRadius: 2,
-            offset: Offset(4, 4),
-            spreadRadius: -3,
-          )
-        ],
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Card(
-        child: GestureDetector(
-          onLongPress: widget.onLongPress,
-          child: Container(
-            padding: EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 255, 246, 227),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _header(),
-                _body(),
-              ],
+    _screenWidth = MediaQuery.of(context).size.width;
+    _scaledSize = _screenWidth * 0.02;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          height: _esGarzon ? null : constraints.maxHeight,
+          width: _esGarzon ? null : _screenWidth / 3.5,
+          padding: EdgeInsets.only(right: 8),
+          margin: EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(.5),
+                blurRadius: 2,
+                offset: Offset(4, 4),
+                spreadRadius: -3,
+              )
+            ],
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Card(
+            child: GestureDetector(
+              onLongPress: widget.onLongPress,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 255, 246, 227),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _header(),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: _scaledSize * .3),
+                      child: Divider(
+                        thickness:
+                            _esGarzon ? _scaledSize / 4 : _scaledSize / 8,
+                        color: widget.ordenarPorNumOrden ?? true
+                            ? null
+                            : Colors.orange,
+                      ),
+                    ),
+                    _body(),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Column _header() {
+  Widget _header() {
     final String fTimestamp =
         DateFormat('hh:mm').format(widget.pedido.timestamp!);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            CircleAvatar(
-                backgroundColor:
-                    widget.ordenarPorNumOrden ?? true ? null : Colors.orange,
-                radius: 20,
-                child: Text(
-                    widget.ordenarPorNumOrden ?? true
-                        ? '${widget.pedido.id}'
-                        : '${widget.pedido.mesa}',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Spacer(),
-            widget.ordenarPorNumOrden ?? true
-                ? Text(
-                    widget.pedido.mesa != null
-                        ? "Mesa ${widget.pedido.mesa}"
-                        : "Para Llevar",
-                    style: TextStyle(fontSize: 16),
-                  )
-                : Text("Pedido ${widget.pedido.id}"),
-          ],
-        ),
-        Row(
-          children: [
-            widget.pedido.estado == 'PENDIENTE' ? AnimatedEllipsis() : Text(''),
-            Spacer(),
-            Text('$fTimestamp'),
-          ],
-        ),
-        Divider(),
-      ],
+    return Padding(
+      padding: _esGarzon
+          ? EdgeInsets.fromLTRB(
+              _scaledSize * 1.5, _scaledSize * 1.5, _scaledSize * 1.5, 0)
+          : EdgeInsets.fromLTRB(
+              _scaledSize * .8, _scaledSize * .8, _scaledSize * .8, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                  backgroundColor:
+                      widget.ordenarPorNumOrden ?? true ? null : Colors.orange,
+                  radius: _esGarzon ? _scaledSize * 3 : _scaledSize * 1.2,
+                  child: Text(
+                      widget.ordenarPorNumOrden ?? true
+                          ? '${widget.pedido.id}'
+                          : '${widget.pedido.mesa}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize:
+                              _esGarzon ? _scaledSize * 3 : _scaledSize))),
+              Spacer(),
+              widget.ordenarPorNumOrden ?? true
+                  ? Text(
+                      widget.pedido.mesa != null
+                          ? "Mesa ${widget.pedido.mesa}"
+                          : "Para Llevar",
+                      style: TextStyle(
+                          fontSize:
+                              _esGarzon ? _scaledSize * 2.5 : _scaledSize),
+                    )
+                  : Text("Pedido ${widget.pedido.id}"),
+            ],
+          ),
+          Row(
+            children: [
+              widget.pedido.estado == 'PENDIENTE'
+                  ? AnimatedEllipsis(
+                      size: _esGarzon ? _scaledSize * 3 : _scaledSize * .8)
+                  : Text(''),
+              Spacer(),
+              Text('$fTimestamp',
+                  style: TextStyle(
+                      fontSize:
+                          _esGarzon ? _scaledSize * 2.1 : _scaledSize * .8)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _body() {
-    List<Text> productos = widget.pedido.productos!.map((producto) {
+    List<Widget> productos = widget.pedido.productos!.map((producto) {
       return Text(
         "${producto.cantidad} ${producto.nombre}",
-        style: TextStyle(fontSize: 18),
+        style: TextStyle(fontSize: _esGarzon ? _scaledSize * 2 : _scaledSize),
         overflow: TextOverflow.ellipsis,
       );
     }).toList();
-
-    return Container(
-      child: _esGarzon
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return _esGarzon
+        ? Container(
+            margin: EdgeInsets.fromLTRB(
+                _scaledSize * 1.3, 0, _scaledSize * 1.3, _scaledSize * 1.3),
+            child: ListView(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
               children: productos,
-            )
-          : Expanded(
-              child: ListView.builder(
-                itemCount: productos.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return productos[index];
-                },
-              ),
-            ),
-    );
+            ))
+        : Expanded(
+            child: Container(
+                margin: EdgeInsets.fromLTRB(
+                    _scaledSize * .8, 0, _scaledSize * .8, _scaledSize * .8),
+                child: ListView(
+                  shrinkWrap: true,
+                  children: productos,
+                )),
+          );
   }
 }

@@ -70,26 +70,9 @@ class PedidoService {
     if (response.statusCode != 200) {
       throw Exception(json.decode(response.body)['error']);
     } else {
-      // solución temporal
-      Map<String, dynamic> jsonData = json.decode(response.body);
-      var productosPost = jsonData['productos'];
-      List<Map<String, dynamic>> adjustedProductos = [];
-      if (productosPost != null) {
-        List<Map<String, dynamic>> productos =
-            List<Map<String, dynamic>>.from(productosPost);
-        adjustedProductos = productos.map((producto) {
-          return {
-            ...producto,
-            'id': producto['producto'],
-          };
-        }).toList();
-      }
-      Map<String, dynamic> adjustedJsonData = {
-        ...jsonData,
-        'productos': adjustedProductos,
-      };
-
-      return Pedido.fromJson(adjustedJsonData);
+      Pedido pedido = Pedido.fromJson(json.decode(response.body));
+      pedido.productos = await getProductosPedido(pedido.id!);
+      return pedido;
     }
   }
 
