@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/login_page.dart';
 import 'package:jerupos/services/firebase_service.dart';
@@ -13,12 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await FirebaseService().initNotifications();
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => PedidoWebSocket(),
-      child: MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

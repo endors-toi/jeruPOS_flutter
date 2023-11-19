@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jerupos/models/producto_pedido.dart';
 import 'package:jerupos/services/pedido_service.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class Pedido {
   int? _id;
@@ -113,20 +111,5 @@ class PedidoProvider with ChangeNotifier {
   void deletePedido(int id) {
     this._pedidos.removeWhere((p) => p.id == id);
     notifyListeners();
-  }
-}
-
-class PedidoWebSocket with ChangeNotifier {
-  static WebSocketChannel channel = WebSocketChannel.connect(Uri.parse(
-      '${dotenv.env['WS_URL_${dotenv.env['CURRENT_DEVICE']}']}/pedidos/'));
-
-  void enviarMensaje(String mensaje) {
-    channel.sink.add(mensaje);
-  }
-
-  @override
-  void dispose() {
-    channel.sink.close();
-    super.dispose();
   }
 }

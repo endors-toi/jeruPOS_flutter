@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:jerupos/models/pedido.dart';
+import 'package:jerupos/services/network_service.dart';
 import 'package:jerupos/utils/mostrar_toast.dart';
 import 'package:jerupos/widgets/pedido_form_page.dart';
 import 'package:jerupos/services/pedido_service.dart';
@@ -9,6 +10,7 @@ import 'package:jerupos/utils/error_retry.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
 import 'package:jerupos/widgets/usuario_drawer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class GarzonPage extends StatefulWidget {
   @override
@@ -16,6 +18,7 @@ class GarzonPage extends StatefulWidget {
 }
 
 class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
+  late WebSocketChannel channel;
   bool ordenarPorNumOrden = true;
   List<Pedido> pedidos = [];
   List<Pedido> pedidosActivos = [];
@@ -26,15 +29,29 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
     super.initState();
     _setOrientation();
     _initializePedidos();
+    _connectToSocket();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('JeruPOS'),
-        backgroundColor: Colors.orange,
-      ),
+          title: Text('JeruPOS'),
+          backgroundColor: Colors.orange,
+          actions: [
+            IconButton(
+              onPressed: () {
+                channel.sink.add('{"message": "ping"}');
+              },
+              icon: Icon(MdiIcons.network),
+            ),
+            IconButton(
+              onPressed: () {
+                _connectToSocket();
+              },
+              icon: Icon(MdiIcons.reload),
+            ),
+          ]),
       drawer: UsuarioDrawer(),
       body: errorMsg.isNotEmpty
           ? ErrorRetry(
@@ -42,8 +59,8 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
               onRetry: () {
                 setState(() {
                   errorMsg = '';
-                  _initializePedidos();
                 });
+                _initializePedidos();
               })
           : Column(
               children: [
@@ -66,8 +83,8 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
                               setState(() {
                                 pedidos.clear();
                                 pedidosActivos.clear();
-                                _initializePedidos();
                               });
+                              _initializePedidos();
                             });
                           },
                           child: Text("Nuevo Pedido",
@@ -133,6 +150,8 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
     );
   }
 
+  /* MÉTODOS */
+
   void _initializePedidos() async {
     await PedidoService.list().then((value) {
       setState(() {
@@ -168,5 +187,11 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+  }
+
+  void _connectToSocket() {
+    channel = WebSocketChannel.connect(
+      Uri.parse('ws://' + getServerIP() + '/ws/pedidos/'),
+    );
   }
 }

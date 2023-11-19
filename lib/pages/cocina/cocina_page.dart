@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/pages/cocina/reporte_diario.dart';
+import 'package:jerupos/services/network_service.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/utils/error_retry.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
@@ -9,6 +10,8 @@ import 'package:jerupos/widgets/usuario_drawer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'dart:math';
+
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class CocinaPage extends StatefulWidget {
   @override
@@ -19,6 +22,7 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   List<Pedido> _pedidos = [];
   final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey();
   ScrollController _pedidosListController = ScrollController();
+  WebSocketChannel? _channel;
 
   String _errorMsg = '';
 
@@ -26,7 +30,8 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _setOrientation();
-    _initializePedidos();
+    // _initializePedidos();
+    _connect();
   }
 
   @override
@@ -46,22 +51,35 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
             icon: Icon(MdiIcons.plus),
             onPressed: () {
               Random random = new Random();
-              _addItem(_pedidos[random.nextInt(_pedidos.length)]);
+              _addPedidoCard(_pedidos[random.nextInt(_pedidos.length)]);
             },
           ),
           IconButton(
             icon: Icon(MdiIcons.minus),
             onPressed: () {
-              _removeItem(0);
+              // _removeItem(0);
+              _pedidos.clear();
             },
           ),
           IconButton(
-            icon: Icon(MdiIcons.launch),
+            icon: Icon(MdiIcons.refresh),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ReporteDiario()));
+              _initializePedidos();
             },
-          )
+          ),
+          IconButton(
+            icon: Icon(MdiIcons.logout),
+            onPressed: () {
+              _connect();
+            },
+          ),
+          // IconButton(
+          //   icon: Icon(MdiIcons.launch),
+          //   onPressed: () {
+          //     Navigator.push(context,
+          //         MaterialPageRoute(builder: (context) => ReporteDiario()));
+          //   },
+          // )
         ],
       ),
       drawer: UsuarioDrawer(),
@@ -87,14 +105,27 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
                     physics: NeverScrollableScrollPhysics(),
                     initialItemCount: _pedidos.length,
                     itemBuilder: (context, index, animation) {
+                      Pedido pedido = _pedidos[index];
                       return SlideTransition(
                         key: UniqueKey(),
                         position: Tween<Offset>(
-                          begin: Offset(
-                              MediaQuery.of(context).size.width / 100, 0),
-                          end: Offset(0, 0),
-                        ).animate(animation),
-                        child: PedidoCard(pedido: _pedidos[index]),
+                                begin: Offset(
+                                    MediaQuery.of(context).size.width / 100, 0),
+                                end: Offset(0, 0))
+                            .animate(animation),
+                        child: Dismissible(
+                          key: Key(_pedidos[index]
+                              .id
+                              .toString()), // Ensure this key is unique for each item.
+                          direction: DismissDirection.endToStart,
+                          onDismissed: (direction) {
+                            _discardPedidoCard(index);
+                            pedido.estado = "PREPARADO";
+                            PedidoService.updatePATCH(pedido)
+                                .then((value) => print(value));
+                          },
+                          child: PedidoCard(pedido: pedido),
+                        ),
                       );
                     },
                   ),
@@ -129,8 +160,9 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
     List<Pedido> pedidos = await PedidoService.list();
     pedidos = pedidos.where((pedido) => pedido.estado == "PENDIENTE").toList();
     for (Pedido pedido in pedidos) {
-      _addItem(pedido);
+      _addPedidoCard(pedido);
       await Future.delayed(Duration(milliseconds: 500));
+      if (_pedidos.length > 10) break;
     }
   }
 
@@ -163,7 +195,7 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   }
 
   // métodos AnimatedList
-  void _addItem(Pedido pedido) {
+  void _addPedidoCard(Pedido pedido) {
     _pedidos.add(pedido);
     _animatedListKey.currentState!.insertItem(
       _pedidos.length - 1,
@@ -171,27 +203,23 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
     );
   }
 
-  void _removeItem(int index) {
-    _animatedListKey.currentState!.removeItem(
-      index,
-      (_, animation) {
-        return SizeTransition(
-          sizeFactor: animation,
-          child: Card(
-            color: Colors.orange,
-            child: Container(color: Colors.orange),
-          ),
-        );
-      },
-      duration: Duration(milliseconds: 500),
-    );
+  void _discardPedidoCard(int index) {
     _pedidos.removeAt(index);
+    _animatedListKey.currentState!
+        .removeItem(index, (context, animation) => Container());
   }
 
+  // otros métodos
   void _setOrientation() async {
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+  }
+
+  void _connect() {
+    _channel = WebSocketChannel.connect(
+      Uri.parse('ws://' + getServerIP() + '/ws/pedidos/'),
+    );
   }
 }
