@@ -113,8 +113,7 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
                           onDismissed: (direction) {
                             _discardPedidoCard(index);
                             pedido.estado = "PREPARADO";
-                            PedidoService.updatePATCH(pedido)
-                                .then((value) => print(value));
+                            PedidoService.updatePATCH(pedido);
                           },
                           child: PedidoCard(pedido: pedido),
                         ),
@@ -227,6 +226,9 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
         if (data['action'] == 'create') {
           _recibirPedidoNuevo(data['pedido']);
         }
+        if (data['action'] == 'update') {
+          _recibirPedidoActualizado(data['pedido']);
+        }
       }
     });
   }
@@ -235,5 +237,18 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
     pedido = Pedido.fromJson(pedido);
     pedido.productos = await PedidoService.getProductosPedido(pedido.id);
     _addPedidoCard(pedido);
+  }
+
+  void _recibirPedidoActualizado(pedido) async {
+    pedido = Pedido.fromJson(pedido);
+    pedido.productos = await PedidoService.getProductosPedido(pedido.id);
+    int index = _pedidos.indexWhere((p) => p.id == pedido.id);
+    if (index != -1) {
+      _pedidos[index] = pedido;
+      _animatedListKey.currentState!
+          .removeItem(index, (context, animation) => Container());
+      _animatedListKey.currentState!
+          .insertItem(index, duration: Duration(milliseconds: 1000));
+    }
   }
 }

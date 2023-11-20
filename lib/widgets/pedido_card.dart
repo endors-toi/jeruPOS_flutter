@@ -130,7 +130,8 @@ class _PedidoCardState extends State<PedidoCard> {
                           fontSize:
                               _esGarzon ? _scaledSize * 2.5 : _scaledSize),
                     )
-                  : Text("Pedido ${widget.pedido.id}"),
+                  : Text("Pedido ${widget.pedido.id}",
+                      style: TextStyle(fontSize: _scaledSize * 2)),
             ],
           ),
           Row(

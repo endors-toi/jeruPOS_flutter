@@ -179,7 +179,7 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
         }
       });
     });
-    mostrarToast("Ordenar por ${ordenarPorNumOrden ? 'tiempo' : 'mesa'}");
+    mostrarToast("Orden ${ordenarPorNumOrden ? 'cronológico' : 'por mesa'}");
   }
 
   void _setOrientation() async {

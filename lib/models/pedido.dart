@@ -46,7 +46,7 @@ class Pedido {
       'timestamp': this._timestamp.toString(),
       'nombre_cliente': this._nombreCliente,
       'mesa': this._mesa,
-      'id_usuario': this._idUsuario,
+      'usuario': this._idUsuario,
       'productos':
           this._productos!.map((producto) => producto.toJson()).toList(),
     };
@@ -88,6 +88,20 @@ class Pedido {
       'productos': productosId,
       'cantidades': cantidades,
       'estado': 'PENDIENTE',
+    };
+  }
+
+  Map<String, dynamic> update() {
+    List<int> productosId =
+        this.productos!.map((producto) => producto.id!).toList();
+    List<int> cantidades =
+        this.productos!.map((producto) => producto.cantidad).toList();
+    String mesaOcliente = this.mesa != null ? 'mesa' : 'cliente';
+    return {
+      mesaOcliente: this.mesa ?? this.nombreCliente,
+      'productos': productosId,
+      'cantidades': cantidades,
+      'estado': this.estado,
     };
   }
 }

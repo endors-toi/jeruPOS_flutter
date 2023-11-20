@@ -68,7 +68,7 @@ class PedidoService {
     );
 
     if (response.statusCode != 200) {
-      throw Exception(json.decode(response.body)['detail']);
+      throw Exception(json.decode(response.body));
     } else {
       return Pedido.fromJson(json.decode(response.body));
     }
@@ -79,11 +79,11 @@ class PedidoService {
     final response = await http.patch(
       uri,
       headers: await getHeaders(),
-      body: json.encode(pedido),
+      body: json.encode(pedido.update()),
     );
 
     if (response.statusCode != 200) {
-      throw Exception(json.decode(response.body)['detail']);
+      throw Exception(json.decode(response.body));
     } else {
       return Pedido.fromJson(json.decode(response.body));
     }

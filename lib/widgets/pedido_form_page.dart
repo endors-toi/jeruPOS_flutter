@@ -16,6 +16,7 @@ class PedidoFormPage extends StatefulWidget {
 }
 
 class _PedidoFormPageState extends State<PedidoFormPage> {
+  Pedido? _pedido;
   late Future _productosFuture;
   Usuario? usuario;
   bool _editMode = false;
@@ -34,7 +35,9 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
 
       PedidoService.get(widget.id!).then((pedido) {
         setState(() {
-          mesa = pedido.mesa;
+          _pedido = pedido;
+          mesa = pedido.mesa ?? null;
+          clienteCtrl.text = pedido.nombreCliente ?? "";
           productosPedido = pedido.productos!;
         });
       }).catchError((e) {
@@ -226,13 +229,12 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
   }
 
   void editarPedido() async {
-    Pedido pedido = Pedido(
-      id: widget.id,
-      mesa: mesa,
-      productos: productosPedido,
-    );
+    _pedido!.mesa = mesa ?? null;
+    _pedido!.nombreCliente =
+        clienteCtrl.text.trim() != "" ? clienteCtrl.text.trim() : null;
+    _pedido!.productos = productosPedido;
 
-    await PedidoService.updatePATCH(pedido);
+    await PedidoService.updatePATCH(_pedido!);
     Navigator.pop(context);
   }
 }

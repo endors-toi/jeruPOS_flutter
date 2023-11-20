@@ -35,6 +35,7 @@ Future<String?> getToken() async {
 Future<Map<String, String>> getHeaders() async {
   String? token = await getToken();
   return {
+    'Accept': 'application/json',
     'Content-Type': 'application/json; charset=UTF-8',
     'Authorization': 'Bearer $token',
   };
