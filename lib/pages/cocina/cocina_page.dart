@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jerupos/models/pedido.dart';
@@ -8,8 +11,7 @@ import 'package:jerupos/utils/error_retry.dart';
 import 'package:jerupos/widgets/pedido_card.dart';
 import 'package:jerupos/widgets/usuario_drawer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
-import 'dart:math';
+import 'package:wakelock/wakelock.dart';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -22,6 +24,8 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   List<Pedido> _pedidos = [];
   final GlobalKey<AnimatedListState> _animatedListKey = GlobalKey();
   ScrollController _pedidosListController = ScrollController();
+
+  Timer? _timer;
   WebSocketChannel? _channel;
 
   String _errorMsg = '';
@@ -30,6 +34,7 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _setOrientation();
+    // Wakelock.enable();
     // _initializePedidos();
     _connect();
   }
@@ -37,6 +42,9 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _pedidosListController.dispose();
+    _timer!.cancel();
+    _channel!.sink.close();
+    // Wakelock.disable();
     super.dispose();
   }
 
@@ -47,20 +55,6 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
         title: Text('JeruPOS'),
         backgroundColor: Colors.orange,
         actions: [
-          IconButton(
-            icon: Icon(MdiIcons.plus),
-            onPressed: () {
-              Random random = new Random();
-              _addPedidoCard(_pedidos[random.nextInt(_pedidos.length)]);
-            },
-          ),
-          IconButton(
-            icon: Icon(MdiIcons.minus),
-            onPressed: () {
-              // _removeItem(0);
-              _pedidos.clear();
-            },
-          ),
           IconButton(
             icon: Icon(MdiIcons.refresh),
             onPressed: () {
@@ -73,13 +67,13 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
               _connect();
             },
           ),
-          // IconButton(
-          //   icon: Icon(MdiIcons.launch),
-          //   onPressed: () {
-          //     Navigator.push(context,
-          //         MaterialPageRoute(builder: (context) => ReporteDiario()));
-          //   },
-          // )
+          IconButton(
+            icon: Icon(MdiIcons.launch),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ReporteDiario()));
+            },
+          )
         ],
       ),
       drawer: UsuarioDrawer(),
@@ -114,9 +108,7 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
                                 end: Offset(0, 0))
                             .animate(animation),
                         child: Dismissible(
-                          key: Key(_pedidos[index]
-                              .id
-                              .toString()), // Ensure this key is unique for each item.
+                          key: Key(_pedidos[index].id.toString()),
                           direction: DismissDirection.endToStart,
                           onDismissed: (direction) {
                             _discardPedidoCard(index);
@@ -221,5 +213,27 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
     _channel = WebSocketChannel.connect(
       Uri.parse('ws://' + getServerIP() + '/ws/pedidos/'),
     );
+
+    _timer = Timer.periodic(Duration(seconds: 20), (timer) {
+      _channel!.sink.add(json.encode({"message": "ping"}));
+    });
+
+    _channel!.stream.listen((message) {
+      Map<String, dynamic> data = json.decode(message);
+      if (data['message'] == 'pong') {
+        print(data);
+      }
+      if (data['type'] == 'pedido_update') {
+        if (data['action'] == 'create') {
+          _recibirPedidoNuevo(data['pedido']);
+        }
+      }
+    });
+  }
+
+  void _recibirPedidoNuevo(pedido) async {
+    pedido = Pedido.fromJson(pedido);
+    pedido.productos = await PedidoService.getProductosPedido(pedido.id);
+    _addPedidoCard(pedido);
   }
 }
