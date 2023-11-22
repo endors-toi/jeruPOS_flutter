@@ -4,6 +4,7 @@ import 'package:jerupos/services/ingrediente_service.dart';
 import 'package:jerupos/pages/admin/ingrediente_form_page.dart';
 import 'package:jerupos/utils/mostrar_snackbar.dart';
 import 'package:jerupos/widgets/ingrediente_tile.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class IngredientesPage extends StatefulWidget {
   @override
@@ -27,14 +28,13 @@ class _IngredientesPageState extends State<IngredientesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Padding(
-          padding: EdgeInsets.only(right: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Ingredientes'),
-              ElevatedButton(
+          automaticallyImplyLeading: false,
+          title: Text('Ingredientes'),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: ElevatedButton(
+                child: Icon(MdiIcons.plus, size: 28),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return IngredienteFormPage();
@@ -42,12 +42,9 @@ class _IngredientesPageState extends State<IngredientesPage> {
                         _ingredientesFuture = _listIngredientes();
                       }));
                 },
-                child: Icon(Icons.add),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
+          ]),
       body: FutureBuilder(
         future: _ingredientesFuture,
         builder: (context, AsyncSnapshot snapshot) {

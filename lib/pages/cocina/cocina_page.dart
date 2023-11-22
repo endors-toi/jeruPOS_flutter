@@ -12,7 +12,6 @@ import 'package:jerupos/widgets/pedido_card.dart';
 import 'package:jerupos/widgets/usuario_drawer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:wakelock/wakelock.dart';
-
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class CocinaPage extends StatefulWidget {
@@ -34,8 +33,8 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _setOrientation();
-    // Wakelock.enable();
-    // _initializePedidos();
+    Wakelock.enable();
+    _initializePedidos();
     _connect();
   }
 
@@ -44,7 +43,7 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
     _pedidosListController.dispose();
     _timer!.cancel();
     _channel!.sink.close();
-    // Wakelock.disable();
+    Wakelock.disable();
     super.dispose();
   }
 
@@ -55,18 +54,6 @@ class _CocinaPageState extends State<CocinaPage> with TickerProviderStateMixin {
         title: Text('JeruPOS'),
         backgroundColor: Colors.orange,
         actions: [
-          IconButton(
-            icon: Icon(MdiIcons.refresh),
-            onPressed: () {
-              _initializePedidos();
-            },
-          ),
-          IconButton(
-            icon: Icon(MdiIcons.logout),
-            onPressed: () {
-              _connect();
-            },
-          ),
           IconButton(
             icon: Icon(MdiIcons.launch),
             onPressed: () {

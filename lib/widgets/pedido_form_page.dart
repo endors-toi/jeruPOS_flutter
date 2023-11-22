@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/models/producto_pedido.dart';
+import 'package:jerupos/models/producto.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/services/pedido_service.dart';
 import 'package:jerupos/services/producto_service.dart';
@@ -74,11 +75,11 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
                   future: _productosFuture,
                   builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
-                      List<ProductoPedido> productos = snapshot.data!;
+                      List<Producto> productos = snapshot.data!;
                       return GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
@@ -92,7 +93,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
                                     RoundedRectangleBorder(
                                         borderRadius: BorderRadius.zero))),
                             onPressed: () => agregarProducto(productos[index]),
-                            child: Text(productos[index].abreviacion ?? 'N/A'),
+                            child: Text(productos[index].abreviacion),
                           );
                         },
                       );
@@ -186,14 +187,20 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     );
   }
 
-  void agregarProducto(ProductoPedido producto) {
+  void agregarProducto(Producto producto) {
     setState(() {
       final indexProductoExistente =
           productosPedido.indexWhere((p) => p.id == producto.id);
       if (indexProductoExistente != -1) {
         productosPedido[indexProductoExistente].incrementarCantidad();
       } else {
-        productosPedido.add(producto);
+        ProductoPedido prod = ProductoPedido(
+          id: producto.id,
+          nombre: producto.nombre,
+          precio: producto.precio,
+          cantidad: 1,
+        );
+        productosPedido.add(prod);
       }
     });
   }

@@ -10,11 +10,11 @@ class PedidoService {
 
   static Future<List<Pedido>> list() async {
     final uri = Uri.parse(url);
-
     final response = await http.get(
       uri,
       headers: await getHeaders(),
     );
+
     if (response.statusCode != 200) {
       throw Exception(json.decode(response.body)['error']);
     } else {

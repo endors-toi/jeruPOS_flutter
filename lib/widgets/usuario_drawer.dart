@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/usuario.dart';
-import 'package:jerupos/pages/cocina/historial_page.dart';
+import 'package:jerupos/widgets/historial_page.dart';
 import 'package:jerupos/pages/login_page.dart';
 import 'package:jerupos/services/auth_service.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -70,7 +70,7 @@ class _UsuarioDrawerState extends State<UsuarioDrawer> {
           ),
           ListTile(
             leading: Icon(Icons.logout),
-            title: Text('Logout'),
+            title: Text('Cerrar sesión'),
             onTap: () {
               AuthService.logout().then(
                 (value) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:jerupos/models/usuario.dart';
 import 'package:jerupos/pages/login_page.dart';
 import 'package:jerupos/services/firebase_service.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        builder: BotToastInit(),
+        builder: EasyLoading.init(builder: BotToastInit()),
         navigatorObservers: [BotToastNavigatorObserver()],
         theme: ThemeData(
           colorScheme:

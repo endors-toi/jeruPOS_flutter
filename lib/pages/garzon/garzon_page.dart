@@ -23,6 +23,7 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
   List<Pedido> pedidos = [];
   List<Pedido> pedidosActivos = [];
   String errorMsg = '';
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -109,11 +110,14 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
                   padding: EdgeInsets.all(8),
                   child: pedidosActivos.isEmpty
                       ? Center(
-                          child: Text(
-                            'No hay pedidos activos',
-                            style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
+                          child: _isLoading
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  'No hay pedidos activos',
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold),
+                                ),
                         )
                       : MasonryGridView.builder(
                           gridDelegate:
@@ -160,6 +164,7 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
             .where((pedido) => pedido.estado != 'PAGADO' && pedido.mesa != null)
             .toList();
         pedidosActivos.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
+        _isLoading = false;
       });
     }).catchError((error) {
       setState(() {
