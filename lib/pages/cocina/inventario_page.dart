@@ -11,8 +11,8 @@ class InventarioPage extends StatefulWidget {
 class _InventarioPageState extends State<InventarioPage>
     with AutomaticKeepAliveClientMixin<InventarioPage> {
   Map<int, TextEditingController> _controllers = {};
-  Map<int, int> _cantidadesActuales = {};
-  Map<int, int> _cantidadesReportadas = {};
+  Map<int, double> _cantidadesActuales = {};
+  Map<int, double> _cantidadesReportadas = {};
 
   @override
   bool get wantKeepAlive => true;
@@ -65,7 +65,7 @@ class _InventarioPageState extends State<InventarioPage>
                         ),
                         onChanged: (value) {
                           _cantidadesReportadas[ingrediente.id] =
-                              int.parse(value);
+                              double.parse(value);
                           Provider.of<ReporteDiarioData>(context, listen: false)
                               .updateInventario(
                                   _cantidadesReportadas, _cantidadesActuales);

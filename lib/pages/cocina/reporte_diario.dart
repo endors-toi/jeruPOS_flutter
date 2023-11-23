@@ -12,8 +12,8 @@ import 'package:provider/provider.dart';
 
 class ReporteDiarioData extends ChangeNotifier {
   List<int> pedidoDiario;
-  Map<int, int> inventario;
-  Map<int, int> stockActual;
+  Map<int, double> inventario;
+  Map<int, double> stockActual;
 
   ReporteDiarioData(
       {this.pedidoDiario = const [],
@@ -25,7 +25,8 @@ class ReporteDiarioData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateInventario(Map<int, int> inventario, Map<int, int> stockActual) {
+  void updateInventario(
+      Map<int, double> inventario, Map<int, double> stockActual) {
     this.inventario = inventario;
     this.stockActual = stockActual;
     notifyListeners();
@@ -98,11 +99,11 @@ class _ReporteDiarioState extends State<ReporteDiario> {
   }
 
   void _enviarInventario(
-      Map<int, int> inventario, Map<int, int> stockActual) async {
+      Map<int, double> inventario, Map<int, double> stockActual) async {
     for (int id in inventario.keys) {
-      int cantReportada = inventario[id] ?? 0;
-      int cantActual = stockActual[id] ?? 0;
-      int diferencia = cantReportada - cantActual;
+      double cantReportada = inventario[id] ?? 0;
+      double cantActual = stockActual[id] ?? 0;
+      double diferencia = cantReportada - cantActual;
       if (diferencia != 0) {
         AjusteStock ajuste = AjusteStock(
           ingrediente: id,

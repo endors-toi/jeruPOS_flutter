@@ -12,7 +12,7 @@ class IngresoDiario extends StatefulWidget {
 
 class _IngresoDiarioState extends State<IngresoDiario> {
   Map<int, TextEditingController> _controllers = {};
-  Map<int, int> _cantidadesActuales = {};
+  Map<int, double> _cantidadesActuales = {};
 
   @override
   void dispose() {
@@ -60,7 +60,7 @@ class _IngresoDiarioState extends State<IngresoDiario> {
                           keyboardType: TextInputType.number,
                           validator: (cantidad) {
                             if (cantidad != "" &&
-                                int.tryParse(cantidad!) == null) {
+                                double.tryParse(cantidad!) == null) {
                               return "Ingrese un número";
                             }
                             return null;
@@ -105,9 +105,9 @@ class _IngresoDiarioState extends State<IngresoDiario> {
     for (int id in _controllers.keys) {
       var controller = _controllers[id];
       if (controller != null) {
-        int cantidadIngresada = int.tryParse(controller.text) ?? 0;
-        int cantidadActual = _cantidadesActuales[id] ?? 0;
-        int cantidadNueva = cantidadActual + cantidadIngresada;
+        double cantidadIngresada = double.tryParse(controller.text) ?? 0;
+        double cantidadActual = _cantidadesActuales[id] ?? 0;
+        double cantidadNueva = cantidadActual + cantidadIngresada;
         await IngredienteService.patch(
             {'cantidad_disponible': cantidadNueva}, id);
       }

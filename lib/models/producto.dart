@@ -40,8 +40,17 @@ class Producto {
       'nombre': _nombre,
       'abreviacion': _abreviacion,
       'precio': _precio,
-      'categoriaId': _categoria,
+      'categoria': _categoria,
       'ingredientes': _ingredientes?.map((item) => item.toJson()).toList(),
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'nombre': _nombre,
+      'abreviacion': _abreviacion,
+      'precio': _precio,
+      'categoria': _categoria,
     };
   }
 
@@ -61,4 +70,12 @@ class Producto {
   set categoriaId(int categoria) => _categoria = categoria;
   set ingredientes(List<Ingrediente>? ingredientes) =>
       _ingredientes = ingredientes;
+
+  // Métodos
+  Map<String, dynamic> post(Map<int, double> ingredientes) {
+    Map<String, dynamic> prod = this.toMap();
+    prod['ingredientes'] = ingredientes.keys.toList();
+    prod['cantidades'] = ingredientes.values.toList();
+    return prod;
+  }
 }

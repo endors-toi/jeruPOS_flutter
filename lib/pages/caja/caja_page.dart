@@ -62,9 +62,10 @@ class _CajaPageState extends State<CajaPage> {
           : ListView.builder(
               itemCount: pedidos.length,
               itemBuilder: (BuildContext context, int index) {
-                if (pedidos[index].estado != 'PAGADO') {
+                Pedido pedido = pedidos[index];
+                if (pedido.estado != 'PAGADO') {
                   return PedidoTile(
-                    pedido: pedidos[index],
+                    pedido: pedido,
                     onAction: refreshList,
                   );
                 } else {

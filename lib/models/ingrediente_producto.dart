@@ -1,7 +1,7 @@
 class IngredienteProducto {
   int producto;
   int ingrediente;
-  int cantidad;
+  double cantidad;
 
   IngredienteProducto({
     required this.producto,

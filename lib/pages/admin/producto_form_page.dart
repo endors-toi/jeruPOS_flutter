@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:jerupos/models/ingrediente.dart';
 import 'package:jerupos/models/producto.dart';
+import 'package:jerupos/pages/admin/ingrediente_form_page.dart';
 import 'package:jerupos/services/categoria_service.dart';
 import 'package:jerupos/services/ingrediente_service.dart';
 import 'package:jerupos/services/producto_service.dart';
+import 'package:jerupos/utils/mostrar_toast.dart';
 import 'package:jerupos/widgets/campo_texto.dart';
 import 'package:jerupos/widgets/Ingrediente_producto_tile.dart';
 
@@ -24,6 +26,7 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
   TextEditingController _precioController = TextEditingController();
   List<DropdownMenuEntry> _categorias = [];
   List<IngredienteProductoTile> _ingredientes = [];
+  Map<int, double> _ingredientesSeleccionados = {};
   int _selectedCategoria = 0;
 
   Producto? producto;
@@ -49,13 +52,24 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
         child: Form(
           key: _formKey,
           child: ListView(children: [
-            CampoTexto(
-              label: "Nombre",
-              controller: _nombreController,
-            ),
-            CampoTexto(
-              label: "Abreviacion",
-              controller: _abreviacionController,
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: CampoTexto(
+                    label: "Nombre",
+                    controller: _nombreController,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  flex: 2,
+                  child: CampoTexto(
+                    label: "Abreviación",
+                    controller: _abreviacionController,
+                  ),
+                ),
+              ],
             ),
             CampoTexto(
               label: "Precio",
@@ -92,6 +106,31 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
                 : Container(
                     padding: EdgeInsets.symmetric(vertical: 12),
                     child: Center(child: CircularProgressIndicator())),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.orangeAccent.withOpacity(0.4),
+              ),
+              margin: EdgeInsets.symmetric(vertical: 16, horizontal: 50),
+              height: 40,
+              alignment: Alignment.center,
+              child: InkWell(
+                child: Text(
+                  "Agregar ingrediente",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => IngredienteFormPage(),
+                    ),
+                  ).then((_) => setState(() {
+                        _loadIngredientes();
+                      }));
+                },
+              ),
+            ),
             FilledButton(
               style: FilledButton.styleFrom(
                 elevation: 10,
@@ -101,11 +140,11 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
               ),
               onPressed: () {
                 if (validateForm()) {
-                  // crear producto
+                  _crearProducto();
                 }
               },
               child: Text("Crear Producto"),
-            )
+            ),
           ]),
         ),
       ),
@@ -115,16 +154,22 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
   bool validateForm() {
     String errores = "";
     if (_nombreController.text == "") {
-      errores += "Especifique nombre.\n";
+      errores += "Especifique nombre.";
     }
     if (_abreviacionController.text == "") {
-      errores += "La abreviacion no puede estar vacia.\n";
+      errores += "La abreviacion no puede estar vacia." +
+          (errores.length == 0 ? "" : "\n");
     }
     if (_precioController.text == "") {
-      errores += "Debe indicar precio del producto.\n";
+      errores += "Debe indicar precio del producto." +
+          (errores.length == 0 ? "" : "\n");
     }
     if (_selectedCategoria == 0) {
-      errores += "Debe seleccionar una categoria.\n";
+      errores +=
+          "Debe seleccionar una categoria." + (errores.length == 0 ? "" : "\n");
+    }
+    if (_ingredientesSeleccionados.length == 0) {
+      errores += "Debe seleccionar al menos un ingrediente.";
     }
     if (errores != "") {
       EasyLoading.showError(
@@ -163,10 +208,46 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
     List<Ingrediente> ingredientes = await IngredienteService.list();
     List<IngredienteProductoTile> _tempIngredientes = [];
     for (var ingrediente in ingredientes) {
-      _tempIngredientes.add(IngredienteProductoTile(ingrediente: ingrediente));
+      _tempIngredientes.add(IngredienteProductoTile(
+        ingrediente: ingrediente,
+        onSelected: (ingrediente, isChecked) {
+          if (isChecked) {
+            _ingredientesSeleccionados[ingrediente.id!] = 0;
+          } else {
+            _ingredientesSeleccionados.remove(ingrediente.id);
+          }
+          print(_ingredientesSeleccionados);
+          setState(() {});
+        },
+        onCantidadChanged: (cantidad) {
+          if (cantidad == null) {
+            mostrarToast("Las cantidades deben ser sólo números");
+          } else {
+            _ingredientesSeleccionados[ingrediente.id!] = cantidad;
+          }
+          print(_ingredientesSeleccionados);
+          setState(() {});
+        },
+      ));
     }
     setState(() {
       _ingredientes = _tempIngredientes;
+    });
+  }
+
+  void _crearProducto() {
+    Producto producto = Producto(
+      nombre: _nombreController.text.trim(),
+      abreviacion: _abreviacionController.text.trim().toUpperCase(),
+      precio: int.parse(_precioController.text),
+      categoria: _selectedCategoria,
+    );
+
+    ProductoService.create(producto).then((value) {
+      EasyLoading.showSuccess("Producto creado correctamente");
+      Navigator.pop(context);
+    }).catchError((error) {
+      EasyLoading.showError("Error al crear producto");
     });
   }
 }

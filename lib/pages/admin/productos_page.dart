@@ -35,7 +35,7 @@ class _ProductosPageState extends State<ProductosPage> {
         builder: (context, AsyncSnapshot snapshot) {
           if (!snapshot.hasData ||
               snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return Center(child: CircularProgressIndicator());
           } else {
             return ListView.builder(
               itemCount: snapshot.data.length,

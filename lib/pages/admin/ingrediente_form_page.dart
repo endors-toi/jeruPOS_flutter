@@ -106,7 +106,7 @@ class _IngredienteFormPageState extends State<IngredienteFormPage> {
                             if (cantidad == null || cantidad.isEmpty) {
                               return "Esta cantidad es requerida";
                             }
-                            if (int.tryParse(cantidad) == null) {
+                            if (double.tryParse(cantidad) == null) {
                               return "Debe ser un número";
                             }
                             return null;
@@ -129,7 +129,7 @@ class _IngredienteFormPageState extends State<IngredienteFormPage> {
                         if (cantidad == null || cantidad.isEmpty) {
                           return "Esta cantidad es requerida";
                         }
-                        if (int.tryParse(cantidad) == null) {
+                        if (double.tryParse(cantidad) == null) {
                           return "Debe ser un número";
                         }
                         return null;
@@ -177,10 +177,10 @@ class _IngredienteFormPageState extends State<IngredienteFormPage> {
                           if (_formKey.currentState!.validate()) {
                             Ingrediente ingrediente = Ingrediente(
                               nombre: nombreController.text,
-                              cantidadDisponible:
-                                  int.parse(cantidadDisponibleController.text),
+                              cantidadDisponible: double.parse(
+                                  cantidadDisponibleController.text),
                               cantidadCritica:
-                                  int.parse(cantidadCriticaController.text),
+                                  double.parse(cantidadCriticaController.text),
                               unidad: unidadController.text,
                             );
                             if (_editMode) {

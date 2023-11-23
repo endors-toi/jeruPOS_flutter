@@ -3,7 +3,7 @@ class AjusteStock {
   int _ingrediente;
   DateTime? _fecha;
   String _tipoAjuste;
-  int _cantidad;
+  double _cantidad;
   String _motivo;
   int _usuario;
 
@@ -13,7 +13,7 @@ class AjusteStock {
       required int ingrediente,
       DateTime? fecha,
       required String tipoAjuste,
-      required int cantidad,
+      required double cantidad,
       required String motivo,
       required int usuario})
       : _id = id,
@@ -54,7 +54,7 @@ class AjusteStock {
   int get ingrediente => this._ingrediente;
   DateTime? get fecha => this._fecha;
   String get tipoAjuste => this._tipoAjuste;
-  int get cantidad => this._cantidad;
+  double get cantidad => this._cantidad;
   String get motivo => this._motivo;
   int get usuario => this._usuario;
 
@@ -63,7 +63,7 @@ class AjusteStock {
   set ingrediente(int ingrediente) => this._ingrediente = ingrediente;
   set fecha(DateTime? fecha) => this._fecha = fecha;
   set tipoAjuste(String tipoAjuste) => this._tipoAjuste = tipoAjuste;
-  set cantidad(int cantidad) => this._cantidad = cantidad;
+  set cantidad(double cantidad) => this._cantidad = cantidad;
   set motivo(String motivo) => this._motivo = motivo;
   set usuario(int usuario) => this._usuario = usuario;
 }

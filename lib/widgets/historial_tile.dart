@@ -42,21 +42,11 @@ class HistorialTile extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [
-              Text(
-                'Pedido #${pedido.id}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
-              ),
-              Spacer(),
-              Text('$fTimestamp'),
-            ]),
             Text(
-              textAlign: TextAlign.right,
-              '${pedido.mesa != null ? "Mesa ${pedido.mesa}" : "Para Llevar"}',
-              style: TextStyle(
-                fontSize: 18,
-              ),
+              'Pedido #${pedido.id}',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
             ),
+            Text('$fTimestamp', style: TextStyle(fontSize: 18)),
             SizedBox(height: 10.0),
             ...List<Widget>.from((pedido.productos!).map((producto) {
               return Text('${producto.cantidad} ${producto.nombre}',
@@ -68,7 +58,7 @@ class HistorialTile extends StatelessWidget {
             child: Text('$total',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             right: 0,
-            bottom: 0),
+            bottom: -3),
       ]),
     );
   }

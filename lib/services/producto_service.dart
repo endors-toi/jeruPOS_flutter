@@ -59,4 +59,21 @@ class ProductoService {
       throw Exception('Error al cargar producto');
     }
   }
+
+  static Future<Producto> create(Producto producto) async {
+    final uri = Uri.parse(url);
+    final response = await http.post(
+      uri,
+      headers: await getHeaders(),
+      body: jsonEncode(producto.toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      var data = json.decode(response.body);
+      Producto producto = Producto.fromJson(data);
+      return producto;
+    } else {
+      throw Exception('Error al crear producto');
+    }
+  }
 }

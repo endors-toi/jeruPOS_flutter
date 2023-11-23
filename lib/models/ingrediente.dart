@@ -1,16 +1,16 @@
 class Ingrediente {
   int? _id;
   String _nombre;
-  int _cantidadDisponible;
-  int _cantidadCritica;
+  double _cantidadDisponible;
+  double _cantidadCritica;
   String _unidad;
 
   // Constructor principal
   Ingrediente(
       {int? id,
       required String nombre,
-      required int cantidadDisponible,
-      required int cantidadCritica,
+      required double cantidadDisponible,
+      required double cantidadCritica,
       required String unidad})
       : this._id = id,
         this._nombre = nombre,
@@ -42,16 +42,16 @@ class Ingrediente {
   // Getters
   int? get id => this._id;
   String get nombre => this._nombre;
-  int get cantidadDisponible => this._cantidadDisponible;
-  int get cantidadCritica => this._cantidadCritica;
+  double get cantidadDisponible => this._cantidadDisponible;
+  double get cantidadCritica => this._cantidadCritica;
   String get unidad => this._unidad;
 
   // Setters
   set id(int? id) => this._id = id;
   set nombre(String nombre) => this._nombre = nombre;
-  set cantidadDisponible(int cantidadDisponible) =>
+  set cantidadDisponible(double cantidadDisponible) =>
       this._cantidadDisponible = cantidadDisponible;
-  set cantidadCritica(int cantidadCritica) =>
+  set cantidadCritica(double cantidadCritica) =>
       this._cantidadCritica = cantidadCritica;
   set unidad(String unidad) => this._unidad = unidad;
 }
