@@ -11,23 +11,42 @@ class AuthService {
   static Future<void> login(String email, String password) async {
     final uri = Uri.parse(url + 'login/');
 
-    final response = await http
-        .post(
-          uri,
-          headers: {'Content-Type': 'application/json; charset=UTF-8'},
-          body: json.encode({'email': email, 'password': password}),
-        )
-        .timeout(Duration(seconds: 5));
+    try {
+      final response = await http
+          .post(
+            uri,
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json; charset=UTF-8'
+            },
+            body: json.encode({'email': email, 'password': password}),
+          )
+          .timeout(Duration(seconds: 5));
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> data = json.decode(response.body);
-      String token = data['access'];
-      String refreshToken = data['refresh'];
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', token);
-      await prefs.setString('refresh_token', refreshToken);
-    } else {
-      throw Exception(json.decode(response.body)['detail']);
+      if (response.statusCode == 200) {
+        // Assume response is JSON, parse it
+        var data = json.decode(response.body);
+        String token = data['access'];
+        String refreshToken = data['refresh'];
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+        await prefs.setString('refresh_token', refreshToken);
+      } else {
+        // Check if response is JSON
+        if (response.headers['content-type']?.contains('application/json') ??
+            false) {
+          // Response is JSON, parse it
+          var errorData = json.decode(response.body);
+          throw Exception(errorData['detail']);
+        } else {
+          // Response is not JSON, treat as plain text
+          throw Exception('Error: ${response.body}');
+        }
+      }
+    } catch (e) {
+      // Handle the exception, could be a FormatException, TimeoutException, etc.
+      rethrow; // or handle it accordingly
     }
   }
 

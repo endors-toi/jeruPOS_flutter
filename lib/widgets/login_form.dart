@@ -8,6 +8,7 @@ import 'package:jerupos/pages/cocina/cocina_page.dart';
 import 'package:jerupos/pages/garzon/garzon_page.dart';
 import 'package:jerupos/services/auth_service.dart';
 import 'package:jerupos/services/network_service.dart';
+import 'package:jerupos/utils/mostrar_dialog_simple.dart';
 import 'package:jerupos/utils/mostrar_snackbar.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -234,7 +235,7 @@ class _LoginFormState extends State<LoginForm> {
       if (e is TimeoutException) {
         mostrarSnackbar(context, 'No se pudo conectar al servidor.');
       } else {
-        mostrarSnackbar(context, 'Error al iniciar sesión.\n$e');
+        mostrarDialogSimple(context, 'Error al iniciar sesión.', '$e');
       }
       setState(() {
         _loading = false;

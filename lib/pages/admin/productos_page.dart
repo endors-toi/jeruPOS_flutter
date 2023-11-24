@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jerupos/models/producto.dart';
 import 'package:jerupos/pages/admin/producto_form_page.dart';
 import 'package:jerupos/services/producto_service.dart';
 import 'package:jerupos/utils/mostrar_snackbar.dart';
@@ -40,7 +41,7 @@ class _ProductosPageState extends State<ProductosPage> {
             return ListView.builder(
               itemCount: snapshot.data.length,
               itemBuilder: (context, index) {
-                var producto = snapshot.data[index];
+                Producto producto = snapshot.data[index];
                 return ProductoTile(
                   producto: producto,
                   onTapUp: (_) => _onTapOptions(producto.id!),
@@ -79,9 +80,9 @@ class _ProductosPageState extends State<ProductosPage> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text('Eliminar Ingrediente'),
+                          title: Text('Eliminar Producto'),
                           content: Text(
-                              '¿Está seguro que desea eliminar este ingrediente?'),
+                              '¿Está seguro que desea eliminar este producto?'),
                           actions: [
                             TextButton(
                               onPressed: () {
@@ -92,11 +93,11 @@ class _ProductosPageState extends State<ProductosPage> {
                             TextButton(
                               onPressed: () {
                                 Navigator.pop(context);
-                                // ProductoService.delete(id).then((_) {
-                                //   setState(() {});
-                                //   mostrarSnackbar(
-                                //       context, 'Ingrediente eliminado');
-                                // });
+                                ProductoService.delete(id).then((_) {
+                                  setState(() {});
+                                  mostrarSnackbar(
+                                      context, 'Producto eliminado');
+                                });
                               },
                               child: Text('Eliminar'),
                             ),

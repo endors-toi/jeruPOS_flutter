@@ -76,4 +76,13 @@ class ProductoService {
       throw Exception('Error al crear producto');
     }
   }
+
+  static Future<void> delete(int id) async {
+    final uri = Uri.parse(url + '$id/');
+    final response = await http.delete(uri, headers: await getHeaders());
+
+    if (response.statusCode != 204) {
+      throw Exception('Error al eliminar producto');
+    }
+  }
 }
