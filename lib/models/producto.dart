@@ -1,4 +1,4 @@
-import 'package:jerupos/models/ingrediente.dart';
+import 'package:jerupos/models/ingrediente_producto.dart';
 
 class Producto {
   int? _id;
@@ -6,7 +6,7 @@ class Producto {
   String _abreviacion;
   int _precio;
   int _categoria;
-  List<Ingrediente>? _ingredientes;
+  List<IngredienteProducto>? _ingredientes;
 
   // Constructor principal
   Producto({
@@ -15,7 +15,7 @@ class Producto {
     required String abreviacion,
     required int precio,
     required int categoria,
-    List<Ingrediente>? ingredientes,
+    List<IngredienteProducto>? ingredientes,
   })  : _id = id,
         _nombre = nombre,
         _abreviacion = abreviacion,
@@ -60,7 +60,7 @@ class Producto {
   String get abreviacion => _abreviacion;
   int get precio => _precio;
   int get categoria => _categoria;
-  List<Ingrediente>? get ingredientes => _ingredientes;
+  List<IngredienteProducto>? get ingredientes => _ingredientes;
 
   // Setters
   set id(int? id) => _id = id;
@@ -68,7 +68,7 @@ class Producto {
   set abreviacion(String abreviacion) => _abreviacion = abreviacion;
   set precio(int precio) => _precio = precio;
   set categoriaId(int categoria) => _categoria = categoria;
-  set ingredientes(List<Ingrediente>? ingredientes) =>
+  set ingredientes(List<IngredienteProducto>? ingredientes) =>
       _ingredientes = ingredientes;
 
   // Métodos

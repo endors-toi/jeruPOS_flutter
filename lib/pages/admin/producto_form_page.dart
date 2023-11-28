@@ -9,6 +9,7 @@ import 'package:jerupos/services/producto_service.dart';
 import 'package:jerupos/utils/mostrar_toast.dart';
 import 'package:jerupos/widgets/campo_texto.dart';
 import 'package:jerupos/widgets/Ingrediente_producto_tile.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class ProductoFormPage extends StatefulWidget {
   final int? id;
@@ -24,12 +25,14 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
   TextEditingController _nombreController = TextEditingController();
   TextEditingController _abreviacionController = TextEditingController();
   TextEditingController _precioController = TextEditingController();
+  TextEditingController _categoriaController = TextEditingController();
   List<DropdownMenuEntry> _categorias = [];
   List<IngredienteProductoTile> _ingredientes = [];
   Map<int, double> _ingredientesSeleccionados = {};
   int _selectedCategoria = 0;
 
-  Producto? producto;
+  Producto? _producto;
+  bool _edit = false;
 
   @override
   void initState() {
@@ -46,6 +49,9 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
         title: widget.id == null
             ? Text('Nuevo producto')
             : Text('Editar producto'),
+        actions: [
+          InkWell(child: Icon(MdiIcons.refresh), onTap: () => setState(() {}))
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
@@ -81,6 +87,9 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
                   ? Center(child: CircularProgressIndicator())
                   : Center(
                       child: DropdownMenu(
+                        initialSelection: _edit
+                            ? _encontrarIndexCategoria(_selectedCategoria)
+                            : null,
                         menuHeight: 235,
                         width: MediaQuery.of(context).size.width - 50,
                         label: Text("Categoria"),
@@ -196,9 +205,15 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
 
   void _loadProducto() {
     if (widget.id != null) {
+      _edit = true;
       ProductoService.get(widget.id!).then((producto) {
         setState(() {
-          this.producto = producto;
+          this._producto = producto;
+          _nombreController.text = producto.nombre;
+          _abreviacionController.text = producto.abreviacion;
+          _precioController.text = producto.precio.toString();
+          _selectedCategoria = producto.categoria;
+          print(producto.categoria);
         });
       });
     }
@@ -235,13 +250,25 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
     });
   }
 
+  int _encontrarIndexCategoria(int id) {
+    return _categorias.indexWhere((cat) => int.parse(cat.value) == id);
+  }
+
   void _crearProducto() {
-    Producto producto = Producto(
-      nombre: _nombreController.text.trim(),
-      abreviacion: _abreviacionController.text.trim().toUpperCase(),
-      precio: int.parse(_precioController.text),
-      categoria: _selectedCategoria,
-    );
+    List<int> ingredientes = [];
+    List<double> cantidades = [];
+    _ingredientesSeleccionados.forEach((key, value) {
+      ingredientes.add(key);
+      cantidades.add(value);
+    });
+    Map<String, dynamic> producto = {
+      "nombre": _nombreController.text.trim(),
+      "abreviacion": _abreviacionController.text.trim().toUpperCase(),
+      "precio": int.parse(_precioController.text),
+      "categoria": _selectedCategoria,
+      "ingredientes": ingredientes,
+      "cantidades": cantidades,
+    };
 
     ProductoService.create(producto).then((value) {
       EasyLoading.showSuccess("Producto creado correctamente");

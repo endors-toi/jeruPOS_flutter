@@ -9,6 +9,11 @@ class ProductoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> ingredientes = [];
+    for (var ingrediente in producto.ingredientes!) {
+      ingredientes.add(Text(
+          "• ${ingrediente.nombreIngrediente}, ${ingrediente.cantidad % 1 == 0 ? ingrediente.cantidad.toInt() : ingrediente.cantidad} ${ingrediente.unidad}"));
+    }
     return GestureDetector(
       onTapUp: onTapUp,
       child: Container(
@@ -27,18 +32,26 @@ class ProductoTile extends StatelessWidget {
         ),
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        child: Row(
+        child: Column(
           children: [
-            Expanded(
-              child: Text(
-                producto.nombre,
-                style: TextStyle(fontSize: 18),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "(${producto.abreviacion}) ${producto.nombre}",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                Text(
+                  "${producto.precio}",
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
             ),
-            Text(
-              "${producto.precio}",
-              style: TextStyle(fontSize: 18),
-            ),
+            ListView(
+              children: ingredientes,
+              shrinkWrap: true,
+            )
           ],
         ),
       ),

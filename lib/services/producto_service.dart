@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:jerupos/models/ingrediente.dart';
+import 'package:jerupos/models/ingrediente_producto.dart';
 import 'package:jerupos/models/producto.dart';
 import 'package:jerupos/services/ingrediente_service.dart';
 import 'dart:convert';
@@ -21,10 +22,16 @@ class ProductoService {
       List<dynamic> data = json.decode(response.body);
       for (var prod in data) {
         Producto producto = Producto.fromJson(prod);
-        List<Ingrediente> ingredientes = [];
-        var ingredientesIds = prod['ingredientes'];
-        for (var ingredienteId in ingredientesIds) {
-          Ingrediente ingrediente = await IngredienteService.get(ingredienteId);
+        List<IngredienteProducto> ingredientes = [];
+        for (int id in prod['ingredientes']) {
+          Ingrediente ing = await IngredienteService.get(id);
+          IngredienteProducto ingrediente = IngredienteProducto(
+            nombreIngrediente: ing.nombre,
+            unidad: ing.unidad,
+            cantidad: prod['cantidades'][prod['ingredientes'].indexOf(id)],
+            ingrediente: ing.id!,
+            producto: producto.id!,
+          );
           ingredientes.add(ingrediente);
         }
         producto.ingredientes = ingredientes;
@@ -45,27 +52,32 @@ class ProductoService {
     );
 
     if (response.statusCode == 200) {
-      var data = json.decode(response.body);
-      var ingredientesIds = data['ingredientes'];
-      Producto producto = Producto.fromJson(data);
-      List<Ingrediente> ingredientes = [];
-      for (var ingredienteId in ingredientesIds) {
-        Ingrediente ingrediente = await IngredienteService.get(ingredienteId);
+      var prod = json.decode(response.body);
+      Producto producto = Producto.fromJson(prod);
+      List<IngredienteProducto> ingredientes = [];
+      for (int id in prod['ingredientes']) {
+        Ingrediente ing = await IngredienteService.get(id);
+        IngredienteProducto ingrediente = IngredienteProducto(
+          nombreIngrediente: ing.nombre,
+          unidad: ing.unidad,
+          cantidad: prod['cantidades'][prod['ingredientes'].indexOf(id)],
+          ingrediente: ing.id!,
+          producto: producto.id!,
+        );
         ingredientes.add(ingrediente);
       }
-      producto.ingredientes = ingredientes;
       return producto;
     } else {
       throw Exception('Error al cargar producto');
     }
   }
 
-  static Future<Producto> create(Producto producto) async {
+  static Future<Producto> create(Map<String, dynamic> producto) async {
     final uri = Uri.parse(url);
     final response = await http.post(
       uri,
       headers: await getHeaders(),
-      body: jsonEncode(producto.toJson()),
+      body: jsonEncode(producto),
     );
 
     if (response.statusCode == 201) {
@@ -73,7 +85,7 @@ class ProductoService {
       Producto producto = Producto.fromJson(data);
       return producto;
     } else {
-      throw Exception('Error al crear producto');
+      throw Exception('Error al crear producto\n' + response.body);
     }
   }
 
