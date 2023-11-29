@@ -43,7 +43,7 @@ class ProductoTile extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "${producto.precio}",
+                  "\$${producto.precio}",
                   style: TextStyle(fontSize: 18),
                 ),
               ],

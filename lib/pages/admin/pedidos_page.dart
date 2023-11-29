@@ -26,9 +26,11 @@ class _PedidosPageState extends State<PedidosPage> {
         pedidos = fetchedPedidos;
       });
     } catch (error) {
-      setState(() {
-        errorMsg = 'Error: $error';
-      });
+      if (mounted) {
+        setState(() {
+          errorMsg = 'Error: $error';
+        });
+      }
     }
   }
 

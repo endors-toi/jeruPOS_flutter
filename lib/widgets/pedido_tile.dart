@@ -64,7 +64,7 @@ class _PedidoTileState extends State<PedidoTile> {
                         ? "\"${widget.pedido.nombreCliente}\""
                         : widget.pedido.mesa != null
                             ? "MESA ${widget.pedido.mesa}"
-                            : "",
+                            : "${widget.pedido.nombreCliente}",
                     style: TextStyle(fontSize: 16)),
               ],
             ),

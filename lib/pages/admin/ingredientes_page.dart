@@ -105,15 +105,20 @@ class _IngredientesPageState extends State<IngredientesPage> {
                               child: Text('Cancelar'),
                             ),
                             TextButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 Navigator.pop(context);
-                                IngredienteService.delete(id).then((_) {
-                                  setState(() {
-                                    _ingredientesFuture = _listIngredientes();
+                                try {
+                                  await IngredienteService.delete(id).then((_) {
+                                    setState(() {
+                                      _ingredientesFuture = _listIngredientes();
+                                    });
+                                    mostrarSnackbar(
+                                        context, 'Ingrediente eliminado');
                                   });
-                                  mostrarSnackbar(
-                                      context, 'Ingrediente eliminado');
-                                });
+                                } catch (e) {
+                                  mostrarSnackbar(context,
+                                      'No se puede eliminar el ingrediente');
+                                }
                               },
                               child: Text('Eliminar'),
                             ),

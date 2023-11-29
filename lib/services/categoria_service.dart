@@ -34,4 +34,45 @@ class CategoriaService {
       throw Exception('Error al cargar categoria');
     }
   }
+
+  static Future<void> create(Map<String, dynamic> categoria) async {
+    final uri = Uri.parse(url);
+    final response = await http.post(
+      uri,
+      headers: await getHeaders(),
+      body: json.encode(categoria),
+    );
+
+    if (response.statusCode != 201) {
+      print(response.body);
+      throw Exception('Error al crear categoria');
+    }
+  }
+
+  static Future<void> update(Map<String, dynamic> categoria, int id) async {
+    final uri = Uri.parse(url + '$id/');
+    final response = await http.put(
+      uri,
+      headers: await getHeaders(),
+      body: json.encode(categoria),
+    );
+
+    if (response.statusCode != 200) {
+      print(response.body);
+      throw Exception('Error al actualizar categoria');
+    }
+  }
+
+  static Future<void> delete(int id) async {
+    final uri = Uri.parse(url + '$id/');
+    final response = await http.delete(
+      uri,
+      headers: await getHeaders(),
+    );
+
+    if (response.statusCode != 204) {
+      print(response.body);
+      throw Exception('Error al eliminar categoria');
+    }
+  }
 }
