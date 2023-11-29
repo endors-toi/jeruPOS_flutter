@@ -21,8 +21,10 @@ class _CajaPageState extends State<CajaPage> {
     super.initState();
     _setOrientation();
     _initializePedidos();
+    //TODO: Implementar WebSocket para actualizar pedidos en tiempo real
   }
 
+  //TODO: Cambiar a FutureBuilder
   Future<void> _initializePedidos() async {
     try {
       final fetchedPedidos = await PedidoService.list();
@@ -36,10 +38,6 @@ class _CajaPageState extends State<CajaPage> {
         });
       }
     }
-  }
-
-  void refreshList() {
-    setState(() {});
   }
 
   @override
@@ -59,27 +57,50 @@ class _CajaPageState extends State<CajaPage> {
                   _initializePedidos();
                 });
               })
-          : ListView.builder(
-              itemCount: pedidos.length,
-              itemBuilder: (BuildContext context, int index) {
-                Pedido pedido = pedidos[index];
-                if (pedido.estado != 'PAGADO') {
-                  return PedidoTile(
-                    pedido: pedido,
-                    onAction: refreshList,
-                  );
-                } else {
-                  return Container();
-                }
-              },
+          : Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(8),
+                  child: ElevatedButton(
+                    child: Text('Nuevo Pedido',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    style: ButtonStyle(
+                      elevation: MaterialStateProperty.all(8),
+                      minimumSize: MaterialStateProperty.all(Size(0, 60)),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PedidoFormPage()))
+                          .then((value) => setState(() {
+                                _initializePedidos();
+                              }));
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: pedidos.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      Pedido pedido = pedidos[index];
+                      if (pedido.estado != 'PAGADO') {
+                        return PedidoTile(
+                          pedido: pedido,
+                          onAction: () => setState(() {}),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => PedidoFormPage()));
-        },
-        child: Icon(Icons.add),
-      ),
     );
   }
 

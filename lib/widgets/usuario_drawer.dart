@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jerupos/models/usuario.dart';
+import 'package:jerupos/pages/chat_page.dart';
 import 'package:jerupos/widgets/historial_page.dart';
 import 'package:jerupos/pages/login_page.dart';
 import 'package:jerupos/services/auth_service.dart';
@@ -64,6 +65,14 @@ class _UsuarioDrawerState extends State<UsuarioDrawer> {
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => HistorialPage()));
+                },
+              ),
+              ListTile(
+                leading: Icon(MdiIcons.chatOutline),
+                title: Text('Chat'),
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ChatPage()));
                 },
               ),
             ]),

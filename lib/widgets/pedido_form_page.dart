@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:jerupos/models/pedido.dart';
 import 'package:jerupos/models/producto_pedido.dart';
 import 'package:jerupos/models/producto.dart';
@@ -20,6 +21,7 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
   Pedido? _pedido;
   late Future _productosFuture;
   Usuario? usuario;
+  bool _esGarzon = true;
   bool _editMode = false;
   int? mesa = null;
   String? cliente = null;
@@ -53,6 +55,9 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     setState(() {
       this.usuario =
           Provider.of<UsuarioProvider>(context, listen: false).usuario;
+      if (usuario != null) {
+        _esGarzon = usuario!.rol == 1;
+      }
     });
   }
 
@@ -220,6 +225,25 @@ class _PedidoFormPageState extends State<PedidoFormPage> {
     int? userId = usuario!.id;
     if (userId == null) {
       mostrarSnackbar(context, 'Error al cargar el usuario');
+      return;
+    }
+
+    String errores = "";
+    if (productosPedido.length == 0) {
+      errores += 'Debes agregar al menos un producto.\n';
+    }
+    if (_esGarzon) {
+      if (mesa == null) {
+        errores += 'Debes seleccionar una mesa.\n';
+      }
+    } else {
+      if (cliente == "") {
+        errores += 'Debes ingresar el nombre del cliente.\n';
+      }
+    }
+
+    if (errores != "") {
+      EasyLoading.showError(errores);
       return;
     }
 

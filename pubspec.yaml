@@ -27,6 +27,7 @@ dependencies:
   wakelock: ^0.6.2
   flutter_easyloading: ^3.0.5
   liquid_pull_to_refresh: ^3.0.1
+  cloud_firestore: ^4.13.3
 
 dev_dependencies:
   flutter_test:
