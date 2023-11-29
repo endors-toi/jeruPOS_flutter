@@ -6,9 +6,7 @@ import 'package:jerupos/pages/admin/ingrediente_form_page.dart';
 import 'package:jerupos/services/categoria_service.dart';
 import 'package:jerupos/services/ingrediente_service.dart';
 import 'package:jerupos/services/producto_service.dart';
-import 'package:jerupos/utils/mostrar_toast.dart';
 import 'package:jerupos/widgets/campo_texto.dart';
-import 'package:jerupos/widgets/Ingrediente_producto_tile.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class ProductoFormPage extends StatefulWidget {
@@ -25,9 +23,7 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
   TextEditingController _nombreController = TextEditingController();
   TextEditingController _abreviacionController = TextEditingController();
   TextEditingController _precioController = TextEditingController();
-  TextEditingController _categoriaController = TextEditingController();
-  List<DropdownMenuEntry> _categorias = [];
-  List<IngredienteProductoTile> _ingredientes = [];
+  Map<int, TextEditingController> _cantidadesControllers = {};
   Map<int, double> _ingredientesSeleccionados = {};
   int _selectedCategoria = 0;
 
@@ -38,17 +34,24 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
   void initState() {
     super.initState();
     _loadProducto();
-    _loadCategorias();
-    _loadIngredientes();
+  }
+
+  @override
+  void dispose() {
+    _nombreController.dispose();
+    _abreviacionController.dispose();
+    _precioController.dispose();
+    _cantidadesControllers.forEach((key, value) {
+      value.dispose();
+    });
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: widget.id == null
-            ? Text('Nuevo producto')
-            : Text('Editar producto'),
+        title: Text(_edit ? 'Editar producto' : 'Nuevo producto'),
         actions: [
           InkWell(child: Icon(MdiIcons.refresh), onTap: () => setState(() {}))
         ],
@@ -81,27 +84,36 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
               label: "Precio",
               controller: _precioController,
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: _categorias == []
-                  ? Center(child: CircularProgressIndicator())
-                  : Center(
-                      child: DropdownMenu(
-                        initialSelection: _edit
-                            ? _encontrarIndexCategoria(_selectedCategoria)
-                            : null,
-                        menuHeight: 235,
-                        width: MediaQuery.of(context).size.width - 50,
-                        label: Text("Categoria"),
-                        dropdownMenuEntries: _categorias,
-                        onSelected: (value) {
-                          setState(() {
-                            _selectedCategoria = int.parse(value);
-                          });
-                        },
+            FutureBuilder(
+                future: CategoriaService.list(),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (!snapshot.hasData ||
+                      snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else {
+                    List<dynamic> categorias = snapshot.data;
+                    List<DropdownMenuItem<int>> items = categorias
+                        .map((categoria) => DropdownMenuItem<int>(
+                            value: categoria["id"],
+                            child: Text(categoria["nombre"])))
+                        .toList();
+                    items.add(DropdownMenuItem<int>(
+                        value: 0, child: Text("Seleccione una categoría")));
+                    return DropdownButtonFormField<int>(
+                      decoration: InputDecoration(
+                        labelText: "Categoría",
+                        border: OutlineInputBorder(),
                       ),
-                    ),
-            ),
+                      value: _selectedCategoria,
+                      items: items,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategoria = value ?? 0;
+                        });
+                      },
+                    );
+                  }
+                }),
             Padding(
               padding: EdgeInsets.only(top: 8),
               child: Text(
@@ -110,11 +122,94 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
                 style: TextStyle(fontSize: 24),
               ),
             ),
-            _ingredientes != []
-                ? Column(children: _ingredientes)
-                : Container(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Center(child: CircularProgressIndicator())),
+            FutureBuilder(
+              future: IngredienteService.list(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  List<Ingrediente> ingredientes =
+                      snapshot.data as List<Ingrediente>;
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: ingredientes.length,
+                    itemBuilder: (context, index) {
+                      Ingrediente ingrediente = ingredientes[index];
+                      bool isSelected = _ingredientesSeleccionados
+                          .containsKey(ingrediente.id);
+                      _cantidadesControllers.putIfAbsent(
+                          ingrediente.id!,
+                          () => TextEditingController(
+                              text: isSelected
+                                  ? _formatoNumero(_ingredientesSeleccionados[
+                                      ingrediente.id!])
+                                  : ""));
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            if (isSelected) {
+                              _ingredientesSeleccionados.remove(ingrediente.id);
+                            } else {
+                              _ingredientesSeleccionados[ingrediente.id!] = 1;
+                            }
+                          });
+                        },
+                        child: ListTile(
+                          tileColor: isSelected
+                              ? Colors.orangeAccent.withOpacity(0.4)
+                              : null,
+                          title: Row(
+                            children: [
+                              Expanded(
+                                child: Text(ingrediente.nombre),
+                              ),
+                              Checkbox(
+                                value: isSelected,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      _ingredientesSeleccionados[
+                                          ingrediente.id!] = 0;
+                                    } else {
+                                      _ingredientesSeleccionados
+                                          .remove(ingrediente.id);
+                                    }
+                                  });
+                                },
+                              ),
+                              if (isSelected)
+                                Flexible(
+                                  child: TextFormField(
+                                    controller:
+                                        _cantidadesControllers[ingrediente.id!],
+                                    decoration: InputDecoration(
+                                      labelText: 'Cantidad',
+                                      border: OutlineInputBorder(),
+                                      suffixText: ingrediente.unidad,
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      if (value.isNotEmpty) {
+                                        double? quantity =
+                                            double.tryParse(value);
+                                        if (quantity != null) {
+                                          _ingredientesSeleccionados[
+                                              ingrediente.id!] = quantity;
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
@@ -134,9 +229,7 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
                     MaterialPageRoute(
                       builder: (context) => IngredienteFormPage(),
                     ),
-                  ).then((_) => setState(() {
-                        _loadIngredientes();
-                      }));
+                  ).then((value) => setState(() {}));
                 },
               ),
             ),
@@ -149,10 +242,10 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
               ),
               onPressed: () {
                 if (validateForm()) {
-                  _crearProducto();
+                  _edit ? _editarProducto() : _crearProducto();
                 }
               },
-              child: Text("Crear Producto"),
+              child: Text(_edit ? "Editar Producto" : "Crear Producto"),
             ),
           ]),
         ),
@@ -163,23 +256,38 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
   bool validateForm() {
     String errores = "";
     if (_nombreController.text == "") {
-      errores += "Especifique nombre.";
+      errores += "Especifique nombre.\n";
     }
     if (_abreviacionController.text == "") {
-      errores += "La abreviacion no puede estar vacia." +
+      errores += "La abreviacion no puede estar vacía." +
           (errores.length == 0 ? "" : "\n");
     }
     if (_precioController.text == "") {
       errores += "Debe indicar precio del producto." +
           (errores.length == 0 ? "" : "\n");
+    } else if (double.tryParse(_precioController.text) == null) {
+      errores +=
+          "El precio debe ser un número." + (errores.length == 0 ? "" : "\n");
     }
     if (_selectedCategoria == 0) {
       errores +=
-          "Debe seleccionar una categoria." + (errores.length == 0 ? "" : "\n");
+          "Debe seleccionar una categoría." + (errores.length == 0 ? "" : "\n");
     }
     if (_ingredientesSeleccionados.length == 0) {
       errores += "Debe seleccionar al menos un ingrediente.";
     }
+    _cantidadesControllers.forEach((ingredienteId, controller) {
+      if (_ingredientesSeleccionados.containsKey(ingredienteId)) {
+        if (controller.text == "") {
+          errores +=
+              "Debe indicar la cantidad de los ingredientes seleccionados.\n";
+        } else if (double.tryParse(controller.text) == null) {
+          errores += "La cantidad del ingrediente " +
+              ingredienteId.toString() +
+              " debe ser un número.\n";
+        }
+      }
+    });
     if (errores != "") {
       EasyLoading.showError(
         errores,
@@ -191,70 +299,38 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
     return true;
   }
 
-  void _loadCategorias() async {
-    List<dynamic> categorias = await CategoriaService.list();
-    List<DropdownMenuEntry> _tempCategorias = [];
-    for (var categoria in categorias) {
-      _tempCategorias.add(DropdownMenuEntry(
-          label: categoria['nombre'], value: categoria['id'].toString()));
-    }
-    setState(() {
-      _categorias = _tempCategorias;
-    });
-  }
-
   void _loadProducto() {
     if (widget.id != null) {
       _edit = true;
       ProductoService.get(widget.id!).then((producto) {
         setState(() {
           this._producto = producto;
-          _nombreController.text = producto.nombre;
-          _abreviacionController.text = producto.abreviacion;
+          _nombreController.text = producto.nombre.trim();
+          _abreviacionController.text =
+              producto.abreviacion.trim().toUpperCase();
           _precioController.text = producto.precio.toString();
           _selectedCategoria = producto.categoria;
-          print(producto.categoria);
+          for (int i = 0; i < producto.ingredientes!.length; i++) {
+            _ingredientesSeleccionados[producto.ingredientes![i].ingrediente] =
+                producto.ingredientes![i].cantidad;
+            _cantidadesControllers[producto.ingredientes![i].ingrediente] =
+                TextEditingController(
+                    text: _formatoNumero(producto.ingredientes![i].cantidad));
+          }
         });
       });
     }
   }
 
-  void _loadIngredientes() async {
-    List<Ingrediente> ingredientes = await IngredienteService.list();
-    List<IngredienteProductoTile> _tempIngredientes = [];
-    for (var ingrediente in ingredientes) {
-      _tempIngredientes.add(IngredienteProductoTile(
-        ingrediente: ingrediente,
-        onSelected: (ingrediente, isChecked) {
-          if (isChecked) {
-            _ingredientesSeleccionados[ingrediente.id!] = 0;
-          } else {
-            _ingredientesSeleccionados.remove(ingrediente.id);
-          }
-          print(_ingredientesSeleccionados);
-          setState(() {});
-        },
-        onCantidadChanged: (cantidad) {
-          if (cantidad == null) {
-            mostrarToast("Las cantidades deben ser sólo números");
-          } else {
-            _ingredientesSeleccionados[ingrediente.id!] = cantidad;
-          }
-          print(_ingredientesSeleccionados);
-          setState(() {});
-        },
-      ));
-    }
-    setState(() {
-      _ingredientes = _tempIngredientes;
-    });
+  String _formatoNumero(double? valor) {
+    return valor != null
+        ? valor % 1 == 0
+            ? valor.toInt().toString()
+            : valor.toString()
+        : "";
   }
 
-  int _encontrarIndexCategoria(int id) {
-    return _categorias.indexWhere((cat) => int.parse(cat.value) == id);
-  }
-
-  void _crearProducto() {
+  Map<String, dynamic> _armarProducto() {
     List<int> ingredientes = [];
     List<double> cantidades = [];
     _ingredientesSeleccionados.forEach((key, value) {
@@ -269,12 +345,26 @@ class _ProductoFormPageState extends State<ProductoFormPage> {
       "ingredientes": ingredientes,
       "cantidades": cantidades,
     };
+    return producto;
+  }
 
+  _crearProducto() {
+    Map<String, dynamic> producto = _armarProducto();
     ProductoService.create(producto).then((value) {
       EasyLoading.showSuccess("Producto creado correctamente");
       Navigator.pop(context);
     }).catchError((error) {
       EasyLoading.showError("Error al crear producto");
+    });
+  }
+
+  _editarProducto() {
+    Map<String, dynamic> producto = _armarProducto();
+    ProductoService.update(producto, _producto!.id!).then((value) {
+      EasyLoading.showSuccess("Producto editado correctamente");
+      Navigator.pop(context);
+    }).catchError((error) {
+      EasyLoading.showError("Error al editar producto");
     });
   }
 }

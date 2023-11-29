@@ -68,7 +68,6 @@ class _UsuariosPageState extends State<UsuariosPage> {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     Usuario usuario = snapshot.data![index];
-                    print(snapshot);
                     return UsuarioTile(
                       usuario: usuario,
                       onActionCompleted: () {

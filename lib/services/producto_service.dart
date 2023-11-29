@@ -66,6 +66,7 @@ class ProductoService {
         );
         ingredientes.add(ingrediente);
       }
+      producto.ingredientes = ingredientes;
       return producto;
     } else {
       throw Exception('Error al cargar producto');
@@ -86,6 +87,23 @@ class ProductoService {
       return producto;
     } else {
       throw Exception('Error al crear producto\n' + response.body);
+    }
+  }
+
+  static Future<Producto> update(Map<String, dynamic> producto, int id) async {
+    final uri = Uri.parse(url + '$id/');
+    final response = await http.put(
+      uri,
+      headers: await getHeaders(),
+      body: jsonEncode(producto),
+    );
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      Producto producto = Producto.fromJson(data);
+      return producto;
+    } else {
+      throw Exception('Error al actualizar producto\n' + response.body);
     }
   }
 
