@@ -15,7 +15,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
-  final bool debug = true;
+  final bool debug = false;
 
   @override
   State<LoginForm> createState() => _LoginFormState();

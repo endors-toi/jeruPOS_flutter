@@ -29,7 +29,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
         drawer: UsuarioDrawer(),
         appBar: AppBar(
-          title: Text('¡Chatea con otros asistentes! :-)'),
+          title: Text('Chat de Personal'),
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         ),
         body: Column(
@@ -71,8 +71,7 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 subtitle: Text(
                   mensaje.mensaje,
-                  style: TextStyle(
-                      fontSize: 16, color: Theme.of(context).primaryColorLight),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
                 ),
               );
             },
