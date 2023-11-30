@@ -50,7 +50,7 @@ class _UsuarioDrawerState extends State<UsuarioDrawer> {
                           ),
                           SizedBox(height: 10),
                           Text(
-                            '${usuario!.nombre} ${usuario!.apellido} (${usuario!.rol})',
+                            '${usuario!.nombre} ${usuario!.apellido}',
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 18,

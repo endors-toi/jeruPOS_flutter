@@ -284,7 +284,7 @@ class _ProductosPageState extends State<ProductosPage> {
         _categorias[categoria['id']] = categoria['nombre'];
       }
     });
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   void _loadProductos() async {
@@ -298,6 +298,6 @@ class _ProductosPageState extends State<ProductosPage> {
         }
       }
     });
-    setState(() {});
+    if (mounted) setState(() {});
   }
 }

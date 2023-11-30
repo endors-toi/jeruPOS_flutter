@@ -21,8 +21,6 @@ class _ReporteDiarioPageState extends State<ReporteDiarioPage> {
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
           } else {
             return ListView.builder(
               itemCount: snapshot.data.length,
@@ -30,7 +28,19 @@ class _ReporteDiarioPageState extends State<ReporteDiarioPage> {
                 ItemPedido item = snapshot.data[index];
                 if (item.selected) {
                   return ListTile(
-                      leading: Icon(MdiIcons.circle), title: Text(item.nombre));
+                    leading: Icon(MdiIcons.circle),
+                    title: Text(item.nombre),
+                    trailing: InkWell(
+                      child: Icon(MdiIcons.checkCircleOutline),
+                      onTap: () async {
+                        await PedidoDiarioService.patch(
+                            {'selected': false}, item.id);
+                        setState(() {
+                          item.selected = false;
+                        });
+                      },
+                    ),
+                  );
                 }
                 return Container();
               },

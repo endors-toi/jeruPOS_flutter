@@ -9,6 +9,8 @@ class PedidosPage extends StatefulWidget {
   _PedidosPageState createState() => _PedidosPageState();
 }
 
+//TODO: WebSocket
+
 class _PedidosPageState extends State<PedidosPage> {
   List<Pedido> pedidos = [];
   String errorMsg = '';

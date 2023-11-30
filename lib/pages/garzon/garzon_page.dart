@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -18,7 +21,8 @@ class GarzonPage extends StatefulWidget {
 }
 
 class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
-  late WebSocketChannel channel;
+  WebSocketChannel? _channel;
+  Timer? _timer;
   bool ordenarPorNumOrden = true;
   List<Pedido> pedidos = [];
   List<Pedido> pedidosActivos = [];
@@ -30,7 +34,14 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
     super.initState();
     _setOrientation();
     _initializePedidos();
-    _connectToSocket();
+    _connect();
+  }
+
+  @override
+  void dispose() {
+    _timer!.cancel();
+    _channel!.sink.close();
+    super.dispose();
   }
 
   @override
@@ -42,13 +53,7 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
           actions: [
             IconButton(
               onPressed: () {
-                channel.sink.add('{"message": "ping"}');
-              },
-              icon: Icon(MdiIcons.network),
-            ),
-            IconButton(
-              onPressed: () {
-                _connectToSocket();
+                _connect();
               },
               icon: Icon(MdiIcons.reload),
             ),
@@ -120,6 +125,7 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
                                 ),
                         )
                       : MasonryGridView.builder(
+                          //TODO: WebSocket
                           gridDelegate:
                               SliverSimpleGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2),
@@ -194,9 +200,32 @@ class _GarzonPageState extends State<GarzonPage> with TickerProviderStateMixin {
     ]);
   }
 
-  void _connectToSocket() {
-    channel = WebSocketChannel.connect(
+  void _connect() {
+    _channel = WebSocketChannel.connect(
       Uri.parse('ws://' + getServerIP() + '/ws/pedidos/'),
     );
+
+    _timer = Timer.periodic(Duration(seconds: 20), (timer) {
+      _channel!.sink.add(json.encode({"message": "ping"}));
+    });
+
+    _channel!.stream.listen((message) {
+      Map<String, dynamic> data = json.decode(message);
+      if (data['message'] == 'pong') {
+        print(data);
+      }
+      if (data['type'] == 'pedido_update') {
+        if (data['action'] == 'create') {
+          _recibirPedidoNuevo(data['pedido']);
+        }
+        if (data['action'] == 'update') {
+          _recibirPedidoActualizado(data['pedido']);
+        }
+      }
+    });
   }
+
+  void _recibirPedidoNuevo(pedido) {}
+
+  void _recibirPedidoActualizado(pedido) {}
 }

@@ -45,7 +45,8 @@ class _IngredientesPageState extends State<IngredientesPage> {
               ),
             ),
           ]),
-      body: FutureBuilder(
+      body: //TODO: Mostrar alerta cuando stock disponible sea menor a stock crítico
+          FutureBuilder(
         future: _ingredientesFuture,
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
